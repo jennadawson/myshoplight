@@ -259,9 +259,11 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 #vbtn-all{background:var(--teal);color:#fff;}
 #vbtn-uncat{background:var(--rust);color:#fff;}
 #vbtn-excluded{background:#888;color:#fff;}
+#vbtn-locked{background:#1a56a0;color:#fff;}
 .view-btn.active{opacity:1;box-shadow:0 0 0 2px #fff,0 0 0 4px currentColor;}
 #vbtn-all.active{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--teal);}
 #vbtn-uncat.active{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--rust);}
+#vbtn-locked.active{box-shadow:0 0 0 2px #fff,0 0 0 4px #1a56a0;}
 #vbtn-excluded.active{box-shadow:0 0 0 2px #fff,0 0 0 4px #888;}
 
 /* ── ACTION CELL ── */
@@ -297,6 +299,16 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .insight-item .insight-val{font-weight:700;color:var(--teal);}
 .insight-item .insight-up{color:var(--rust);font-weight:700;}
 .insight-item .insight-down{color:var(--olive);font-weight:700;}
+
+/* ── ITEM MANAGER FAQ ── */
+.faq-item{background:#fff;border:1px solid var(--cream2);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+.faq-item:hover{border-color:var(--teal);}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;gap:10px;}
+.faq-arrow{font-size:12px;color:var(--teal);flex-shrink:0;transition:transform .2s;}
+.faq-a{display:none;padding:0 14px 12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--cream2);padding-top:10px;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+.faq-item.open .faq-a{display:block;}
+
 </style>
 </head>
 <body>
@@ -307,10 +319,58 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
 <div class="container">
 
+  <!-- WELCOME / INSTRUCTIONS PANEL -->
+  <div class="upload-panel" id="welcome-panel" style="margin-bottom:1.25rem;">
+    <div onclick="togglePanel('welcome')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;">
+      <div class="panel-title" style="margin-bottom:0;">👋 How to get your Amazon data</div>
+      <div id="welcome-chevron" style="font-size:16px;color:var(--teal);margin-left:12px;transition:transform .25s;">▼</div>
+    </div>
+    <div id="welcome-panel-body" style="margin-top:1.1rem;">
+    <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:1.25rem;">
+      MyShopLight turns your Amazon order history into a clear picture of exactly where your money goes — by category, by year, by audience, and more. To get started, you'll need to download your order data directly from Amazon. Here's how:
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Log into your <strong>Amazon account</strong>.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Go to <strong>Accounts &amp; Lists</strong> → scroll down to <strong>"Manage your data"</strong> → select <strong>"Request your data"</strong>.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Select <strong>"Your Orders"</strong> → click <strong>"Submit Request"</strong>.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Amazon will send a <strong>confirmation email</strong> immediately, then a <strong>download link email within 24–48 hours</strong>.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">5</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file from that email.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
+        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">6</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Open the .zip and find the <strong>"Order History.csv"</strong> — that's the file you'll upload below. ⬇️</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;background:#f0f6f9;border:1px solid #b0d0e0;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--teal);line-height:1.6;">
+      🔒 <strong>Your data stays on your device.</strong> MyShopLight runs entirely in your browser — your order history is never uploaded to any server.
+    </div>
+    </div><!-- end welcome-panel-body -->
+  </div>
+
   <!-- UPLOAD PANEL -->
-  <div class="upload-panel">
-    <div class="panel-title">MyShopLight</div>
-    <div class="panel-sub" id="panel-sub">Upload your Amazon Order History CSV to get started. Your file stays on your device — nothing is sent anywhere.</div>
+  <div class="upload-panel" id="upload-panel">
+    <div onclick="togglePanel('upload')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;">
+      <div>
+        <div class="panel-title" style="margin-bottom:2px;">Upload Order History</div>
+        <div class="panel-sub" id="panel-sub" style="margin-bottom:0;">Upload your Amazon Order History CSV to get started.</div>
+      </div>
+      <div id="upload-chevron" style="font-size:16px;color:var(--teal);margin-left:12px;transition:transform .25s;">▼</div>
+    </div>
+    <div id="upload-panel-body" style="margin-top:1.25rem;">
     <div class="step-box active" id="step2-box" style="max-width:520px;margin:0 auto;text-align:center;">
       <div class="step-title" style="margin-bottom:6px;">Upload Order History</div>
       <div class="step-sub">Upload your Amazon Order History CSV. We'll detect all available years and let you choose which ones to analyze.</div>
@@ -334,6 +394,18 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           </div>
         </div>
 
+        <!-- address filter — only shown when multiple shipping addresses detected -->
+        <div id="address-select-section" style="display:none;margin-bottom:12px;">
+          <div class="year-label" style="text-align:left;margin-bottom:4px;">Filter by shipping address</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">We detected multiple shipping addresses in this file — great for shared accounts across households. Select only the addresses you want included in your dashboard.</div>
+          <div id="addr-toggle-wrap" style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.6;"></div>
+          <div id="address-checkboxes" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+          <div style="display:flex;gap:10px;margin-bottom:4px;">
+            <a onclick="toggleAllAddresses(true)" style="font-size:11px;color:var(--teal);cursor:pointer;text-decoration:underline;">Select all</a>
+            <a onclick="toggleAllAddresses(false)" style="font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;">Deselect all</a>
+          </div>
+        </div>
+
         <div style="margin-bottom:12px;">
           <label style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:4px;">Account label <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional — e.g. Jenna, Nick)</span></label>
           <input type="text" id="upload-label" class="cm-search" placeholder="Leave blank to skip" style="width:100%;font-size:12px;padding:6px 10px;">
@@ -343,6 +415,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         </button>
       </div>
     </div>
+    </div><!-- end upload-panel-body -->
     <div id="sessions" class="sessions"></div>
     <div id="err-box" class="err-box"></div>
     <div id="info-box" class="info-box"></div>
@@ -350,16 +423,16 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
   </div>
 
   <!-- TABS -->
-  <div class="tab-bar" id="tab-bar" style="display:none">
-    <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
-    <div class="tab" onclick="switchTab('manager')" id="manager-tab">
+  <div class="tab-bar" id="tab-bar">
+    <div class="tab active" id="tab-btn-dashboard" onclick="switchTab('dashboard')" style="display:none">Dashboard</div>
+    <div class="tab" id="tab-btn-manager" onclick="switchTab('manager')" style="display:none">
       Item Manager <span class="tab-badge" id="uncat-badge">0</span>
     </div>
-    <div class="tab" onclick="switchTab('catmap')">Category Map</div>
+    <div class="tab active" id="tab-btn-catmap" onclick="switchTab('catmap')">Category Map</div>
   </div>
 
   <!-- DASHBOARD TAB -->
-  <div id="tab-dashboard">
+  <div id="tab-dashboard" style="display:none">
     <!-- Next-steps callout (shown after first upload, dismissed by user) -->
     <div id="next-steps-callout" class="next-steps" style="display:none">
       <div class="next-steps-text" id="next-steps-text"></div>
@@ -465,37 +538,144 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="cm-header">
       <div>
         <div class="cm-title">Item Manager</div>
-        <div class="cm-sub">Review uncategorized items, get AI suggestions, save and export your updated map.</div>
+        <div class="cm-sub">Review and fix item categories, back up your customizations, and get AI help with uncategorized items.</div>
       </div>
       <div class="cm-actions">
         <button class="btn sm teal" onclick="reRunCategorization()" title="Re-apply all keyword rules to every unlocked item — useful after adding new rules">↺ Re-run Rules</button>
-        <button class="btn sm olive" onclick="exportCategoryMap()">Download Updated Map</button>
       </div>
-    </div>
 
-    <!-- AI Suggest bar -->
-    <div class="suggest-bar" id="suggest-bar">
-      <div class="suggest-info">
-        <strong>Get AI Category Suggestions</strong>
-        <small>Download your uncategorized items + a ready-to-use prompt, then paste into Claude or ChatGPT. Import the CSV they return.</small>
+    <!-- FAQ PANEL -->
+    <div style="background:var(--cream);border:1px solid var(--cream2);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+      <div onclick="toggleManagerFAQ()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);">📖 How the Item Manager works</div>
+        <div id="faq-chevron" style="font-size:16px;color:var(--teal);transition:transform .25s;">▼</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn amber sm" onclick="downloadAIPrompt()">⬇ Download Prompt + Items</button>
-        <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--amber);color:var(--amber)">⬆ Import AI Results</button>
-      </div>
-    </div>
+      <div id="manager-faq-body" style="margin-top:1rem;display:none;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
 
-    <!-- Import panel (hidden by default) -->
-    <div id="import-panel" style="display:none;background:#fffbf0;border:1px solid #e8d090;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;">
-      <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--amber);margin-bottom:6px;">Import AI Results</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Paste the CSV that Claude or ChatGPT returned, then click Import. Only valid categories and subcategories will be applied.</div>
-      <textarea id="import-textarea" style="width:100%;height:140px;border:1px solid var(--cream2);border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste the CSV here — it should start with: keyword,category,subcategory,priority"></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-        <button class="btn amber sm" onclick="importAIResults()">Import Suggestions</button>
-        <button class="btn sm outline" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
-        <span id="import-status" style="font-size:12px;color:var(--olive);"></span>
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What is the Item Manager for?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">The Item Manager is where you clean up and improve your spending data. MyShopLight automatically categorizes every purchase using a built-in keyword map but not every item will be matched perfectly. Some will land in "Uncategorized" and some may be assigned to the wrong category. The Item Manager is where you fix those, back up your work, and get AI help with stubborn items. The more accurately your items are categorized, the more useful your dashboard becomes.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What does "Uncategorized" mean?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">When MyShopLight can't find a keyword match for an item, it lands in "Uncategorized." These items still count toward your total spend but won't appear in your category charts or breakdowns which makes your dashboard less accurate. You can fix them one at a time using the dropdowns on each row, or use the AI Suggestions feature in the yellow box above to get bulk recommendations.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">How does automatic categorization work — and what is prioritization?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">When your file is processed, every item title is scanned against a built-in keyword map with over 2,000 rules. Each rule has a priority level that determines which one wins when multiple keywords match the same item:<br><br><strong>Priority 1 — Brand name</strong> (e.g. "Purina", "LEGO") — most specific, wins over everything<br><strong>Priority 2 — Specific phrase</strong> (e.g. "dog food", "yoga mat") — wins over generic terms<br><strong>Priority 3 — Product type</strong> (e.g. "shampoo", "puzzle") — general match<br><strong>Priority 5 — Broad fallback</strong> (e.g. "toy", "book") — last resort<br><br>The longest, most specific match at the highest priority wins. When you add your own keyword rules, you set the priority yourself in the Category Map tab.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">How do I fix a wrong category?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">Find the item in the list and use the Category and Subcategory dropdowns on that row to select the correct values. You can also update the Audience and Spend Type on the same row. Once everything looks right, click the "Save" button — this locks all your selections to that item permanently. Locked items are protected from being overwritten the next time you click "Re-run Rules."</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What does saving an item do?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">When you click Save on an item row, three things happen at once:<br><br>1. Your chosen category, subcategory, audience, and spend type are applied to that item immediately and the dashboard updates right away.<br>2. The item is locked, meaning it won't be touched if you click "Re-run Rules" in the future. Your manual choice always wins.<br>3. If you typed a keyword in the optional keyword field, a new keyword rule is added to your Category Map so future items matching that keyword get categorized the same way automatically.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">How do I add a keyword rule when saving an item?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">When you're ready to save an item, look for the "+ Add keyword rule" link below the Save button. Click it to expand a text field — MyShopLight will pre-fill a suggested keyword based on the item title. You can keep the suggestion or type your own. When you click Save, the keyword rule is added to your Category Map at the same time. Future items containing that keyword will be automatically categorized the same way, so you won't have to fix similar items manually again.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What is the AI suggestion feature and how do I use it?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">The AI feature helps you categorize uncategorized items in bulk without going row by row. Here's the workflow:<br><br>1. Click "Download Prompt + Items" in the yellow box — this downloads a text file containing all your uncategorized item names plus a ready-to-use prompt.<br>2. Open Claude or ChatGPT and paste the entire file contents in.<br>3. The AI will return a CSV of suggested categories.<br>4. Click "Apply AI Suggestions," paste in the CSV, and click Apply — MyShopLight applies all valid suggestions automatically.<br><br>Review anything that doesn't look right afterward and use the Save button to lock any corrections.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">How do I create a new category or subcategory?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">New categories and subcategories are created in the Category Map tab (right next to this one). Click "+ New Category" or "+ New Subcategory" to expand the form, fill in the name, and click Create or Add. Your new category will appear immediately in all dropdowns in the Item Manager. Scroll down to add a specific keyword to your new Category or Subcategory to create a new rule. Note: custom categories are stored in your browser — export your customizations regularly so you don't lose them if you switch devices or download a new version.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What is the Audience feature and how is it assigned?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">Audience tags each item by who the purchase was likely for. The distinctions here are Household, Adult and Kids. It's automatically assigned based on category and subcategory with another layer added for Kids. You can override the audience on any item using the Audience dropdown on that row, then click Save to lock it. Your dashboard shows an Audience breakdown chart so you can see how your spending is split across your household.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What is Spend Type and how is it assigned or changed?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">Spend Type classifies each purchase by how discretionary it is:<br><br><strong>Essential</strong> — things you need (groceries, medicine, household supplies, pet food)<br><strong>Flexible</strong> — useful but not critical (clothing, home goods, personal care, fitness)<br><strong>Discretionary</strong> — wants over needs (entertainment, hobbies, beauty)<br><br>Spend Type is automatically assigned based on category and subcategory. To change it for a specific item, use the Spend Type dropdown on that row and click Save — your override will be locked and protected from re-runs. Your dashboard shows an Essential / Flexible / Discretionary split in the insight strip and charts, making it one of the most useful views for understanding your real spending habits.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">What's the difference between excluding an item and deleting it?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a"><strong>Exclude from analysis</strong> — the item stays in your data but disappears from all dashboard charts, totals, and breakdowns. Use this for purchases that skew your data — a business reimbursement, a gift you bought for someone else, or a return. The item is still there and you can restore it at any time by finding it in the "Excluded Only" view and clicking Restore.<br><br><strong>Delete</strong> — the item is permanently removed from this session. Use this only for true junk data, like a cancelled order that slipped through or a duplicate. Deleted items cannot be recovered without re-uploading your CSV file.<br><br>When in doubt, Exclude rather than Delete.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">Do I need to categorize everything?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">No, but the more you categorize, the more accurate and useful your dashboard becomes. Uncategorized items still count toward your total spend, so your overall numbers are always correct. What you miss out on is the category-level breakdowns, charts, and insights for those items. If you have a large number of uncategorized items, the AI Suggestions feature in the yellow box is the fastest way to get them sorted without going one by one.</div>
+          </div>
+
+          <div class="faq-item" onclick="toggleFAQ(this)">
+            <div class="faq-q">How do I save my work so I don't lose it?<span class="faq-arrow">▼</span></div>
+            <div class="faq-a">Your customizations such as keyword rules, locked items, audience overrides, spend type changes, and excluded items are saved automatically to your browser's local storage. This means they're tied to this specific browser on this specific device. If you open MyShopLight on a different computer, download a new version, or clear your browser data, your customizations will be gone.<br><br>To protect both your work and time, use the "Export My Customizations" button in the teal box above. This downloads a backup file (.json) containing everything you've set up. To restore it on a new device or after downloading a new version, click "Restore My Customizations," paste in the contents of your backup file, and click Restore. It's non-destructive — restoring won't overwrite anything you've already set up on the new device, it only adds what's missing.</div>
+          </div>
+
+        </div>
       </div>
+    </div><!-- end FAQ panel -->
+
+    <!-- TWO-BOX PANEL: Customizations + AI Suggestions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+
+      <!-- BOX 1: Save Customizations -->
+      <div style="background:#f0f8f8;border:2px solid var(--teal);border-radius:14px;padding:1.25rem 1.5rem;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="background:var(--teal);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--teal);">Saving Customizations</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Your custom keyword rules, locked items, audience overrides, and spend type changes are saved to this browser only. Export them as a backup so you never lose your work — and restore them anytime you open MyShopLight on a new device or download a new version.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn sm teal" onclick="exportCustomizations()">💾 Export My Customizations</button>
+          <button class="btn sm outline" onclick="toggleRestorePanel()" style="border-color:var(--teal);color:var(--teal);">↩ Restore My Customizations</button>
+        </div>
+        <!-- Restore panel -->
+        <div id="restore-panel" style="display:none;margin-top:1rem;border-top:1px solid var(--cream2);padding-top:1rem;">
+          <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:6px;">Restore from backup</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the contents of your exported customizations file below, then click Restore.</div>
+          <textarea id="restore-textarea" style="width:100%;height:120px;border:1px solid var(--cream2);border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste your exported customizations JSON here…"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <button class="btn sm teal" onclick="restoreCustomizations()">↩ Restore</button>
+            <button class="btn sm outline" onclick="toggleRestorePanel()">Cancel</button>
+            <span id="restore-status" style="font-size:12px;color:var(--olive);"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOX 2: AI Category Suggestions -->
+      <div style="background:#fffbf0;border:2px solid var(--amber);border-radius:14px;padding:1.25rem 1.5rem;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="background:var(--amber);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--amber);">Get AI Category Suggestions</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Have uncategorized items? Download a prompt file containing all your unmatched purchases and paste it into Claude or ChatGPT. They'll return a CSV of suggested categories — upload it here and MyShopLight applies them automatically. Review anything that doesn't look right afterward.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn amber sm" onclick="downloadAIPrompt()">⬇ Download Prompt + Items</button>
+          <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--amber);color:var(--amber);">⬆ Apply AI Suggestions</button>
+        </div>
+        <!-- AI Import panel -->
+        <div id="import-panel" style="display:none;margin-top:1rem;border-top:1px solid #e8d090;padding-top:1rem;">
+          <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px;">Apply AI suggestions</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the CSV that Claude or ChatGPT returned. Only valid categories and subcategories will be applied.</div>
+          <textarea id="import-textarea" style="width:100%;height:120px;border:1px solid #e8d090;border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste the CSV here — it should start with: keyword,category,subcategory,priority"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <button class="btn amber sm" onclick="importAIResults()">Apply Suggestions</button>
+            <button class="btn sm outline" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
+            <span id="import-status" style="font-size:12px;color:var(--olive);"></span>
+          </div>
+        </div>
+      </div>
+
     </div>
+    <!-- responsive stack on mobile -->
+    <style>@media(max-width:640px){#manager-toolboxes{grid-template-columns:1fr!important;}}</style>
 
     <!-- localStorage persistence notice -->
     <div class="storage-bar" id="storage-bar" style="display:none">
@@ -517,6 +697,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="cm-filters" style="margin-bottom:8px;gap:6px;">
       <button class="view-btn" id="vbtn-all" onclick="setFilterView('all')">Show All</button>
       <button class="view-btn" id="vbtn-uncat" onclick="setFilterView('uncat')">Uncategorized Only</button>
+      <button class="view-btn" id="vbtn-locked" onclick="setFilterView('locked')">🔒 Locked Items</button>
       <button class="view-btn" id="vbtn-excluded" onclick="setFilterView('excluded')">Excluded Only</button>
     </div>
     <div class="cm-filters">
@@ -579,25 +760,19 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </table>
     </div>
 
-    <div class="export-bar">
-      <div class="export-info">
-        <strong>Export your custom keyword rules</strong> — saves the rules you've added here so you can back them up or share them.
-      </div>
-      <button class="btn olive" onclick="exportCategoryMap()">Export My Custom Rules</button>
-    </div>
   </div>
 
+  </div><!-- /tab-manager -->
+
   <!-- CATEGORY MAP TAB -->
-  <div id="tab-catmap" style="display:none">
+  <div id="tab-catmap">
 
     <div class="cm-header">
       <div>
         <div class="cm-title">Category Map</div>
         <div class="cm-sub">2,210 built-in keyword rules are always active. Add your own rules below to improve categorization for items specific to your household. Your additions are saved to your browser automatically.</div>
       </div>
-      <div class="cm-actions">
-        <button class="btn sm olive" onclick="exportCategoryMap()">Export My Custom Rules</button>
-      </div>
+      <div class="cm-actions"></div>
     </div>
 
     <!-- ── SECTION 1: Manage Categories & Subcategories ── -->
@@ -933,7 +1108,8 @@ let uploadedYears = new Set(); // retained for localStorage compatibility
       });
       if(allItems.length > 0){
         rebuildYearFilter();rebuildManagerYearFilter();
-        document.getElementById('tab-bar').style.display='';
+        document.getElementById('tab-btn-dashboard').style.display='';
+        document.getElementById('tab-btn-manager').style.display='';
         document.getElementById('dash-head').style.display='';
         document.getElementById('dash-body').style.display='';
         renderSessionBadges();
@@ -1190,9 +1366,42 @@ function deleteItem(idx){
 let pendingFile = null;
 let detectedYears = []; // years found in the uploaded CSV
 
+function togglePanel(which){
+  const bodyId = which==='welcome' ? 'welcome-panel-body' : 'upload-panel-body';
+  const chevronId = which==='welcome' ? 'welcome-chevron' : 'upload-chevron';
+  const body = document.getElementById(bodyId);
+  const chevron = document.getElementById(chevronId);
+  if(!body) return;
+  const isHidden = body.style.display==='none';
+  body.style.display = isHidden ? '' : 'none';
+  if(chevron) chevron.style.transform = isHidden ? '' : 'rotate(-90deg)';
+}
+
+function collapsePanelsAfterUpload(){
+  ['welcome','upload'].forEach(which=>{
+    const bodyId = which==='welcome' ? 'welcome-panel-body' : 'upload-panel-body';
+    const chevronId = which==='welcome' ? 'welcome-chevron' : 'upload-chevron';
+    const body = document.getElementById(bodyId);
+    const chevron = document.getElementById(chevronId);
+    if(body){ body.style.display='none'; }
+    if(chevron){ chevron.style.transform='rotate(-90deg)'; }
+  });
+}
+
 function toggleAllYears(checked){
   document.querySelectorAll('#year-checkboxes input[type=checkbox]').forEach(cb=>cb.checked=checked);
   updateRunBtn();
+}
+
+function toggleAllAddresses(checked){
+  document.querySelectorAll('#address-checkboxes input[type=checkbox]').forEach(cb=>{
+    cb.checked=checked;
+    const label=cb.closest('label');
+    if(label){
+      label.style.borderColor = checked ? 'var(--teal)' : 'var(--cream2)';
+      label.style.background = checked ? '#f0f8f8' : '#fff';
+    }
+  });
 }
 
 function updateRunBtn(){
@@ -1213,6 +1422,7 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
   const dateCol = headers.find(h=>h==='order date'||h.includes('order date'));
   const titleCol = headers.find(h=>h.includes('product name'));
   const amtCol = headers.find(h=>h==='total amount'||h.includes('total amount'));
+  const addrCol = headers.find(h=>h.includes('shipping address') || h.includes('ship address') || h==='ship to' || h.includes('delivery address'));
 
   if(!titleCol||!amtCol||!dateCol){
     showMsg('err','Could not find required columns. Make sure this is your Amazon Order History CSV export.');
@@ -1220,17 +1430,95 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
   }
 
   const yearSet = new Set();
+  const addressMap = {};
   for(let i=1;i<lines.length;i++){
     const vals=parseCSVLine(lines[i]);if(vals.length<3)continue;
     const row={};headers.forEach((h,idx)=>row[h]=(vals[idx]||'').replace(/"/g,'').trim());
     const d=parseDate(row[dateCol]);
     if(d) yearSet.add(d.getFullYear());
+    if(addrCol && row[addrCol]) addressMap[row[addrCol]] = (addressMap[row[addrCol]]||0)+1;
   }
 
   if(!yearSet.size){ showMsg('err','No valid order dates found in this file.'); return; }
 
   pendingFile = file;
   detectedYears = [...yearSet].sort((a,b)=>a-b);
+
+  // Build address checkboxes (only if multiple addresses found)
+  const addrSection = document.getElementById('address-select-section');
+  const addrContainer = document.getElementById('address-checkboxes');
+  addrContainer.innerHTML = '';
+
+  if(addrCol && Object.keys(addressMap).length > 1){
+    const ADDR_THRESHOLD = 3;
+    const addrCounts = addressMap;
+    const allAddrs = Object.keys(addrCounts).sort();
+    const frequentAddrs = allAddrs.filter(a=>addrCounts[a]>=ADDR_THRESHOLD);
+    const hiddenCount = allAddrs.length - frequentAddrs.length;
+
+    // Store all addresses on the section element for the "show all" toggle
+    addrSection._allAddrs = allAddrs;
+    addrSection._frequentAddrs = frequentAddrs;
+    addrSection._addrCounts = addrCounts;
+    addrSection._showingAll = false;
+
+    function buildAddrCheckboxes(addrsToShow){
+      addrContainer.innerHTML='';
+      addrsToShow.forEach(addr=>{
+        const label = document.createElement('label');
+        label.style.cssText='display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid var(--cream2);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .15s;line-height:1.5;';
+        const cb = document.createElement('input');
+        cb.type='checkbox'; cb.value=addr; cb.checked=true;
+        cb.style.cssText='accent-color:var(--teal);margin-top:2px;flex-shrink:0;';
+        cb.addEventListener('change', ()=>{
+          label.style.borderColor = cb.checked ? 'var(--teal)' : 'var(--cream2)';
+          label.style.background = cb.checked ? '#f0f8f8' : '#fff';
+        });
+        label.style.borderColor='var(--teal)'; label.style.background='#f0f8f8';
+        const textWrap = document.createElement('span');
+        textWrap.style.cssText='display:flex;justify-content:space-between;width:100%;align-items:center;gap:8px;';
+        const addrSpan = document.createElement('span');
+        addrSpan.textContent = addr;
+        const countSpan = document.createElement('span');
+        countSpan.style.cssText='font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0;';
+        countSpan.textContent = `${addrCounts[addr]} order${addrCounts[addr]!==1?'s':''}`;
+        textWrap.appendChild(addrSpan);
+        textWrap.appendChild(countSpan);
+        label.appendChild(cb);
+        label.appendChild(textWrap);
+        addrContainer.appendChild(label);
+      });
+    }
+
+    // Build the show-all toggle link
+    const toggleWrap = document.getElementById('addr-toggle-wrap');
+    if(toggleWrap){
+      if(hiddenCount > 0){
+        toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
+        document.getElementById('addr-show-all-link').addEventListener('click', ()=>{
+          if(!addrSection._showingAll){
+            addrSection._showingAll=true;
+            buildAddrCheckboxes(allAddrs);
+            toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses. <a id="addr-show-freq-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show frequent only (${frequentAddrs.length})</a>`;
+            document.getElementById('addr-show-freq-link').addEventListener('click', ()=>{
+              addrSection._showingAll=false;
+              buildAddrCheckboxes(frequentAddrs);
+              // re-render toggle
+              toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
+              document.getElementById('addr-show-all-link').addEventListener('click', arguments.callee);
+            });
+          }
+        });
+      } else {
+        toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses detected in your file.`;
+      }
+    }
+
+    buildAddrCheckboxes(frequentAddrs.length > 0 ? frequentAddrs : allAddrs);
+    addrSection.style.display = (frequentAddrs.length > 0 ? frequentAddrs : allAddrs).length > 1 ? '' : 'none';
+  } else {
+    addrSection.style.display='none';
+  }
 
   document.getElementById('pending-filename').textContent = file.name;
   document.getElementById('pending-file').style.display = '';
@@ -1283,6 +1571,13 @@ async function runProcessing(){
   const dateCol=headers.find(h=>h==='order date'||h.includes('order date'));
   const statusCol=headers.find(h=>h.includes('order status'));
   const orderIdCol=headers.find(h=>h==='order id'||h.includes('order id'));
+  const addrCol=headers.find(h=>h.includes('shipping address')||h.includes('ship address')||h==='ship to'||h.includes('delivery address'));
+
+  // Get selected addresses (null = no filter / section hidden)
+  const addrSection = document.getElementById('address-select-section');
+  const selectedAddresses = addrSection.style.display !== 'none'
+    ? new Set([...document.querySelectorAll('#address-checkboxes input[type=checkbox]')].filter(cb=>cb.checked).map(cb=>cb.value))
+    : null;
 
   const rules=buildRuleSet();
   const items=[];let skipped=0;
@@ -1291,6 +1586,7 @@ async function runProcessing(){
     const row={};headers.forEach((h,idx)=>row[h]=(vals[idx]||'').replace(/"/g,'').trim());
     const d=parseDate(row[dateCol]);
     if(!d||!selectedYears.has(d.getFullYear()))continue;
+    if(selectedAddresses && addrCol && !selectedAddresses.has(row[addrCol]||''))continue;
     const amt=parseFloat((row[amtCol]||'').replace(/[$,]/g,''));
     if(isNaN(amt)||amt<=0)continue;
     if((row[statusCol]||'').toLowerCase().includes('cancel'))continue;
@@ -1363,9 +1659,11 @@ async function runProcessing(){
   allItems=[...allItems,...dedupedItems];
 
   renderSessionBadges();rebuildYearFilter();rebuildManagerYearFilter();
-  document.getElementById('tab-bar').style.display='';
+  document.getElementById('tab-btn-dashboard').style.display='';
+  document.getElementById('tab-btn-manager').style.display='';
   document.getElementById('dash-head').style.display='';
   document.getElementById('dash-body').style.display='';
+  switchTab('dashboard');
   renderDash();updateUncatBadge();
 
   const pct=Math.round((1-skipped/dedupedItems.length)*100);
@@ -1378,11 +1676,17 @@ async function runProcessing(){
   // show next-steps callout
   showNextSteps();
 
+  // collapse welcome + upload panels to free up screen real estate
+  collapsePanelsAfterUpload();
+
   // Reset for possible additional upload
   pendingFile=null;
   detectedYears=[];
   document.getElementById('pending-file').style.display='none';
   document.getElementById('pending-filename').textContent='';
+  document.getElementById('address-checkboxes').innerHTML='';
+  document.getElementById('addr-toggle-wrap').innerHTML='';
+  document.getElementById('address-select-section').style.display='none';
   document.getElementById('year-checkboxes').innerHTML='';
   document.getElementById('year-select-section').style.display='none';
   document.getElementById('upload-label').value='';
@@ -1392,8 +1696,11 @@ async function runProcessing(){
 
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>
-    t.classList.toggle('active',(tab==='dashboard'&&i===0)||(tab==='manager'&&i===1)||(tab==='catmap'&&i===2)));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const activeBtn = document.getElementById(
+    tab==='dashboard'?'tab-btn-dashboard':tab==='manager'?'tab-btn-manager':'tab-btn-catmap'
+  );
+  if(activeBtn) activeBtn.classList.add('active');
   document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'':'none';
   document.getElementById('tab-manager').style.display=tab==='manager'?'':'none';
   document.getElementById('tab-catmap').style.display=tab==='catmap'?'':'none';
@@ -1404,7 +1711,7 @@ function switchTab(tab){
 function updateUncatBadge(){
   const n=managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat).length;
   document.getElementById('uncat-badge').textContent=n;
-  document.getElementById('manager-tab').style.color=n>0?'var(--rust)':'';
+  const mt=document.getElementById('tab-btn-manager'); if(mt) mt.style.color=n>0?'var(--rust)':'';
 }
 
 // ── SESSIONS ───────────────────────────────────────────────────────────────
@@ -1417,12 +1724,14 @@ function renderSessionBadges(){
 function removeSession(idx){
   sessions.splice(idx,1);sessionItems.splice(idx,1);allItems=sessionItems.flat();
   if(!sessions.length){
-    document.getElementById('tab-bar').style.display='none';
+    document.getElementById('tab-btn-dashboard').style.display='none';
+    document.getElementById('tab-btn-manager').style.display='none';
     document.getElementById('dash-head').style.display='none';
     document.getElementById('dash-body').style.display='none';
-    document.getElementById('tab-dashboard').style.display='';
+    document.getElementById('tab-dashboard').style.display='none';
     document.getElementById('tab-manager').style.display='none';
-    document.getElementById('tab-catmap').style.display='none';
+    document.getElementById('tab-catmap').style.display='';
+    document.getElementById('tab-btn-catmap').classList.add('active');
     Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
     managerItems=[];
   }
@@ -1734,7 +2043,7 @@ function setManagerSort(col){
 
 function renderManager(){
   // update active view button
-  ['all','uncat','excluded'].forEach(v=>{
+  ['all','uncat','locked','excluded'].forEach(v=>{
     const btn=document.getElementById(`vbtn-${v}`);
     if(btn) btn.classList.toggle('active', filterView===v);
   });
@@ -1748,6 +2057,7 @@ function renderManager(){
   let visible=managerItems;
   if(filterView==='uncat')visible=visible.filter(m=>m.cat==='Uncategorized'&&!m.excluded);
   else if(filterView==='excluded')visible=visible.filter(m=>m.excluded);
+  else if(filterView==='locked')visible=visible.filter(m=>m.pinned&&!m.excluded);
   else visible=visible.filter(m=>!m.excluded); // 'all' hides excluded by default
   if(search)visible=visible.filter(m=>m.title.toLowerCase().includes(search));
   if(yearFilter!=='all')visible=visible.filter(m=>m.year===yearFilter);
@@ -1810,6 +2120,7 @@ function renderManager(){
   const tbody=document.getElementById('manager-tbody');
   if(!visible.length){
     const msg = filterView==='uncat' ? 'All items are categorized! 🎉'
+              : filterView==='locked' ? 'No locked items yet. Save any item to lock it — locked items are protected from re-runs.'
               : filterView==='excluded' ? 'No excluded items. Use ⊘ on any row to exclude reimbursed or irrelevant purchases.'
               : 'No items match your search.';
     tbody.innerHTML=`<tr><td colspan="10" class="empty-state">${msg}</td></tr>`;
@@ -1843,14 +2154,9 @@ function renderManager(){
     // audience display (read-only pill + editable dropdown)
     const audLocked = item.audLocked;
     const audVal = item.aud || getAudience(effectiveCat, item.title);
-    const audCell = `<div style="display:flex;flex-direction:column;gap:3px;">
-        <select class="cell-sel" onchange="setAudience(${gi},this.value)" style="font-size:11px;" ${item.pinned&&audLocked?'disabled':''}>
+    const audCell = `<select class="cell-sel" onchange="setAudience(${gi},this.value)" style="font-size:11px;" ${item.pinned&&audLocked?'disabled':''}>
           ${VALID_AUDS.map(a=>`<option value="${a}" ${audVal===a?'selected':''}>${a}</option>`).join('')}
-        </select>
-        <button class="lock-btn${audLocked?' locked':''}" onclick="toggleAudLock(${gi})" style="font-size:10px;padding:2px 6px;" title="${audLocked?'Unlock audience':'Lock audience'}">
-          ${audLocked?'\uD83D\uDD12 Locked':'Lock'}
-        </button>
-      </div>`;
+        </select>`;
 
     // spend type display
     const stVal=item.stype||getSpendType(item.cat,item.matchedSub||'');
@@ -1871,19 +2177,17 @@ function renderManager(){
         <button class="lock-btn locked" onclick="togglePin(${gi})" style="font-size:11px;padding:4px 8px;">Unlock Item</button>
       </div>`;
     } else {
-      const needsCat = !currentCat || currentCat==='Uncategorized';
+      const hasCat=(item.userCat||item.cat)&&(item.userCat||item.cat)!=='Uncategorized';
       actionCell=`<div style="display:flex;flex-direction:column;gap:4px;">
-        <select class="action-sel" id="act-sel-${gi}" onchange="onActionChange(${gi})">
-          <option value="">— Choose action —</option>
-          <option value="lock">Update this item only</option>
-          <option value="rule">Update &amp; create keyword rule</option>
-          <option value="exclude">Exclude from analysis</option>
-          <option value="delete">Delete item</option>
-        </select>
-        <div id="act-kw-wrap-${gi}" style="display:none;">
-          <input class="action-kw" id="act-kw-${gi}" type="text" placeholder="Keyword (e.g. yoga mat)">
+        <button class="btn sm teal" onclick="saveItemFull(${gi})" ${hasCat?'':'disabled'} title="Save & lock all selections for this item — protects from re-runs" style="width:100%;">🔒 Save</button>
+        <div id="kw-toggle-wrap-${gi}">
+          <a onclick="toggleKwField(${gi})" style="font-size:11px;color:var(--teal);cursor:pointer;text-decoration:underline;display:block;text-align:center;margin-top:1px;">+ Add keyword rule</a>
         </div>
-        <button class="action-apply" id="act-btn-${gi}" onclick="applyItemAction(${gi})" disabled>Apply</button>
+        <div id="kw-field-wrap-${gi}" style="display:none;">
+          <input class="action-kw" id="item-kw-${gi}" type="text" placeholder="e.g. yoga mat" style="margin-bottom:3px;">
+          <div style="font-size:10px;color:var(--muted);line-height:1.4;">Future items matching this keyword will auto-categorize the same way.</div>
+        </div>
+        <button class="btn sm outline" onclick="showExcludeConfirm(${gi})" style="width:100%;font-size:11px;">⊘ Exclude / Delete</button>
       </div>`;
     }
 
@@ -1991,6 +2295,85 @@ function toggleStypeLock(idx){
   renderManager();
   showMsg(item.stypeLocked?'success':'info',
     item.stypeLocked?`Spend type locked to "${item.stype}" for this item.`:'Spend type unlocked — category default will apply.');
+}
+
+function toggleKwField(idx){
+  const wrap = document.getElementById(`kw-field-wrap-${idx}`);
+  const toggle = document.getElementById(`kw-toggle-wrap-${idx}`);
+  if(!wrap) return;
+  const opening = wrap.style.display === 'none';
+  wrap.style.display = opening ? '' : 'none';
+  if(toggle) toggle.querySelector('a').textContent = opening ? '− Remove keyword rule' : '+ Add keyword rule';
+  if(opening){
+    const kw = document.getElementById(`item-kw-${idx}`);
+    if(kw && !kw.value){
+      kw.value = suggestKeyword(managerItems[idx].title);
+    }
+    if(kw) kw.focus();
+  }
+}
+
+function saveItemFull(idx){
+  const item=managerItems[idx];
+  const cat=item.userCat||item.cat;
+  const sub=item.userSub||item.matchedSub||'';
+  if(!cat||cat==='Uncategorized'){showMsg('err','Select a category before saving.');return;}
+  const key=overrideKey(item.title);
+
+  // Save category override (locks against re-runs)
+  overrides[key]={cat,sub};
+  item.pinned=true;
+  item.cat=cat;
+  item.matchedSub=sub;
+
+  // Save audience override if changed from auto
+  const autoAud=getAudience(cat,item.title);
+  if(item.aud && item.aud!==autoAud){
+    audOverrides[key]=item.aud;
+    item.audLocked=true;
+    try{localStorage.setItem(STORAGE_KEY_AUD_OV,JSON.stringify(audOverrides));}catch(e){}
+  }
+
+  // Save spend type override if changed from category default
+  const autoStype=getSpendType(cat,sub);
+  if(item.stype && item.stype!==autoStype){
+    stypeOverrides[key]=item.stype;
+    item.stypeLocked=true;
+    try{localStorage.setItem(STORAGE_KEY_STYPE_OV,JSON.stringify(stypeOverrides));}catch(e){}
+  }
+
+  // Update all matching items in allItems
+  allItems.forEach(ai=>{
+    if(overrideKey(ai.title)===key){
+      ai.cat=cat; ai.subcat=sub;
+      if(item.audLocked) ai.aud=item.aud;
+      else ai.aud=getAudience(cat,ai.title);
+      if(item.stypeLocked) ai.stype=item.stype;
+    }
+  });
+
+  item.userKw=''; item.userCat=''; item.userSub=''; item.suggested=false;
+
+  // Save keyword rule if user entered one
+  const kwInput = document.getElementById(`item-kw-${idx}`);
+  const kw = kwInput ? kwInput.value.trim().toLowerCase() : '';
+  if(kw){
+    const exists=[...categoryRules,...newRules].some(r=>r.kw===kw);
+    if(exists){
+      showMsg('err',`Keyword "${kw}" already exists in the map — item saved but keyword rule skipped.`);
+    } else {
+      const wordCount = kw.split(/\s+/).length;
+      const pri = wordCount===1 ? 1 : wordCount>=2 ? 2 : 3;
+      newRules.push({kw, cat, sub, pri, len:kw.length});
+      try{localStorage.setItem(STORAGE_KEY_NEW,JSON.stringify(newRules));}catch(e){}
+      updateStorageBar();
+    }
+  }
+
+  try{localStorage.setItem(STORAGE_KEY_OVERRIDES,JSON.stringify(overrides));}catch(e){}
+  updateStorageBar(); updateUncatBadge(); renderManager(); renderDash();
+  saveSessionData();
+  showMsg('success',`🔒 Saved & locked — "${cat}"${item.audLocked?' · '+item.aud:''}${item.stypeLocked?' · '+item.stype:''}${kw?' · keyword rule added: "'+kw+'"':''}`);
 }
 
 function saveItem(idx){
@@ -2222,25 +2605,30 @@ function renderDash(){
     const yrSel = getMsYearSelections();   // null = all years
     const moSel = getMsMonthSelections();  // null = all months
 
-    // Only show insights when not filtered to specific months
-    if(moSel && moSel.size > 0){ strip.style.display='none'; return; }
-
-    // Insight 1: year-over-year comparison (only when viewing all years)
-    if(!yrSel){
-      const yearTotals = {};
-      allItems.forEach(i=>{ yearTotals[i.year]=(yearTotals[i.year]||0)+i.amount; });
-      const sortedYears = Object.keys(yearTotals).sort();
-      if(sortedYears.length >= 2){
-        const latestYr = sortedYears[sortedYears.length-1];
-        const prevYr = sortedYears[sortedYears.length-2];
-        const latestAmt = yearTotals[latestYr];
-        const prevAmt = yearTotals[prevYr];
+    // Insight 1: month-over-month comparison using all data (always shown regardless of filter)
+    (function(){
+      const MONTH_NAMES = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const monthTotals = {};
+      allItems.forEach(i=>{
+        const key = `${i.year}-${String(i.month).padStart(2,'0')}`;
+        monthTotals[key] = (monthTotals[key]||0) + i.amount;
+      });
+      const sortedMonths = Object.keys(monthTotals).sort();
+      if(sortedMonths.length >= 2){
+        const latestKey = sortedMonths[sortedMonths.length-1];
+        const prevKey = sortedMonths[sortedMonths.length-2];
+        const latestAmt = monthTotals[latestKey];
+        const prevAmt = monthTotals[prevKey];
         const pctChange = Math.round(((latestAmt - prevAmt) / prevAmt) * 100);
         const dir = pctChange >= 0 ? 'up' : 'down';
         const arrow = pctChange >= 0 ? '↑' : '↓';
-        insights.push(`<div class="insight-item"><span class="insight-${dir}" style="font-size:17px;">${arrow} ${Math.abs(pctChange)}% vs ${prevYr}</span><br>You spent <span class="insight-val">${fmt(latestAmt)}</span> in ${latestYr} vs <span class="insight-val">${fmt(prevAmt)}</span> in ${prevYr}</div>`);
+        const [latestYr, latestMo] = latestKey.split('-');
+        const [prevYr, prevMo] = prevKey.split('-');
+        const latestLabel = `${MONTH_NAMES[parseInt(latestMo)]} ${latestYr}`;
+        const prevLabel = `${MONTH_NAMES[parseInt(prevMo)]} ${prevYr}`;
+        insights.push(`<div class="insight-item"><span class="insight-${dir}" style="font-size:17px;">${arrow} ${Math.abs(pctChange)}% vs ${prevLabel}</span><br>You spent <span class="insight-val">${fmt(latestAmt)}</span> in ${latestLabel} vs <span class="insight-val">${fmt(prevAmt)}</span> in ${prevLabel}</div>`);
       }
-    }
+    })();
 
     // Insight 2: avg order vs overall (only when filtered to specific years)
     if(yrSel && yrSel.size === 1){
@@ -3073,6 +3461,123 @@ function renderCatMap(){
   }).join('');
 }
 
+
+
+// ── CUSTOMIZATIONS EXPORT / RESTORE ───────────────────────────────────────
+function exportCustomizations(){
+  const data = {
+    version: 1,
+    exported: new Date().toISOString(),
+    newRules: newRules,
+    overrides: overrides,
+    audOverrides: audOverrides,
+    stypeOverrides: stypeOverrides,
+    excludedItems: [...excludedItems],
+    catStructure: (() => {
+      const custom = {};
+      Object.entries(CAT_SUBS).forEach(([cat, subs]) => {
+        // Only export user-added structure (not in original)
+        const origSubs = (window._ORIG_CAT_SUBS || {})[cat];
+        if (!origSubs) { custom[cat] = subs; return; }
+        const added = subs.filter(s => !origSubs.includes(s));
+        if (added.length) custom[cat] = added;
+      });
+      return custom;
+    })()
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `MyShopLight_customizations_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showMsg('success', `💾 Customizations exported — ${newRules.length} keyword rules, ${Object.keys(overrides).length} locked items saved.`);
+}
+
+function toggleRestorePanel(){
+  const panel = document.getElementById('restore-panel');
+  if(!panel) return;
+  const opening = panel.style.display === 'none';
+  panel.style.display = opening ? '' : 'none';
+  if(opening){ document.getElementById('restore-textarea').value=''; document.getElementById('restore-status').textContent=''; }
+}
+
+function restoreCustomizations(){
+  const raw = (document.getElementById('restore-textarea').value || '').trim();
+  if(!raw){ showMsg('err', 'Paste your exported customizations JSON first.'); return; }
+  let data;
+  try { data = JSON.parse(raw); } catch(e) { showMsg('err', 'Invalid file — make sure you pasted the full contents of your exported .json file.'); return; }
+
+  let restored = [];
+
+  if(data.newRules && Array.isArray(data.newRules)){
+    const existingKws = new Set([...categoryRules, ...newRules].map(r => r.kw));
+    let added = 0;
+    data.newRules.forEach(r => {
+      if(r.kw && !existingKws.has(r.kw)){ newRules.push(r); existingKws.add(r.kw); added++; }
+    });
+    if(added) restored.push(`${added} keyword rules`);
+    try{ localStorage.setItem(STORAGE_KEY_NEW, JSON.stringify(newRules)); }catch(e){}
+  }
+
+  if(data.overrides && typeof data.overrides === 'object'){
+    let added = 0;
+    Object.entries(data.overrides).forEach(([k,v]) => { if(!overrides[k]){ overrides[k]=v; added++; } });
+    if(added) restored.push(`${added} locked items`);
+    try{ localStorage.setItem(STORAGE_KEY_OVERRIDES, JSON.stringify(overrides)); }catch(e){}
+  }
+
+  if(data.audOverrides && typeof data.audOverrides === 'object'){
+    Object.entries(data.audOverrides).forEach(([k,v]) => { audOverrides[k]=v; });
+    try{ localStorage.setItem(STORAGE_KEY_AUD_OV, JSON.stringify(audOverrides)); }catch(e){}
+  }
+
+  if(data.stypeOverrides && typeof data.stypeOverrides === 'object'){
+    Object.entries(data.stypeOverrides).forEach(([k,v]) => { stypeOverrides[k]=v; });
+    try{ localStorage.setItem(STORAGE_KEY_STYPE_OV, JSON.stringify(stypeOverrides)); }catch(e){}
+  }
+
+  if(data.excludedItems && Array.isArray(data.excludedItems)){
+    data.excludedItems.forEach(k => excludedItems.add(k));
+    try{ localStorage.setItem(STORAGE_KEY_EXCLUDED, JSON.stringify([...excludedItems])); }catch(e){}
+  }
+
+  if(data.catStructure && typeof data.catStructure === 'object'){
+    Object.entries(data.catStructure).forEach(([cat, subs]) => {
+      if(!CAT_SUBS[cat]) CAT_SUBS[cat] = [];
+      subs.forEach(s => { if(!CAT_SUBS[cat].includes(s)) CAT_SUBS[cat].push(s); });
+    });
+    try{ localStorage.setItem(STORAGE_KEY_STRUCTURE, JSON.stringify(data.catStructure)); }catch(e){}
+  }
+
+  updateStorageBar();
+  if(allItems.length) { renderManager(); renderDash(); }
+
+  const status = document.getElementById('restore-status');
+  if(status) status.textContent = restored.length ? `✅ Restored: ${restored.join(', ')}` : 'Nothing new to restore.';
+
+  if(restored.length) showMsg('success', `↩ Customizations restored — ${restored.join(', ')}.`);
+  else showMsg('info', 'Nothing new to restore — your current setup already has all these customizations.');
+}
+
+// ── INIT CATMAP ON DOM READY ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  renderCatMap();
+});
+
+function toggleManagerFAQ(){
+  const body = document.getElementById('manager-faq-body');
+  const chevron = document.getElementById('faq-chevron');
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? '' : 'none';
+  if(chevron) chevron.style.transform = isHidden ? '' : 'rotate(-90deg)';
+}
+
+function toggleFAQ(el){
+  el.classList.toggle('open');
+}
 
 </script>
 </body>
