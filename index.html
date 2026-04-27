@@ -332,27 +332,15 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Log into your <strong>Amazon account</strong>.</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Log into your <strong>Amazon account</strong>, then <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600;text-decoration:underline;">click this link</a> and submit your data request.</div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Go to <strong>Accounts &amp; Lists</strong> → scroll down to <strong>"Manage your data"</strong> → select <strong>"Request your data"</strong>.</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Amazon will email you immediately — open it and click the <strong>"Confirm Data Request"</strong> button. Once confirmed, they'll send a second email with your <strong>download link typically within 24–48 hours</strong>.</div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Select <strong>"Your Orders"</strong> → click <strong>"Submit Request"</strong>.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
-        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Amazon will send a <strong>confirmation email</strong> immediately, then a <strong>download link email within 24–48 hours</strong>.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
-        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">5</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file from that email.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
-        <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">6</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Open the .zip and find the <strong>"Order History.csv"</strong> — that's the file you'll upload below. ⬇️</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file, open it, and find the <strong>"Order History.csv"</strong> — that's the file you'll upload below. ⬇️</div>
       </div>
     </div>
     <div style="margin-top:1rem;background:#f0f6f9;border:1px solid #b0d0e0;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--teal);line-height:1.6;">
@@ -1389,13 +1377,32 @@ function collapsePanelsAfterUpload(){
 }
 
 function toggleAllYears(checked){
-  document.querySelectorAll('#year-checkboxes input[type=checkbox]').forEach(cb=>cb.checked=checked);
+  document.querySelectorAll('#year-checkboxes input[type=checkbox]').forEach(cb=>{
+    cb.checked=checked;
+    const label=cb.closest('label');
+    if(label){
+      label.style.background = checked ? 'var(--teal)' : 'var(--cream2)';
+      label.style.color = checked ? '#fff' : '';
+      label.style.borderColor = checked ? 'var(--teal)' : 'var(--cream2)';
+    }
+  });
   updateRunBtn();
+  // Refresh addresses to match the currently selected years
+  const addrSection = document.getElementById('address-select-section');
+  if(addrSection && typeof addrSection._rerender === 'function'){
+    addrSection._rerender();
+  }
 }
 
 function toggleAllAddresses(checked){
+  const addrSection = document.getElementById('address-select-section');
   document.querySelectorAll('#address-checkboxes input[type=checkbox]').forEach(cb=>{
     cb.checked=checked;
+    // Keep the userUnchecked set in sync so year-driven re-renders preserve intent
+    if(addrSection && addrSection._userUnchecked){
+      if(checked) addrSection._userUnchecked.delete(cb.value);
+      else addrSection._userUnchecked.add(cb.value);
+    }
     const label=cb.closest('label');
     if(label){
       label.style.borderColor = checked ? 'var(--teal)' : 'var(--cream2)';
@@ -1430,13 +1437,19 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
   }
 
   const yearSet = new Set();
-  const addressMap = {};
+  const addressMap = {}; // { address: { byYear: {2020: 5, 2021: 3}, total: 8 } }
   for(let i=1;i<lines.length;i++){
     const vals=parseCSVLine(lines[i]);if(vals.length<3)continue;
     const row={};headers.forEach((h,idx)=>row[h]=(vals[idx]||'').replace(/"/g,'').trim());
     const d=parseDate(row[dateCol]);
     if(d) yearSet.add(d.getFullYear());
-    if(addrCol && row[addrCol]) addressMap[row[addrCol]] = (addressMap[row[addrCol]]||0)+1;
+    if(addrCol && row[addrCol] && d){
+      const addr = row[addrCol];
+      const yr = d.getFullYear();
+      if(!addressMap[addr]) addressMap[addr] = { byYear: {}, total: 0 };
+      addressMap[addr].byYear[yr] = (addressMap[addr].byYear[yr]||0) + 1;
+      addressMap[addr].total += 1;
+    }
   }
 
   if(!yearSet.size){ showMsg('err','No valid order dates found in this file.'); return; }
@@ -1451,30 +1464,47 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
 
   if(addrCol && Object.keys(addressMap).length > 1){
     const ADDR_THRESHOLD = 3;
-    const addrCounts = addressMap;
-    const allAddrs = Object.keys(addrCounts).sort();
-    const frequentAddrs = allAddrs.filter(a=>addrCounts[a]>=ADDR_THRESHOLD);
-    const hiddenCount = allAddrs.length - frequentAddrs.length;
 
-    // Store all addresses on the section element for the "show all" toggle
-    addrSection._allAddrs = allAddrs;
-    addrSection._frequentAddrs = frequentAddrs;
-    addrSection._addrCounts = addrCounts;
+    // Store full data on the section for later re-filtering
+    addrSection._addressMap = addressMap;
+    addrSection._addrCol = addrCol;
+    addrSection._addrThreshold = ADDR_THRESHOLD;
     addrSection._showingAll = false;
+    addrSection._userUnchecked = new Set(); // remember which addresses the user manually unchecked
 
-    function buildAddrCheckboxes(addrsToShow){
+    function getFilteredAddrCounts(selectedYears){
+      // Compute address counts filtered by currently-selected years.
+      // If selectedYears is null/empty, return all.
+      const filtered = {};
+      Object.keys(addressMap).forEach(addr=>{
+        if(!selectedYears || selectedYears.size===0){
+          filtered[addr] = addressMap[addr].total;
+        } else {
+          let sum = 0;
+          selectedYears.forEach(yr=>{ sum += (addressMap[addr].byYear[yr]||0); });
+          if(sum > 0) filtered[addr] = sum;
+        }
+      });
+      return filtered;
+    }
+
+    function buildAddrCheckboxes(addrsToShow, addrCounts){
       addrContainer.innerHTML='';
       addrsToShow.forEach(addr=>{
         const label = document.createElement('label');
         label.style.cssText='display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid var(--cream2);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .15s;line-height:1.5;';
         const cb = document.createElement('input');
-        cb.type='checkbox'; cb.value=addr; cb.checked=true;
+        cb.type='checkbox'; cb.value=addr;
+        cb.checked = !addrSection._userUnchecked.has(addr);
         cb.style.cssText='accent-color:var(--teal);margin-top:2px;flex-shrink:0;';
         cb.addEventListener('change', ()=>{
           label.style.borderColor = cb.checked ? 'var(--teal)' : 'var(--cream2)';
           label.style.background = cb.checked ? '#f0f8f8' : '#fff';
+          if(cb.checked) addrSection._userUnchecked.delete(addr);
+          else addrSection._userUnchecked.add(addr);
         });
-        label.style.borderColor='var(--teal)'; label.style.background='#f0f8f8';
+        label.style.borderColor = cb.checked ? 'var(--teal)' : 'var(--cream2)';
+        label.style.background = cb.checked ? '#f0f8f8' : '#fff';
         const textWrap = document.createElement('span');
         textWrap.style.cssText='display:flex;justify-content:space-between;width:100%;align-items:center;gap:8px;';
         const addrSpan = document.createElement('span');
@@ -1490,34 +1520,65 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
       });
     }
 
-    // Build the show-all toggle link
-    const toggleWrap = document.getElementById('addr-toggle-wrap');
-    if(toggleWrap){
-      if(hiddenCount > 0){
-        toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
-        document.getElementById('addr-show-all-link').addEventListener('click', ()=>{
-          if(!addrSection._showingAll){
-            addrSection._showingAll=true;
-            buildAddrCheckboxes(allAddrs);
-            toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses. <a id="addr-show-freq-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show frequent only (${frequentAddrs.length})</a>`;
-            document.getElementById('addr-show-freq-link').addEventListener('click', ()=>{
-              addrSection._showingAll=false;
-              buildAddrCheckboxes(frequentAddrs);
-              // re-render toggle
-              toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
-              document.getElementById('addr-show-all-link').addEventListener('click', arguments.callee);
-            });
-          }
-        });
-      } else {
-        toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses detected in your file.`;
+    // Main render function — called on initial load and whenever years change
+    function renderAddressesForSelectedYears(){
+      const selectedYears = new Set(
+        [...document.querySelectorAll('#year-checkboxes input[type=checkbox]')]
+          .filter(cb=>cb.checked).map(cb=>parseInt(cb.value))
+      );
+      const addrCounts = getFilteredAddrCounts(selectedYears);
+      const allAddrs = Object.keys(addrCounts).sort();
+      const frequentAddrs = allAddrs.filter(a=>addrCounts[a]>=ADDR_THRESHOLD);
+      const hiddenCount = allAddrs.length - frequentAddrs.length;
+
+      // Update stored references
+      addrSection._allAddrs = allAddrs;
+      addrSection._frequentAddrs = frequentAddrs;
+      addrSection._addrCounts = addrCounts;
+
+      // Hide the whole section if 0 or 1 address remains after year filter
+      if(allAddrs.length <= 1){
+        addrSection.style.display='none';
+        return;
+      }
+      addrSection.style.display='';
+
+      // Decide which list to show based on toggle state
+      const addrsToShow = addrSection._showingAll
+        ? allAddrs
+        : (frequentAddrs.length > 0 ? frequentAddrs : allAddrs);
+
+      buildAddrCheckboxes(addrsToShow, addrCounts);
+
+      // Rebuild the toggle link
+      const toggleWrap = document.getElementById('addr-toggle-wrap');
+      if(toggleWrap){
+        if(hiddenCount > 0 && !addrSection._showingAll){
+          toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
+          document.getElementById('addr-show-all-link').addEventListener('click', ()=>{
+            addrSection._showingAll = true;
+            renderAddressesForSelectedYears();
+          });
+        } else if(addrSection._showingAll && frequentAddrs.length < allAddrs.length){
+          toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses. <a id="addr-show-freq-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show frequent only (${frequentAddrs.length})</a>`;
+          document.getElementById('addr-show-freq-link').addEventListener('click', ()=>{
+            addrSection._showingAll = false;
+            renderAddressesForSelectedYears();
+          });
+        } else {
+          toggleWrap.innerHTML=`Showing all ${allAddrs.length} addresses detected in your file.`;
+        }
       }
     }
 
-    buildAddrCheckboxes(frequentAddrs.length > 0 ? frequentAddrs : allAddrs);
-    addrSection.style.display = (frequentAddrs.length > 0 ? frequentAddrs : allAddrs).length > 1 ? '' : 'none';
+    // Expose so the year-checkbox change handler can call it
+    addrSection._rerender = renderAddressesForSelectedYears;
+
+    // Initial render (all years selected by default at this point)
+    renderAddressesForSelectedYears();
   } else {
     addrSection.style.display='none';
+    addrSection._rerender = null;
   }
 
   document.getElementById('pending-filename').textContent = file.name;
@@ -1538,6 +1599,11 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
       label.style.color = cb.checked ? '#fff' : '';
       label.style.borderColor = cb.checked ? 'var(--teal)' : 'var(--cream2)';
       updateRunBtn();
+      // Refresh addresses to match the currently selected years
+      const addrSection = document.getElementById('address-select-section');
+      if(addrSection && typeof addrSection._rerender === 'function'){
+        addrSection._rerender();
+      }
     });
     label.style.background='var(--teal)'; label.style.color='#fff'; label.style.borderColor='var(--teal)';
     label.appendChild(cb);
