@@ -340,7 +340,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file, open it, and find the <strong>"Order History.csv"</strong> — that's the file you'll upload below. ⬇️</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file and open it. The two files you'll need are <strong>"Order History.csv"</strong> (in the <em>Your Amazon Orders</em> folder) and optionally <strong>"Refund Details.csv"</strong> (in the <em>Your Returns &amp; Refunds</em> folder, only needed if you want returned items excluded). Upload them below. ⬇️</div>
       </div>
     </div>
     <div style="margin-top:1rem;background:#f0f6f9;border:1px solid #b0d0e0;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--teal);line-height:1.6;">
@@ -353,17 +353,27 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
   <div class="upload-panel" id="upload-panel">
     <div onclick="togglePanel('upload')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;">
       <div>
-        <div class="panel-title" style="margin-bottom:2px;">Upload Order History</div>
-        <div class="panel-sub" id="panel-sub" style="margin-bottom:0;">Upload your Amazon Order History CSV to get started.</div>
+        <div class="panel-title" style="margin-bottom:2px;">Upload Your Amazon Files</div>
+        <div class="panel-sub" id="panel-sub" style="margin-bottom:0;">Upload your Order History CSV (and optionally your Refund Details CSV) to get started.</div>
       </div>
       <div id="upload-chevron" style="font-size:16px;color:var(--teal);margin-left:12px;transition:transform .25s;">▼</div>
     </div>
     <div id="upload-panel-body" style="margin-top:1.25rem;">
     <div class="step-box active" id="step2-box" style="max-width:520px;margin:0 auto;text-align:center;">
-      <div class="step-title" style="margin-bottom:6px;">Upload Order History</div>
-      <div class="step-sub">Upload your Amazon Order History CSV. We'll detect all available years and let you choose which ones to analyze.</div>
+      <div class="step-title" style="margin-bottom:6px;">Upload Your Amazon Files</div>
+      <div class="step-sub">Upload your Amazon Order History CSV (required), and optionally your Refund Details CSV to exclude returned items from your dashboard.</div>
       <input type="file" id="orders-input" accept=".csv" style="display:none">
-      <button class="btn sm" id="orders-btn" onclick="document.getElementById('orders-input').click()">Choose Order History CSV</button>
+      <input type="file" id="refunds-input" accept=".csv" style="display:none">
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <button class="btn sm" id="orders-btn" onclick="document.getElementById('orders-input').click()">Choose Order History CSV</button>
+          <div id="orders-file-status" style="font-size:10px;color:var(--muted);min-height:14px;">Required</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <button class="btn sm" id="refunds-btn" onclick="document.getElementById('refunds-input').click()" style="background:#fff;color:var(--teal);border:1px solid var(--teal);">Choose Refund Details CSV</button>
+          <div id="refunds-file-status" style="font-size:10px;color:var(--muted);min-height:14px;">Optional — for return tracking</div>
+        </div>
+      </div>
 
       <!-- shown after file is chosen -->
       <div id="pending-file" style="display:none;margin-top:14px;text-align:left;">
@@ -1352,6 +1362,8 @@ function deleteItem(idx){
   showMsg('info', `Item deleted from this session. Re-upload your CSV to restore it.`);
 }
 let pendingFile = null;
+let pendingRefundFile = null; // optional Refund Details.csv from Amazon zip
+let pendingRefundMap = null; // { orderId: [{ amount, date, refundId, ... }, ...] }
 let detectedYears = []; // years found in the uploaded CSV
 
 function togglePanel(which){
@@ -1584,6 +1596,14 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
   document.getElementById('pending-filename').textContent = file.name;
   document.getElementById('pending-file').style.display = '';
 
+  // Update the Order History status indicator
+  const ordersStatusEl = document.getElementById('orders-file-status');
+  if(ordersStatusEl){
+    ordersStatusEl.innerHTML = `✓ ${lines.length - 1} orders loaded`;
+    ordersStatusEl.style.color = 'var(--teal)';
+    ordersStatusEl.style.fontWeight = '600';
+  }
+
   // Build year checkboxes
   const container = document.getElementById('year-checkboxes');
   container.innerHTML = '';
@@ -1613,6 +1633,125 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
 
   document.getElementById('year-select-section').style.display='';
   document.getElementById('run-btn').disabled=false;
+});
+
+// ===== Refund Details CSV handler =====
+// Parses Amazon's Refund Details.csv and stores it in pendingRefundMap.
+// This is parsed independently of Order History; it just sits in memory until
+// the dashboard build (Session 2) uses it to mark items as returned.
+document.getElementById('refunds-input').addEventListener('change', async e=>{
+  const file = e.target.files[0];
+  e.target.value = '';
+  const statusEl = document.getElementById('refunds-file-status');
+
+  if(!file){
+    pendingRefundFile = null;
+    pendingRefundMap = null;
+    statusEl.textContent = 'Optional — for return tracking';
+    statusEl.style.color = 'var(--muted)';
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    const lines = text.trim().split('\n');
+    if(lines.length < 2){
+      pendingRefundFile = null;
+      pendingRefundMap = null;
+      statusEl.textContent = '⚠ File appears empty';
+      statusEl.style.color = '#c0392b';
+      return;
+    }
+
+    const headers = parseCSVLine(lines[0]).map(h=>h.replace(/"/g,'').trim().toLowerCase());
+    // Validate by columns, not filename. Prefer exact matches over substring matches
+    // because Amazon also has columns like "Direct Debit Refund Amount" that we don't want.
+    const findCol = (candidates) => {
+      for(const c of candidates){
+        const exact = headers.find(h => h === c);
+        if(exact) return exact;
+      }
+      for(const c of candidates){
+        const partial = headers.find(h => h.includes(c));
+        if(partial) return partial;
+      }
+      return null;
+    };
+    const orderIdCol = findCol(['order id']);
+    const refundAmtCol = findCol(['refund amount']);
+    const paymentStatusCol = findCol(['payment status']);
+    const refundDateCol = findCol(['refund date', 'disbursement date', 'refund initiation date']);
+
+    if(!orderIdCol || !refundAmtCol){
+      pendingRefundFile = null;
+      pendingRefundMap = null;
+      statusEl.textContent = '⚠ Not a Refund Details file';
+      statusEl.style.color = '#c0392b';
+      showMsg('err', `That file doesn't look like a Refund Details CSV — we couldn't find the "Order ID" and "Refund Amount" columns. Check that you grabbed the file from the "Your Returns & Refunds" folder in your Amazon zip.`);
+      return;
+    }
+
+    // Build the refund map: { orderId: [{ amount, date, paymentStatus }, ...] }
+    const refundMap = {};
+    let totalRefundRows = 0;
+    let validRefundRows = 0;
+
+    for(let i = 1; i < lines.length; i++){
+      const vals = parseCSVLine(lines[i]);
+      if(vals.length < 2) continue;
+      const row = {};
+      headers.forEach((h, idx) => row[h] = (vals[idx]||'').replace(/"/g,'').trim());
+      totalRefundRows++;
+
+      const orderId = row[orderIdCol];
+      if(!orderId) continue;
+
+      // Parse refund amount — handles "$12.34" or "12.34" or "(12.34)"
+      const amtStr = (row[refundAmtCol]||'').replace(/[$,]/g,'').replace(/[()]/g,'').trim();
+      const amount = parseFloat(amtStr);
+      if(!isFinite(amount) || amount <= 0) continue;
+
+      // Only count refunds that actually completed (skip pending/failed/etc.)
+      if(paymentStatusCol){
+        const status = (row[paymentStatusCol]||'').toLowerCase();
+        if(status && !status.includes('complete')) continue;
+      }
+
+      validRefundRows++;
+      if(!refundMap[orderId]) refundMap[orderId] = [];
+      refundMap[orderId].push({
+        amount: amount,
+        date: refundDateCol ? row[refundDateCol] : '',
+        paymentStatus: paymentStatusCol ? row[paymentStatusCol] : ''
+      });
+    }
+
+    const orderCount = Object.keys(refundMap).length;
+    const totalRefundAmt = Object.values(refundMap)
+      .flat()
+      .reduce((sum, r) => sum + r.amount, 0);
+
+    if(orderCount === 0){
+      pendingRefundFile = null;
+      pendingRefundMap = null;
+      statusEl.innerHTML = '⚠ No completed refunds found';
+      statusEl.style.color = '#c0392b';
+      showMsg('info', `We parsed your Refund Details file but didn't find any completed refunds. Continue without it if you have no returns to exclude.`);
+      return;
+    }
+
+    pendingRefundFile = file;
+    pendingRefundMap = refundMap;
+    statusEl.innerHTML = `✓ ${validRefundRows} refund${validRefundRows!==1?'s':''} across ${orderCount} order${orderCount!==1?'s':''} ($${totalRefundAmt.toFixed(2)})`;
+    statusEl.style.color = 'var(--teal)';
+    statusEl.style.fontWeight = '600';
+  } catch(err){
+    console.error('Refund file parse error:', err);
+    pendingRefundFile = null;
+    pendingRefundMap = null;
+    statusEl.textContent = '⚠ Could not read file';
+    statusEl.style.color = '#c0392b';
+  }
 });
 
 async function runProcessing(){
@@ -1747,6 +1886,8 @@ async function runProcessing(){
 
   // Reset for possible additional upload
   pendingFile=null;
+  pendingRefundFile=null;
+  pendingRefundMap=null;
   detectedYears=[];
   document.getElementById('pending-file').style.display='none';
   document.getElementById('pending-filename').textContent='';
@@ -1756,6 +1897,11 @@ async function runProcessing(){
   document.getElementById('year-checkboxes').innerHTML='';
   document.getElementById('year-select-section').style.display='none';
   document.getElementById('upload-label').value='';
+  // Reset file status indicators
+  const ordersStatus = document.getElementById('orders-file-status');
+  if(ordersStatus){ ordersStatus.textContent='Required'; ordersStatus.style.color='var(--muted)'; ordersStatus.style.fontWeight=''; }
+  const refundsStatus = document.getElementById('refunds-file-status');
+  if(refundsStatus){ refundsStatus.textContent='Optional — for return tracking'; refundsStatus.style.color='var(--muted)'; refundsStatus.style.fontWeight=''; }
   runBtn.disabled=true;runBtn.textContent='▶ Build Dashboard';
   document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
 }
