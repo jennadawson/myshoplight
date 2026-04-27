@@ -426,6 +426,9 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="tab" id="tab-btn-manager" onclick="switchTab('manager')" style="display:none">
       Item Manager <span class="tab-badge" id="uncat-badge">0</span>
     </div>
+    <div class="tab" id="tab-btn-returns" onclick="switchTab('returns')" style="display:none">
+      Returns <span class="tab-badge" id="returns-badge" style="background:var(--rust);display:none;">0</span>
+    </div>
     <div class="tab active" id="tab-btn-catmap" onclick="switchTab('catmap')">Category Map</div>
   </div>
 
@@ -435,6 +438,18 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div id="next-steps-callout" class="next-steps" style="display:none">
       <div class="next-steps-text" id="next-steps-text"></div>
       <span class="next-steps-dismiss" onclick="dismissNextSteps()">✕ Dismiss</span>
+    </div>
+
+    <!-- Returns indicator banner (shown when refunds detected) -->
+    <div id="returns-banner" style="display:none;background:var(--cream);border:1px solid var(--cream2);border-left:3px solid var(--teal);border-radius:8px;padding:10px 14px;margin-bottom:1rem;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="font-size:12px;color:var(--text);line-height:1.5;">
+        <span id="returns-banner-text"></span>
+        <a onclick="switchTab('returns')" style="color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;margin-left:6px;">View in Returns →</a>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="returns-include-toggle" onchange="toggleReturnsInTotals(this.checked)" style="accent-color:var(--teal);">
+        Include returns in totals
+      </label>
     </div>
 
     <div class="dash-head" id="dash-head" style="display:none">
@@ -762,6 +777,39 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
   </div><!-- /tab-manager -->
 
+  <!-- RETURNS MANAGER TAB -->
+  <div id="tab-returns" style="display:none">
+    <div style="background:var(--cream);border-radius:14px;padding:1.5rem;border:1px solid var(--cream2);margin-bottom:1.25rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Returns Manager</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;max-width:560px;">Returned items are excluded from your dashboard so your numbers reflect what you actually spent. Review and resolve any items below where we couldn't auto-match a refund.</div>
+        </div>
+        <div id="returns-summary" style="text-align:right;font-size:12px;color:var(--text);line-height:1.7;"></div>
+      </div>
+      <!-- How it works help -->
+      <details style="margin-top:14px;background:#fff;border:1px solid var(--cream2);border-radius:8px;padding:10px 14px;">
+        <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--teal);">How does return matching work?</summary>
+        <div style="margin-top:10px;font-size:12px;color:var(--text);line-height:1.6;">
+          <div style="margin-bottom:8px;"><strong style="color:var(--teal);">✓ Auto-matched</strong> means we're confident the refund matches a specific item — either the order had only one item, or the refund amount uniquely matches exactly one item in a multi-item order. <em>No action needed — these are already excluded from your dashboard.</em></div>
+          <div style="margin-bottom:8px;"><strong style="color:var(--rust);">⚠ Needs Review</strong> means the order had multiple items and the refund amount doesn't uniquely identify which one was returned (e.g., two items at the same price, or a partial refund that doesn't match any single item). <em>You'll pick which item was returned and whether it was a full or partial return.</em></div>
+          <div style="margin-bottom:8px;"><strong>Partial returns</strong> happen when you bought multiple of an item (qty &gt; 1) and only returned some. Use the "Partial return" button — only the refund amount is subtracted from the item's price, and the rest still counts as spending.</div>
+          <div><strong>Unmatched Refunds</strong> are refunds Amazon recorded for orders that aren't in your uploaded Order History — usually purchases from years you didn't include or filtered-out addresses. These are shown for transparency but don't require action.</div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Filter tabs inside Returns -->
+    <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;" id="returns-filter-tabs">
+      <button class="returns-filter-btn" data-filter="review" onclick="setReturnsFilter('review')" style="background:var(--rust);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Needs Review (<span id="rf-review-count">0</span>)</button>
+      <button class="returns-filter-btn" data-filter="matched" onclick="setReturnsFilter('matched')" style="background:#fff;color:var(--text);border:1px solid var(--cream2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Returned Items (<span id="rf-matched-count">0</span>)</button>
+      <button class="returns-filter-btn" data-filter="unmatched" onclick="setReturnsFilter('unmatched')" style="background:#fff;color:var(--text);border:1px solid var(--cream2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Unmatched Refunds (<span id="rf-unmatched-count">0</span>)</button>
+    </div>
+
+    <!-- Content area, switches based on filter -->
+    <div id="returns-content"></div>
+  </div><!-- /tab-returns -->
+
   <!-- CATEGORY MAP TAB -->
   <div id="tab-catmap">
 
@@ -1049,6 +1097,17 @@ let sessionItems  = [];
 let sessions      = [];
 let charts        = {};
 let filterView    = 'all';
+// ── Returns tracking ─────────────────────────────────────────────────────
+let returnsData = {
+  refundMap: null,       // raw refund map by Order ID (from Refund Details parse)
+  ambiguous: [],         // [{orderId, refundAmount, candidates: [items], refundDate}, ...]
+  unmatched: [],         // [{orderId, refundAmount, refundDate}, ...] (no candidates)
+  autoMatchedCount: 0,   // count of items that got returned=true automatically
+  totalRefundAmount: 0,  // dollar total of detected refunds
+  includeInTotals: false // dashboard toggle: false = exclude returns (default), true = include
+};
+let returnsTabFilter = 'review'; // 'review' | 'matched' | 'unmatched'
+let returnsMatchedFilter = 'all'; // 'all' | 'auto' | 'confirmed' | 'partial' — chip filter inside Returned Items
 
 function setFilterView(view){
   filterView = view;
@@ -1130,6 +1189,32 @@ function parseCSVLine(line){
     if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c);c='';}else{c+=ch;}
   }
   r.push(c);return r;
+}
+
+// Split a CSV file into rows, respecting quoted fields that contain newlines.
+// Naive .split('\n') breaks rows whose product names or addresses contain line
+// breaks — those rows then fail downstream parsing and silently disappear.
+function splitCSVRows(text){
+  const rows=[];let cur='',inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(ch==='"'){
+      // Handle doubled "" inside a quoted field — they're an escaped quote, not a toggle
+      if(inQuotes && text[i+1]==='"'){ cur+='""'; i++; continue; }
+      inQuotes=!inQuotes;
+      cur+=ch;
+    } else if((ch==='\n' || ch==='\r') && !inQuotes){
+      // End of a real row — push if non-empty
+      if(cur.length>0) rows.push(cur);
+      cur='';
+      // Swallow \r\n as a single line ending
+      if(ch==='\r' && text[i+1]==='\n') i++;
+    } else {
+      cur+=ch;
+    }
+  }
+  if(cur.trim().length>0) rows.push(cur);
+  return rows;
 }
 function parseDate(s){if(!s)return null;try{const d=new Date(s.trim());return isNaN(d.getTime())?null:d;}catch(e){return null;}}
 function fmt(n){return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -1434,7 +1519,7 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
 
   // Quick-scan the CSV to detect which years are present
   const text = await file.text();
-  const lines = text.trim().split('\n');
+  const lines = splitCSVRows(text);
   if(lines.length < 2){ showMsg('err','File appears empty.'); return; }
 
   const headers = parseCSVLine(lines[0]).map(h=>h.replace(/"/g,'').trim().toLowerCase());
@@ -1649,12 +1734,13 @@ document.getElementById('refunds-input').addEventListener('change', async e=>{
     pendingRefundMap = null;
     statusEl.textContent = 'Optional — for return tracking';
     statusEl.style.color = 'var(--muted)';
+    hideApplyRefundsButton();
     return;
   }
 
   try {
     const text = await file.text();
-    const lines = text.trim().split('\n');
+    const lines = splitCSVRows(text);
     if(lines.length < 2){
       pendingRefundFile = null;
       pendingRefundMap = null;
@@ -1692,9 +1778,14 @@ document.getElementById('refunds-input').addEventListener('change', async e=>{
     }
 
     // Build the refund map: { orderId: [{ amount, date, paymentStatus }, ...] }
+    // Amazon's export sometimes contains literal duplicate rows for the same refund
+    // (same orderId + amount + date logged 2-4 times). Dedupe to avoid creating
+    // phantom unmatched refunds in the matcher.
     const refundMap = {};
+    const seenRefundFingerprints = new Set();
     let totalRefundRows = 0;
     let validRefundRows = 0;
+    let duplicateRefundRows = 0;
 
     for(let i = 1; i < lines.length; i++){
       const vals = parseCSVLine(lines[i]);
@@ -1717,11 +1808,20 @@ document.getElementById('refunds-input').addEventListener('change', async e=>{
         if(status && !status.includes('complete')) continue;
       }
 
+      // Dedupe: skip rows that have the same orderId + amount + date as one we've seen
+      const refundDate = refundDateCol ? row[refundDateCol] : '';
+      const fingerprint = `${orderId}|${amount.toFixed(2)}|${refundDate}`;
+      if(seenRefundFingerprints.has(fingerprint)){
+        duplicateRefundRows++;
+        continue;
+      }
+      seenRefundFingerprints.add(fingerprint);
+
       validRefundRows++;
       if(!refundMap[orderId]) refundMap[orderId] = [];
       refundMap[orderId].push({
         amount: amount,
-        date: refundDateCol ? row[refundDateCol] : '',
+        date: refundDate,
         paymentStatus: paymentStatusCol ? row[paymentStatusCol] : ''
       });
     }
@@ -1745,6 +1845,12 @@ document.getElementById('refunds-input').addEventListener('change', async e=>{
     statusEl.innerHTML = `✓ ${validRefundRows} refund${validRefundRows!==1?'s':''} across ${orderCount} order${orderCount!==1?'s':''} ($${totalRefundAmt.toFixed(2)})`;
     statusEl.style.color = 'var(--teal)';
     statusEl.style.fontWeight = '600';
+
+    // If dashboard is already built, surface a "Run" button so the user can
+    // apply the refund file without re-uploading their Order History.
+    if(allItems.length > 0){
+      showApplyRefundsButton();
+    }
   } catch(err){
     console.error('Refund file parse error:', err);
     pendingRefundFile = null;
@@ -1753,6 +1859,194 @@ document.getElementById('refunds-input').addEventListener('change', async e=>{
     statusEl.style.color = '#c0392b';
   }
 });
+
+// Apply a refund file to an already-built dashboard.
+// Triggered by the "Apply Refunds" button that appears when user uploads
+// Refund Details after their dashboard is already loaded.
+function showApplyRefundsButton(){
+  let btn = document.getElementById('apply-refunds-btn');
+  if(!btn){
+    btn = document.createElement('button');
+    btn.id = 'apply-refunds-btn';
+    btn.className = 'btn sm';
+    btn.style.cssText = 'background:var(--teal);color:#fff;margin-top:10px;';
+    btn.textContent = '▶ Apply Refunds to Dashboard';
+    btn.onclick = applyRefundsToExistingDashboard;
+    // Place it under the file inputs, before pending-file area
+    const refundsStatusEl = document.getElementById('refunds-file-status');
+    if(refundsStatusEl && refundsStatusEl.parentNode && refundsStatusEl.parentNode.parentNode){
+      refundsStatusEl.parentNode.parentNode.appendChild(btn);
+    }
+  }
+  btn.style.display = '';
+}
+
+function hideApplyRefundsButton(){
+  const btn = document.getElementById('apply-refunds-btn');
+  if(btn) btn.style.display = 'none';
+}
+
+function applyRefundsToExistingDashboard(){
+  if(!pendingRefundMap){
+    showMsg('err','Upload a Refund Details file first.');
+    return;
+  }
+  if(!allItems.length){
+    showMsg('err','Upload your Order History first to build the dashboard.');
+    return;
+  }
+
+  // Filter the refund map: only keep refunds for Order IDs in the current dashboard.
+  // (We don't have access to the raw CSV here, so refunds for orders not in allItems
+  // are silently dropped — the user already chose what's in their dashboard.)
+  const includedOrderIds = new Set(allItems.map(it => it.orderId).filter(Boolean));
+  const filteredRefundMap = {};
+  Object.keys(pendingRefundMap).forEach(orderId => {
+    if(includedOrderIds.has(orderId)){
+      filteredRefundMap[orderId] = pendingRefundMap[orderId];
+    }
+  });
+
+  // Run matching against the existing allItems
+  const result = matchRefundsToItems(allItems, filteredRefundMap);
+
+  // Reset returnsData (full replace, not accumulate, since we're matching against everything)
+  returnsData.refundMap = filteredRefundMap;
+  returnsData.ambiguous = result.ambiguous;
+  returnsData.unmatched = result.unmatched;
+  returnsData.autoMatchedCount = result.autoMatched;
+  returnsData.totalRefundAmount = result.totalRefund;
+
+  // Propagate amountReturned from allItems to managerItems
+  allItems.forEach(item=>{
+    if(item.amountReturned){
+      const mi = managerItems.find(m => m.title === item.title);
+      if(mi){
+        mi.amountReturned = item.amountReturned;
+        mi.refundDate = item.refundDate;
+        mi.returnMatchType = item.returnMatchType;
+      }
+    }
+  });
+
+  // Reveal Returns tab
+  const returnsTabBtn = document.getElementById('tab-btn-returns');
+  if(returnsTabBtn) returnsTabBtn.style.display = '';
+
+  saveSessionData();
+  renderDash();
+  updateUncatBadge();
+
+  const parts = [];
+  if(result.autoMatched > 0) parts.push(`${result.autoMatched} auto-matched`);
+  if(result.ambiguous.length > 0) parts.push(`${result.ambiguous.length} need${result.ambiguous.length===1?'s':''} review`);
+  showMsg('success',`Refunds applied — ${parts.join(', ')}. View in Returns tab.`);
+
+  hideApplyRefundsButton();
+  switchTab('returns');
+}
+
+// ===== Returns matching engine =====
+// Matches refunds (from pendingRefundMap) to items (from current upload) by Order ID.
+// Mutates items in place by adding `amountReturned` (dollar amount), `refundDate`,
+// `returnMatchType` ('auto-single' | 'auto-amount' | 'ambiguous-resolved' | 'manual').
+// Items are considered fully returned when amountReturned >= amount * 0.99.
+// Items can be partially returned (amountReturned < amount) — they still count
+// in totals at (amount - amountReturned).
+//
+// Items that can't be auto-matched go into the ambiguous queue for user review.
+function isFullyReturned(item){
+  return item && item.amountReturned && item.amountReturned >= (item.amount || 0) * 0.99;
+}
+
+function matchRefundsToItems(items, refundMap){
+  if(!refundMap || !items || !items.length){
+    return { autoMatched: 0, ambiguous: [], unmatched: [], totalRefund: 0 };
+  }
+
+  // Group items by Order ID for fast lookup
+  const itemsByOrderId = {};
+  items.forEach(item => {
+    if(!item.orderId) return;
+    if(!itemsByOrderId[item.orderId]) itemsByOrderId[item.orderId] = [];
+    itemsByOrderId[item.orderId].push(item);
+  });
+
+  let autoMatched = 0;
+  const ambiguous = [];
+  const unmatched = [];
+  let totalRefund = 0;
+
+  // Process each Order ID that has refunds
+  Object.keys(refundMap).forEach(orderId => {
+    const refunds = refundMap[orderId];
+    const orderItems = itemsByOrderId[orderId] || [];
+
+    // No matching purchase items at all (e.g., refund predates uploaded year range)
+    if(orderItems.length === 0){
+      refunds.forEach(r => {
+        unmatched.push({ orderId, refundAmount: r.amount, refundDate: r.date });
+        totalRefund += r.amount;
+      });
+      return;
+    }
+
+    // Process each refund within this order
+    refunds.forEach(refund => {
+      totalRefund += refund.amount;
+
+      // Get items not yet fully returned
+      const availableItems = orderItems.filter(it => !isFullyReturned(it));
+
+      if(availableItems.length === 0){
+        // All items in this order already matched — extra refund is a partial/duplicate
+        unmatched.push({ orderId, refundAmount: refund.amount, refundDate: refund.date });
+        return;
+      }
+
+      // CASE 1: Single item in order → auto-match (treat as full return).
+      // The user can convert to partial via the Auto-matched section if qty > 1.
+      if(availableItems.length === 1 && orderItems.length === 1){
+        const item = availableItems[0];
+        item.amountReturned = item.amount;
+        item.refundDate = refund.date;
+        item.returnMatchType = 'auto-single';
+        autoMatched++;
+        return;
+      }
+
+      // CASE 2: Multi-item order — try to match by exact amount (within 1¢ tolerance)
+      const exactMatches = availableItems.filter(it =>
+        Math.abs(it.amount - refund.amount) < 0.01
+      );
+
+      if(exactMatches.length === 1){
+        // Unique amount match → auto-match (full return)
+        const item = exactMatches[0];
+        item.amountReturned = item.amount;
+        item.refundDate = refund.date;
+        item.returnMatchType = 'auto-amount';
+        autoMatched++;
+        return;
+      }
+
+      // CASE 3: Ambiguous — multiple items match the refund amount, OR no exact match
+      ambiguous.push({
+        orderId,
+        refundAmount: refund.amount,
+        refundDate: refund.date,
+        candidates: orderItems.map(it => ({
+          title: it.title,
+          amount: it.amount,
+          qty: it.qty || 1,
+          itemRef: it
+        }))
+      });
+    });
+  });
+
+  return { autoMatched, ambiguous, unmatched, totalRefund };
+}
 
 async function runProcessing(){
   if(!pendingFile){showMsg('err','Please choose a file first.');return;}
@@ -1768,7 +2062,7 @@ async function runProcessing(){
   runBtn.textContent='Processing...';
 
   const text=await pendingFile.text();
-  const lines=text.trim().split('\n');
+  const lines=splitCSVRows(text);
 
   const headers=parseCSVLine(lines[0]).map(h=>h.replace(/"/g,'').trim().toLowerCase());
   const titleCol=headers.find(h=>h.includes('product name'));
@@ -1776,6 +2070,7 @@ async function runProcessing(){
   const dateCol=headers.find(h=>h==='order date'||h.includes('order date'));
   const statusCol=headers.find(h=>h.includes('order status'));
   const orderIdCol=headers.find(h=>h==='order id'||h.includes('order id'));
+  const qtyCol=headers.find(h=>h==='original quantity'||h==='quantity'||h.includes('original quantity'));
   const addrCol=headers.find(h=>h.includes('shipping address')||h.includes('ship address')||h==='ship to'||h.includes('delivery address'));
 
   // Get selected addresses (null = no filter / section hidden)
@@ -1786,9 +2081,16 @@ async function runProcessing(){
 
   const rules=buildRuleSet();
   const items=[];let skipped=0;
+  // Track Order IDs that exist in the raw CSV (regardless of year/address filter).
+  // This lets us distinguish "refund for a purchase you filtered out" (silently drop)
+  // from "refund for a purchase that doesn't exist in your data" (truly unmatched).
+  const allOrderIdsInFile = new Set();
   for(let i=1;i<lines.length;i++){
     const vals=parseCSVLine(lines[i]);if(vals.length<5)continue;
     const row={};headers.forEach((h,idx)=>row[h]=(vals[idx]||'').replace(/"/g,'').trim());
+    // Track every order ID we see in the file, even ones we filter out
+    if(orderIdCol && row[orderIdCol]) allOrderIdsInFile.add(row[orderIdCol]);
+
     const d=parseDate(row[dateCol]);
     if(!d||!selectedYears.has(d.getFullYear()))continue;
     if(selectedAddresses && addrCol && !selectedAddresses.has(row[addrCol]||''))continue;
@@ -1797,6 +2099,7 @@ async function runProcessing(){
     if((row[statusCol]||'').toLowerCase().includes('cancel'))continue;
     const title=row[titleCol];if(!title)continue;
     const orderId=orderIdCol?row[orderIdCol]||'':'';
+    const qty=qtyCol?(parseInt(row[qtyCol])||1):1;
     const{cat,sub,kw,pri,pinned,audOverride}=categorizeWithOverrides(title,rules);
     let aud=getAudience(cat,title);
     if(audOverride)aud=audOverride;
@@ -1804,7 +2107,7 @@ async function runProcessing(){
     const stypeOv=stypeOverrides[overrideKey(title)];
     if(stypeOv)stype=stypeOv;
     if(cat==='Uncategorized')skipped++;
-    items.push({title:title.slice(0,120),amount:amt,cat,aud,stype,orderId,
+    items.push({title:title.slice(0,120),amount:amt,cat,aud,stype,orderId,qty,
       date:row[dateCol],year:String(d.getFullYear()),month:d.getMonth()+1,subcat:sub,matchedKw:kw,matchedPri:pri,pinned:!!pinned});
   }
 
@@ -1835,6 +2138,64 @@ async function runProcessing(){
     return;
   }
 
+  // ── Returns matching ──────────────────────────────────────────────────
+  // If the user uploaded Refund Details, re-run matching from scratch against
+  // ALL items (existing + new). This avoids stale state when sessions are added
+  // or replaced — the refund file is the source of truth for what got refunded.
+  let refundMatchResult = null;
+  if(pendingRefundMap){
+    // First, add new items to allItems so we match against the full set
+    const itemsForMatching = [...allItems, ...dedupedItems];
+
+    // Reset returned state on every item that wasn't manually overridden — we'll
+    // re-compute fresh based on the current refund file and current item set.
+    itemsForMatching.forEach(it => {
+      if(!it.returnOverridden){
+        it.amountReturned = 0;
+        delete it.refundDate;
+        delete it.returnMatchType;
+      }
+    });
+
+    // Filter the refund map by what's actually in the user's data:
+    // - Order ID present in user's items → keep, will match
+    // - Order ID exists in raw CSV but filtered by year/address → silently drop
+    // - Order ID isn't in raw CSV at all → keep (truly unmatched)
+    const includedOrderIds = new Set(itemsForMatching.map(it => it.orderId).filter(Boolean));
+    const filteredRefundMap = {};
+    Object.keys(pendingRefundMap).forEach(orderId => {
+      const inUserData = includedOrderIds.has(orderId);
+      const filteredOutByYear = !inUserData && allOrderIdsInFile.has(orderId);
+      if(filteredOutByYear) return; // silently drop
+      filteredRefundMap[orderId] = pendingRefundMap[orderId];
+    });
+
+    refundMatchResult = matchRefundsToItems(itemsForMatching, filteredRefundMap);
+
+    // Reset returnsData entirely from this fresh match
+    returnsData.refundMap = filteredRefundMap;
+    returnsData.ambiguous = refundMatchResult.ambiguous;
+    returnsData.unmatched = refundMatchResult.unmatched;
+    returnsData.autoMatchedCount = refundMatchResult.autoMatched;
+    returnsData.totalRefundAmount = refundMatchResult.totalRefund;
+  } else if(returnsData.refundMap){
+    // No new refund file uploaded, but we have one from a prior session.
+    // Re-run matching against the full item set so new items can match existing refunds.
+    const itemsForMatching = [...allItems, ...dedupedItems];
+    itemsForMatching.forEach(it => {
+      if(!it.returnOverridden){
+        it.amountReturned = 0;
+        delete it.refundDate;
+        delete it.returnMatchType;
+      }
+    });
+    const result = matchRefundsToItems(itemsForMatching, returnsData.refundMap);
+    returnsData.ambiguous = result.ambiguous;
+    returnsData.unmatched = result.unmatched;
+    returnsData.autoMatchedCount = result.autoMatched;
+    returnsData.totalRefundAmount = result.totalRefund;
+  }
+
   // Add unique items to category manager
   const existingTitles=new Set(managerItems.map(m=>m.title));
   dedupedItems.forEach(item=>{
@@ -1845,8 +2206,22 @@ async function runProcessing(){
         stype:item.stype||'Flexible', stypeLocked:!!stypeOverrides[overrideKey(item.title)],
         pinned:!!item.pinned,
         year:item.year||'', month:item.month||null,
+        qty: item.qty || 1,
+        amountReturned: item.amountReturned || 0,
+        refundDate: item.refundDate || null,
+        returnMatchType: item.returnMatchType || null,
+        orderId: item.orderId || null,
         userKw:'',userCat:'',userSub:'',userPri:2,suggested:false});
       existingTitles.add(item.title);
+    } else if(item.amountReturned){
+      // If we already had this item in managerItems (from a previous session)
+      // and this upload's matching marked it as returned, propagate the flag.
+      const existing = managerItems.find(m => m.title === item.title);
+      if(existing){
+        existing.amountReturned = item.amountReturned;
+        existing.refundDate = item.refundDate;
+        existing.returnMatchType = item.returnMatchType;
+      }
     }
   });
 
@@ -1873,7 +2248,20 @@ async function runProcessing(){
 
   const pct=Math.round((1-skipped/dedupedItems.length)*100);
   const dupeMsg = dupeCount>0 ? ` ${dupeCount} duplicate${dupeCount>1?'s':''} skipped.` : '';
-  showMsg('success',`${sessionLabel} loaded — ${dedupedItems.length} orders, ${pct}% categorized.${dupeMsg}${skipped>0?' '+skipped+' items need review in Item Manager.':''}`);
+  let refundMsg = '';
+  if(refundMatchResult){
+    const parts = [];
+    if(refundMatchResult.autoMatched > 0) parts.push(`${refundMatchResult.autoMatched} return${refundMatchResult.autoMatched!==1?'s':''} auto-matched`);
+    if(refundMatchResult.ambiguous.length > 0) parts.push(`${refundMatchResult.ambiguous.length} need${refundMatchResult.ambiguous.length===1?'s':''} review`);
+    if(parts.length) refundMsg = ` ${parts.join(', ')} — see Returns tab.`;
+  }
+  showMsg('success',`${sessionLabel} loaded — ${dedupedItems.length} orders, ${pct}% categorized.${dupeMsg}${skipped>0?' '+skipped+' items need review in Item Manager.':''}${refundMsg}`);
+
+  // Show Returns tab if any refund data was processed
+  if(returnsData.refundMap){
+    const returnsTabBtn = document.getElementById('tab-btn-returns');
+    if(returnsTabBtn) returnsTabBtn.style.display = '';
+  }
 
   // persist session data to localStorage
   saveSessionData();
@@ -1909,21 +2297,537 @@ async function runProcessing(){
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const activeBtn = document.getElementById(
-    tab==='dashboard'?'tab-btn-dashboard':tab==='manager'?'tab-btn-manager':'tab-btn-catmap'
-  );
+  const tabBtnId =
+    tab==='dashboard' ? 'tab-btn-dashboard' :
+    tab==='manager'   ? 'tab-btn-manager'   :
+    tab==='returns'   ? 'tab-btn-returns'   :
+                        'tab-btn-catmap';
+  const activeBtn = document.getElementById(tabBtnId);
   if(activeBtn) activeBtn.classList.add('active');
   document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'':'none';
   document.getElementById('tab-manager').style.display=tab==='manager'?'':'none';
+  const returnsTab = document.getElementById('tab-returns');
+  if(returnsTab) returnsTab.style.display = tab==='returns' ? '' : 'none';
   document.getElementById('tab-catmap').style.display=tab==='catmap'?'':'none';
   if(tab==='manager')renderManager();
+  if(tab==='returns')renderReturns();
   if(tab==='catmap')renderCatMap();
 }
 
 function updateUncatBadge(){
-  const n=managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat).length;
+  const n=managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat&&!isFullyReturned(m)).length;
   document.getElementById('uncat-badge').textContent=n;
   const mt=document.getElementById('tab-btn-manager'); if(mt) mt.style.color=n>0?'var(--rust)':'';
+}
+
+// ── RETURNS MANAGER ────────────────────────────────────────────────────────
+function fmtMoney(n){ return '$' + (n||0).toFixed(2); }
+
+function setReturnsFilter(filter){
+  returnsTabFilter = filter;
+  // Update button styling
+  document.querySelectorAll('#returns-filter-tabs .returns-filter-btn').forEach(btn=>{
+    const isActive = btn.dataset.filter === filter;
+    if(isActive){
+      btn.style.background = filter==='review' ? 'var(--rust)' : 'var(--teal)';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+    } else {
+      btn.style.background = '#fff';
+      btn.style.color = 'var(--text)';
+      btn.style.border = '1px solid var(--cream2)';
+    }
+  });
+  renderReturnsContent();
+}
+
+function renderReturns(){
+  // Update summary header
+  const autoCount = managerItems.filter(m=>m.amountReturned > 0 && m.returnMatchType !== 'manual').length;
+  const partialCount = managerItems.filter(m=>m.amountReturned > 0 && !isFullyReturned(m)).length;
+  const reviewCount = returnsData.ambiguous.length;
+  const unmatchedCount = returnsData.unmatched.length;
+  const totalRefund = returnsData.totalRefundAmount;
+
+  // Counts on filter buttons
+  document.getElementById('rf-review-count').textContent = reviewCount;
+  document.getElementById('rf-matched-count').textContent = autoCount;
+  document.getElementById('rf-unmatched-count').textContent = unmatchedCount;
+
+  // Summary block
+  const summary = document.getElementById('returns-summary');
+  if(summary){
+    summary.innerHTML = `
+      <div><strong style="color:var(--teal);">${fmtMoney(totalRefund)}</strong> in refunds detected</div>
+      <div><span style="color:var(--teal);">✓</span> ${autoCount} auto-matched · <span style="color:var(--rust);">⚠</span> ${reviewCount} need review · ${unmatchedCount} unmatched</div>
+    `;
+  }
+
+  // Update top-bar Returns badge
+  const tabBadge = document.getElementById('returns-badge');
+  if(tabBadge){
+    if(reviewCount > 0){
+      tabBadge.textContent = reviewCount;
+      tabBadge.style.display = '';
+    } else {
+      tabBadge.style.display = 'none';
+    }
+  }
+
+  // Default to "review" if there are items needing review, else show matched
+  if(returnsTabFilter === 'review' && reviewCount === 0 && autoCount > 0){
+    returnsTabFilter = 'matched';
+  }
+
+  setReturnsFilter(returnsTabFilter);
+}
+
+function renderReturnsContent(){
+  const container = document.getElementById('returns-content');
+  if(!container) return;
+
+  if(returnsTabFilter === 'review'){
+    renderReturnsReview(container);
+  } else if(returnsTabFilter === 'matched'){
+    renderReturnsMatched(container);
+  } else if(returnsTabFilter === 'unmatched'){
+    renderReturnsUnmatched(container);
+  }
+}
+
+function renderReturnsReview(container){
+  const ambig = returnsData.ambiguous;
+  if(!ambig.length){
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">
+      <div style="font-size:32px;margin-bottom:8px;">✓</div>
+      No refunds need your review — everything was auto-matched.
+    </div>`;
+    return;
+  }
+
+  // Sort most recent first — refunds without dates fall to the bottom
+  const sorted = [...ambig].sort((a,b)=>{
+    const da = a.refundDate || '';
+    const db = b.refundDate || '';
+    if(!da && !db) return 0;
+    if(!da) return 1;
+    if(!db) return -1;
+    return db.localeCompare(da);
+  });
+
+  let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+    These refunds were on multi-item orders where we couldn't tell which item was returned. Pick the one you returned for each. <em style="color:var(--text);">Sorted most recent first. Showing items priced within ~30% of the refund amount. Items already marked as returned in another card are hidden.</em>
+  </div>`;
+
+  sorted.forEach((amb)=>{
+    const idx = ambig.indexOf(amb);
+    const dateStr = amb.refundDate ? ` · ${amb.refundDate.split('T')[0]}` : '';
+
+    // Filter out candidates that have already been marked as returned
+    // (either auto-matched or resolved in a previous card during this session).
+    // This prevents the user from flagging the same physical item multiple times.
+    const stillAvailable = amb.candidates.filter(c => !c.itemRef.amountReturned);
+
+    // Edge case: no items left in this order to attribute the refund to.
+    // Show the card in a special "no items remaining" state — user can only Skip.
+    if(stillAvailable.length === 0){
+      html += `<div class="returns-review-card" style="background:#fff;border:1px solid var(--cream2);border-left:3px solid var(--muted);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-family:monospace;">Order ${amb.orderId}${dateStr}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">Refund of ${fmtMoney(amb.refundAmount)}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-style:italic;margin-bottom:10px;">All items in this order have already been marked as returned. This refund may be a duplicate, partial-refund follow-up, or fee.</div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button onclick="resolveAmbiguous(${idx},'skip')" style="background:#fff;color:var(--muted);border:1px solid var(--cream2);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Dismiss</button>
+        </div>
+      </div>`;
+      return;
+    }
+
+    // Filter still-available candidates by 30% threshold; fallback to all if zero in range
+    const refAmt = amb.refundAmount;
+    const lowerBound = refAmt * 0.70;
+    const upperBound = refAmt * 1.30;
+    const inRange = stillAvailable.filter(c => c.amount >= lowerBound && c.amount <= upperBound);
+    const showCandidates = inRange.length > 0 ? inRange : stillAvailable;
+    const fallbackNote = inRange.length === 0
+      ? `<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:6px;">No remaining items in this order are close to the refund amount (likely a partial refund or fees) — showing all remaining items.</div>`
+      : '';
+
+    // Note about hidden items if some have already been returned
+    const hiddenCount = amb.candidates.length - stillAvailable.length;
+    const hiddenNote = hiddenCount > 0
+      ? `<div style="font-size:10px;color:var(--muted);margin-bottom:6px;"><em>${hiddenCount} item${hiddenCount>1?'s':''} from this order already marked as returned and hidden.</em></div>`
+      : '';
+
+    html += `<div class="returns-review-card" data-idx="${idx}" style="background:#fff;border:1px solid var(--cream2);border-left:3px solid var(--rust);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-family:monospace;">Order ${amb.orderId}${dateStr}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">Refund of ${fmtMoney(amb.refundAmount)}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:6px;">Which item(s) were returned?</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-style:italic;">Select one or more items. If you returned multiple items in one shipment, Amazon often combines them into a single refund.</div>
+      ${hiddenNote}
+      ${fallbackNote}
+      <div style="display:flex;flex-direction:column;gap:6px;">`;
+    showCandidates.forEach((cand)=>{
+      const cidx = amb.candidates.indexOf(cand);
+      const matchHint = Math.abs(cand.amount - amb.refundAmount) < 0.01 ? ' <span style="color:var(--teal);font-size:10px;">(amount matches)</span>' : '';
+      const qtyHint = cand.qty > 1 ? ` <span style="color:var(--muted);font-size:10px;">(qty ${cand.qty})</span>` : '';
+      html += `<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--cream2);border-radius:6px;cursor:pointer;font-size:12px;background:var(--cream);transition:all .12s;" onmouseover="if(!this.querySelector('input').checked)this.style.background='#f0f8f8'" onmouseout="if(!this.querySelector('input').checked)this.style.background='var(--cream)'">
+        <input type="checkbox" name="ambig-${idx}" value="${cidx}" data-amount="${cand.amount}" onchange="updateAmbigTotal(${idx})" style="accent-color:var(--teal);">
+        <span style="flex:1;">${cand.title.slice(0,80)}${cand.title.length>80?'…':''}${qtyHint}</span>
+        <span style="color:var(--muted);font-weight:600;white-space:nowrap;">${fmtMoney(cand.amount)}${matchHint}</span>
+      </label>`;
+    });
+    html += `<label title="No items will be marked as returned for this refund. All items in this order will continue to count toward your spending totals." style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--cream2);border-radius:6px;cursor:pointer;font-size:12px;background:var(--cream);transition:all .12s;color:var(--muted);">
+      <input type="checkbox" name="ambig-${idx}-skip" data-skip="true" onchange="toggleAmbigSkip(${idx})" style="accent-color:var(--muted);">
+      <span style="flex:1;font-style:italic;">Can't tell — leave items in totals <span style="color:var(--muted);font-size:10px;">(refund won't be excluded)</span></span>
+    </label>`;
+    html += `</div>
+      <div id="ambig-total-${idx}" style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;min-height:16px;"></div>
+      <div style="margin-top:6px;display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;">
+        <button onclick="resolveAmbiguous(${idx},'full')" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Confirm full return</button>
+        <button onclick="resolveAmbiguous(${idx},'partial')" title="Use when you bought multiple of the same item and only returned some — the refund amount will be subtracted from the item's price, and the remainder will count as spending." style="background:#fff;color:var(--teal);border:1px solid var(--teal);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Partial return</button>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function setMatchedFilter(filter){
+  returnsMatchedFilter = filter;
+  renderReturnsContent();
+}
+
+function renderReturnsMatched(container){
+  const matched = managerItems.filter(m=>m.amountReturned > 0 && m.returnMatchType !== 'manual');
+  if(!matched.length){
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No returned items yet.</div>`;
+    return;
+  }
+
+  // Count by type for the chips
+  const counts = {
+    all: matched.length,
+    auto: matched.filter(m=>m.returnMatchType==='auto-single' || m.returnMatchType==='auto-amount').length,
+    confirmed: matched.filter(m=>m.returnMatchType==='ambiguous-resolved').length,
+    partial: matched.filter(m=>m.returnMatchType==='partial-resolved' || (m.amountReturned > 0 && !isFullyReturned(m))).length,
+  };
+
+  // Apply chip filter
+  let displayed = matched;
+  if(returnsMatchedFilter === 'auto'){
+    displayed = matched.filter(m=>m.returnMatchType==='auto-single' || m.returnMatchType==='auto-amount');
+  } else if(returnsMatchedFilter === 'confirmed'){
+    displayed = matched.filter(m=>m.returnMatchType==='ambiguous-resolved');
+  } else if(returnsMatchedFilter === 'partial'){
+    displayed = matched.filter(m=>m.returnMatchType==='partial-resolved' || (m.amountReturned > 0 && !isFullyReturned(m)));
+  }
+
+  // Build filter chips (only show types that exist)
+  const chipDef = (key, label, count) => {
+    const isActive = returnsMatchedFilter === key;
+    return `<button onclick="setMatchedFilter('${key}')" style="background:${isActive?'var(--teal)':'#fff'};color:${isActive?'#fff':'var(--text)'};border:1px solid ${isActive?'var(--teal)':'var(--cream2)'};border-radius:16px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;">${label} (${count})</button>`;
+  };
+  let chipsHtml = `<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">`;
+  chipsHtml += chipDef('all','All',counts.all);
+  if(counts.auto > 0) chipsHtml += chipDef('auto','Auto-matched',counts.auto);
+  if(counts.confirmed > 0) chipsHtml += chipDef('confirmed','You confirmed',counts.confirmed);
+  if(counts.partial > 0) chipsHtml += chipDef('partial','Partial',counts.partial);
+  chipsHtml += `</div>`;
+
+  let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;">
+    Items currently excluded from your dashboard. If we got one wrong, click "Not returned" to put it back into your spending. For multi-quantity items where only some were returned, click "Convert to partial."
+  </div>`;
+  html += chipsHtml;
+
+  if(!displayed.length){
+    html += `<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:13px;background:#fff;border:1px solid var(--cream2);border-radius:10px;">No items match this filter.</div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  html += `<div style="background:#fff;border:1px solid var(--cream2);border-radius:10px;overflow:hidden;">`;
+  // Sort by date desc
+  displayed.sort((a,b)=>(b.refundDate||'').localeCompare(a.refundDate||''));
+  displayed.forEach((m)=>{
+    // Build the provenance badge
+    let badge;
+    if(m.returnMatchType === 'partial-resolved' || (m.amountReturned > 0 && !isFullyReturned(m))){
+      badge = `<span style="display:inline-block;background:#fef0e8;color:var(--rust);font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;">Partial</span>`;
+    } else if(m.returnMatchType === 'ambiguous-resolved'){
+      badge = `<span style="display:inline-block;background:#e0f0f5;color:#1e6c87;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;">You confirmed</span>`;
+    } else {
+      badge = `<span style="display:inline-block;background:#e6f3ed;color:#2d7a4f;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;">Auto-matched</span>`;
+    }
+
+    const dateStr = m.refundDate ? m.refundDate.split('T')[0] : '';
+    const isPartial = !isFullyReturned(m);
+    const amountLabel = isPartial
+      ? `<span style="color:var(--rust);">${fmtMoney(m.amountReturned)} of ${fmtMoney(m.amount)}</span>`
+      : fmtMoney(m.amountReturned || m.amount);
+    const escapedTitle = m.title.replace(/'/g,"\\'");
+    const showPartialBtn = !isPartial && (m.qty || 1) > 1;
+    const partialBtn = showPartialBtn
+      ? `<button onclick="convertToPartial('${escapedTitle}')" title="Use when you bought multiple of this item and only returned some" style="background:#fff;color:var(--teal);border:1px solid var(--teal);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;white-space:nowrap;">Convert to partial</button>`
+      : '';
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--cream2);font-size:12px;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${badge}
+          <span style="color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">${m.title}</span>
+        </div>
+        <div style="color:var(--muted);font-size:10px;margin-top:2px;">${dateStr || 'No date'}${(m.qty||1)>1?' · qty '+(m.qty):''}</div>
+      </div>
+      <div style="font-weight:600;color:var(--text);white-space:nowrap;">${amountLabel}</div>
+      ${partialBtn}
+      <button onclick="overrideReturn('${escapedTitle}')" style="background:#fff;color:var(--muted);border:1px solid var(--cream2);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;white-space:nowrap;" title="Mark this as not actually returned">Not returned</button>
+    </div>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function convertToPartial(title){
+  const item = allItems.find(i => i.title === title && i.amountReturned > 0);
+  if(!item){ showMsg('err','Could not find item.'); return; }
+  // Prompt user for the partial amount
+  const currentRefund = item.amountReturned;
+  const itemAmount = item.amount;
+  const partialStr = prompt(`Partial return for: ${title.slice(0,80)}\n\nItem cost: $${itemAmount.toFixed(2)} (qty ${item.qty || 1})\nCurrent refund: $${currentRefund.toFixed(2)}\n\nHow much was actually refunded? (e.g., if you returned 1 of 4 cushions for $17, enter 17)`, currentRefund.toFixed(2));
+  if(partialStr === null) return; // cancelled
+  const partial = parseFloat(partialStr);
+  if(!isFinite(partial) || partial <= 0){
+    showMsg('err','Enter a valid dollar amount.');
+    return;
+  }
+  if(partial >= itemAmount){
+    showMsg('info','That equals or exceeds the item cost — keeping it as a full return.');
+    return;
+  }
+  item.amountReturned = partial;
+  item.returnMatchType = 'partial-resolved';
+  const mi = managerItems.find(m => m.title === title);
+  if(mi){
+    mi.amountReturned = partial;
+    mi.returnMatchType = 'partial-resolved';
+  }
+  saveSessionData();
+  if(allItems.length) renderDash();
+  renderReturns();
+  showMsg('success',`Updated — ${fmtMoney(itemAmount - partial)} of this item now counts as spending.`);
+}
+
+function renderReturnsUnmatched(container){
+  const um = returnsData.unmatched;
+  if(!um.length){
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No unmatched refunds.</div>`;
+    return;
+  }
+  let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+    These refunds appear in your Refund Details file but we couldn't find any matching purchase in your Order History. This is normal if the original purchase happened in a year you didn't include, or if the refund is for an item that was never in your order history.
+  </div>`;
+  html += `<div style="background:#fff;border:1px solid var(--cream2);border-radius:10px;overflow:hidden;">`;
+  um.forEach(r=>{
+    const dateStr = r.refundDate ? r.refundDate.split('T')[0] : '';
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--cream2);font-size:12px;">
+      <div style="font-family:monospace;color:var(--muted);font-size:11px;">${r.orderId}${dateStr?' · '+dateStr:''}</div>
+      <div style="font-weight:600;color:var(--text);">${fmtMoney(r.refundAmount)}</div>
+    </div>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// Live update of "Selected: $X.XX" total beneath each card.
+// Also updates label backgrounds to reflect selection state.
+function updateAmbigTotal(idx){
+  const checkboxes = document.querySelectorAll(`input[name="ambig-${idx}"]`);
+  let total = 0;
+  let count = 0;
+  checkboxes.forEach(cb => {
+    const label = cb.closest('label');
+    if(cb.checked){
+      total += parseFloat(cb.dataset.amount) || 0;
+      count++;
+      if(label){ label.style.background = '#f0f8f8'; label.style.borderColor = 'var(--teal)'; }
+    } else if(label){
+      label.style.background = 'var(--cream)';
+      label.style.borderColor = 'var(--cream2)';
+    }
+  });
+  // Find this card's refund amount from the Skip checkbox sibling area
+  const ambig = returnsData.ambiguous[idx];
+  const refAmt = ambig ? ambig.refundAmount : 0;
+  const totalEl = document.getElementById(`ambig-total-${idx}`);
+  if(totalEl){
+    if(count === 0){
+      totalEl.textContent = '';
+    } else {
+      const diff = total - refAmt;
+      let icon = '', color = 'var(--muted)';
+      if(Math.abs(diff) < 0.01){ icon = '✓ matches refund'; color = 'var(--teal)'; }
+      else if(diff < 0){ icon = `${fmtMoney(Math.abs(diff))} less than refund`; color = 'var(--muted)'; }
+      else { icon = `${fmtMoney(diff)} more than refund`; color = '#c0392b'; }
+      totalEl.innerHTML = `<span style="color:var(--text);font-weight:600;">Selected: ${fmtMoney(total)}</span> · <span style="color:${color};">${icon}</span>`;
+    }
+  }
+  // If user picks any item, uncheck the Skip box
+  if(count > 0){
+    const skipCb = document.querySelector(`input[name="ambig-${idx}-skip"]`);
+    if(skipCb && skipCb.checked) skipCb.checked = false;
+  }
+}
+
+function toggleAmbigSkip(idx){
+  const skipCb = document.querySelector(`input[name="ambig-${idx}-skip"]`);
+  if(skipCb && skipCb.checked){
+    // Uncheck all item checkboxes if user picks Skip
+    document.querySelectorAll(`input[name="ambig-${idx}"]`).forEach(cb => {
+      cb.checked = false;
+      const label = cb.closest('label');
+      if(label){ label.style.background = 'var(--cream)'; label.style.borderColor = 'var(--cream2)'; }
+    });
+    const totalEl = document.getElementById(`ambig-total-${idx}`);
+    if(totalEl) totalEl.textContent = '';
+  }
+}
+
+function resolveAmbiguous(idx, kind){
+  const amb = returnsData.ambiguous[idx];
+  if(!amb) return;
+
+  // Direct skip from "no items remaining" Dismiss button
+  if(kind === 'skip'){
+    returnsData.ambiguous.splice(idx, 1);
+    saveSessionData();
+    if(allItems.length) renderDash();
+    renderReturns();
+    return;
+  }
+
+  // Check Skip checkbox state
+  const skipCb = document.querySelector(`input[name="ambig-${idx}-skip"]`);
+  if(skipCb && skipCb.checked){
+    returnsData.ambiguous.splice(idx, 1);
+    saveSessionData();
+    if(allItems.length) renderDash();
+    renderReturns();
+    return;
+  }
+
+  // Get all checked items (multi-select)
+  const checked = [...document.querySelectorAll(`input[name="ambig-${idx}"]:checked`)];
+  if(checked.length === 0){
+    showMsg('info','Pick one or more items (or check "Can\'t tell") before confirming.');
+    return;
+  }
+
+  const refundAmt = amb.refundAmount;
+
+  if(kind === 'partial'){
+    // Partial mode: only one item allowed, refund amount becomes amountReturned
+    if(checked.length > 1){
+      showMsg('info','Partial returns work for one item at a time. To split a refund across multiple items, use "Confirm full return" with all selected items.');
+      return;
+    }
+    const cand = amb.candidates[parseInt(checked[0].value)];
+    if(cand && cand.itemRef){
+      const amountReturned = Math.min(refundAmt, cand.itemRef.amount);
+      cand.itemRef.amountReturned = amountReturned;
+      cand.itemRef.refundDate = amb.refundDate;
+      cand.itemRef.returnMatchType = 'partial-resolved';
+      const mi = managerItems.find(m => m.title === cand.itemRef.title);
+      if(mi){
+        mi.amountReturned = amountReturned;
+        mi.refundDate = amb.refundDate;
+        mi.returnMatchType = 'partial-resolved';
+      }
+      returnsData.autoMatchedCount++;
+    }
+    returnsData.ambiguous.splice(idx, 1);
+  } else {
+    // Full mode: mark all selected items as fully returned
+    checked.forEach(cb => {
+      const cand = amb.candidates[parseInt(cb.value)];
+      if(cand && cand.itemRef){
+        cand.itemRef.amountReturned = cand.itemRef.amount;
+        cand.itemRef.refundDate = amb.refundDate;
+        cand.itemRef.returnMatchType = 'ambiguous-resolved';
+        const mi = managerItems.find(m => m.title === cand.itemRef.title);
+        if(mi){
+          mi.amountReturned = mi.amount;
+          mi.refundDate = amb.refundDate;
+          mi.returnMatchType = 'ambiguous-resolved';
+        }
+        returnsData.autoMatchedCount++;
+      }
+    });
+    returnsData.ambiguous.splice(idx, 1);
+  }
+
+  saveSessionData();
+  if(allItems.length) renderDash();
+  renderReturns();
+  showMsg('success', checked.length > 1 ? `${checked.length} items marked as returned.` : 'Saved.');
+}
+
+function overrideReturn(title){
+  // Flip a matched item back to NOT returned (clears amountReturned)
+  const item = allItems.find(i => i.title === title && i.amountReturned > 0);
+  if(item){
+    item.amountReturned = 0;
+    item.returnOverridden = true;
+    delete item.refundDate;
+    delete item.returnMatchType;
+  }
+  const mi = managerItems.find(m => m.title === title && m.amountReturned > 0);
+  if(mi){
+    mi.amountReturned = 0;
+    mi.returnOverridden = true;
+    mi.refundDate = null;
+    mi.returnMatchType = null;
+  }
+  saveSessionData();
+  if(allItems.length) renderDash();
+  renderReturns();
+  showMsg('info','Item moved back to Item Manager — categorize it there if needed.');
+}
+
+function toggleReturnsInTotals(checked){
+  returnsData.includeInTotals = !!checked;
+  if(allItems.length) renderDash();
+  updateReturnsBanner();
+}
+
+function updateReturnsBanner(){
+  const banner = document.getElementById('returns-banner');
+  if(!banner) return;
+  const returnedItems = allItems.filter(i => i.amountReturned > 0);
+  if(!returnedItems.length){
+    banner.style.display = 'none';
+    return;
+  }
+  // Total returned $ = sum of amountReturned values (handles both full and partial)
+  const totalReturned = returnedItems.reduce((s,i)=>s+(i.amountReturned||0),0);
+  const fullCount = returnedItems.filter(i=>isFullyReturned(i)).length;
+  const partialCount = returnedItems.length - fullCount;
+  const text = document.getElementById('returns-banner-text');
+  if(text){
+    const partialPart = partialCount > 0 ? ` (${partialCount} partial)` : '';
+    if(returnsData.includeInTotals){
+      text.innerHTML = `<strong>${returnedItems.length} returned item${returnedItems.length!==1?'s':''}</strong>${partialPart} (${fmtMoney(totalReturned)}) currently <strong style="color:var(--teal);">included</strong> in your dashboard totals.`;
+    } else {
+      text.innerHTML = `<strong>${fmtMoney(totalReturned)}</strong> in returns excluded from your dashboard (${returnedItems.length} item${returnedItems.length!==1?'s':''}${partialPart}).`;
+    }
+  }
+  banner.style.display = 'flex';
 }
 
 // ── SESSIONS ───────────────────────────────────────────────────────────────
@@ -1946,12 +2850,50 @@ function removeSession(idx){
     document.getElementById('tab-btn-catmap').classList.add('active');
     Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
     managerItems=[];
+    // No items left, reset returns state too
+    returnsData = {
+      refundMap: null, ambiguous: [], unmatched: [],
+      autoMatchedCount: 0, totalRefundAmount: 0, includeInTotals: false
+    };
+    const returnsTabBtn = document.getElementById('tab-btn-returns');
+    if(returnsTabBtn) returnsTabBtn.style.display = 'none';
+  } else if(returnsData.refundMap){
+    // Items shrunk — re-run matching so refunds for removed orders go back to unmatched
+    allItems.forEach(it => {
+      if(!it.returnOverridden){
+        it.amountReturned = 0;
+        delete it.refundDate;
+        delete it.returnMatchType;
+      }
+    });
+    const includedOrderIds = new Set(allItems.map(it => it.orderId).filter(Boolean));
+    const filteredRefundMap = {};
+    Object.keys(returnsData.refundMap).forEach(orderId => {
+      // For session removal, we don't have allOrderIdsInFile from a fresh parse — so
+      // we use a simpler rule: if the order isn't in current data, drop the refund.
+      if(includedOrderIds.has(orderId)) filteredRefundMap[orderId] = returnsData.refundMap[orderId];
+    });
+    const result = matchRefundsToItems(allItems, filteredRefundMap);
+    returnsData.refundMap = filteredRefundMap;
+    returnsData.ambiguous = result.ambiguous;
+    returnsData.unmatched = result.unmatched;
+    returnsData.autoMatchedCount = result.autoMatched;
+    returnsData.totalRefundAmount = result.totalRefund;
+    // Propagate amountReturned changes to managerItems
+    allItems.forEach(item => {
+      const mi = managerItems.find(m => m.title === item.title);
+      if(mi){
+        mi.amountReturned = item.amountReturned || 0;
+        mi.refundDate = item.refundDate || null;
+        mi.returnMatchType = item.returnMatchType || null;
+      }
+    });
   }
   renderSessionBadges();rebuildYearFilter();rebuildManagerYearFilter();
   if(allItems.length>0){renderDash();updateUncatBadge();}
 }
 function showNextSteps(){
-  const uncatN = managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat).length;
+  const uncatN = managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat&&!isFullyReturned(m)).length;
   const callout = document.getElementById('next-steps-callout');
   const text = document.getElementById('next-steps-text');
   if(uncatN > 0){
@@ -2090,16 +3032,25 @@ function getFiltered(){
   const moSel = getMsMonthSelections();
   return allItems.filter(i=>{
     if(excludedItems.has(overrideKey(i.title))) return false;
+    // Fully returned items are excluded entirely (unless toggle says include)
+    if(isFullyReturned(i) && !returnsData.includeInTotals) return false;
     if(yrSel && !yrSel.has(i.year)) return false;
     if(moSel && !moSel.has(i.month)) return false;
     return true;
+  }).map(i=>{
+    // For partial returns, adjust the amount to reflect what the user actually kept.
+    // Only apply when toggle is OFF — when ON, we want to show the full amount as gross.
+    if(i.amountReturned && i.amountReturned > 0 && !isFullyReturned(i) && !returnsData.includeInTotals){
+      return Object.assign({}, i, { amount: i.amount - i.amountReturned });
+    }
+    return i;
   });
 }
 
 // ── AI SUGGESTIONS — COPY FOR AI WORKFLOW ──────────────────────────────────
 
 function downloadAIPrompt(){
-  const uncatItems=managerItems.filter(m=>m.cat==='Uncategorized'&&!m.userCat);
+  const uncatItems=managerItems.filter(m=>m.cat==='Uncategorized'&&!m.userCat&&!isFullyReturned(m));
   if(!uncatItems.length){showMsg('info','No uncategorized items right now.');return;}
 
   // Build the category + subcategory reference
@@ -2267,6 +3218,9 @@ function renderManager(){
   const audFilter=(document.getElementById('cm-aud-filter').value||'all');
   const stypeFilter=(document.getElementById('cm-stype-filter').value||'all');
   let visible=managerItems;
+  // Fully returned items are hidden from Item Manager — they live in Returns tab.
+  // Partial returns DO appear (they represent real spending) with a badge.
+  visible = visible.filter(m=>!isFullyReturned(m));
   if(filterView==='uncat')visible=visible.filter(m=>m.cat==='Uncategorized'&&!m.excluded);
   else if(filterView==='excluded')visible=visible.filter(m=>m.excluded);
   else if(filterView==='locked')visible=visible.filter(m=>m.pinned&&!m.excluded);
@@ -2403,8 +3357,13 @@ function renderManager(){
       </div>`;
     }
 
+    // Partial return badge (item is in manager because it has spending value, but some was refunded)
+    const partialBadge = (item.amountReturned > 0 && !isFullyReturned(item))
+      ? `<span title="${fmtMoney(item.amountReturned)} of ${fmtMoney(item.amount)} was refunded — net ${fmtMoney(item.amount - item.amountReturned)} counts as spending" style="display:inline-block;background:#fef0e8;color:var(--rust);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle;text-transform:uppercase;letter-spacing:.04em;">Partial return ${fmtMoney(item.amountReturned)}</span>`
+      : '';
+
     return`<tr class="${rowCls}">
-      <td style="font-size:11px;max-width:180px;word-break:break-word">${escHtml(item.title.slice(0,70))}${item.title.length>70?'\u2026':''}</td>
+      <td style="font-size:11px;max-width:180px;word-break:break-word">${escHtml(item.title.slice(0,70))}${item.title.length>70?'\u2026':''}${partialBadge}</td>
       <td class="amt-cell">${fmt(item.amount)}</td>
       <td style="font-size:11px;color:var(--muted);text-align:center">${escHtml(item.year||'\u2014')}</td>
       <td>${statusTag}</td>
@@ -2761,6 +3720,7 @@ function exportCategoryMap(){
 
 // ── DASHBOARD RENDER ───────────────────────────────────────────────────────
 function renderDash(){
+  updateReturnsBanner();
   const items=getFiltered();
   if(!items.length){
     document.getElementById('hero-metrics').innerHTML='<div style="color:var(--muted);padding:1rem;font-size:14px;">No data for selected period.</div>';
