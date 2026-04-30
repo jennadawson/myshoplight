@@ -16,9 +16,58 @@
 body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:var(--text);min-height:100vh;}
 
 /* ── HEADER ── */
-.app-header{background:var(--teal);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+.app-header{background:var(--teal);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:relative;}
 .app-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;letter-spacing:.02em;}
 .app-logo span{opacity:.7;font-size:13px;font-family:'Source Sans 3',sans-serif;font-weight:400;margin-left:10px;}
+
+/* ── HAMBURGER MENU ── */
+.hamburger-btn{background:transparent;border:none;color:#fff;cursor:pointer;padding:6px 10px;font-size:0;display:none;border-radius:6px;transition:background .15s;}
+.hamburger-btn:hover{background:rgba(255,255,255,.12);}
+.hamburger-btn.visible{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;font-family:'Playfair Display',serif;letter-spacing:.01em;}
+.hamburger-icon{width:18px;height:14px;display:flex;flex-direction:column;justify-content:space-between;}
+.hamburger-icon span{display:block;height:2px;background:#fff;border-radius:1px;}
+.menu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:none;z-index:99;}
+.menu-overlay.open{display:block;}
+.menu-drawer{position:fixed;top:0;right:0;width:340px;max-width:90vw;height:100vh;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,.12);z-index:100;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
+.menu-drawer.open{transform:translateX(0);}
+.menu-header{background:var(--teal);color:#fff;padding:1.1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.menu-title{font-family:'Playfair Display',serif;font-size:20px;}
+.menu-close{background:transparent;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:0 4px;opacity:.85;}
+.menu-close:hover{opacity:1;}
+.menu-body{flex:1;overflow-y:auto;padding:.5rem 0;}
+.menu-section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:14px 1.5rem 6px;}
+.menu-item{display:flex;align-items:center;gap:12px;padding:11px 1.5rem;font-size:13px;color:var(--text);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-family:'Source Sans 3',sans-serif;font-weight:500;transition:background .12s;}
+.menu-item:hover{background:var(--cream);}
+.menu-item.danger{color:var(--rust);}
+.menu-item.danger:hover{background:#fdf0ee;}
+.menu-icon{width:18px;height:18px;flex-shrink:0;color:var(--teal);}
+.menu-item.danger .menu-icon{color:var(--rust);}
+
+/* ── LANDING VIEW ── */
+.landing-hero{background:var(--cream);border-radius:14px;padding:2.25rem 2rem;border:1px solid var(--cream2);margin-bottom:1.5rem;}
+.landing-hero-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;align-items:center;}
+@media(max-width:760px){.landing-hero-grid{grid-template-columns:1fr;gap:1.5rem;}}
+.landing-eyebrow{display:inline-block;background:#fff;border:1px solid var(--cream2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--teal);font-weight:600;margin-bottom:14px;}
+.landing-headline{font-family:'Playfair Display',serif;font-size:30px;line-height:1.2;color:var(--teal);margin-bottom:12px;}
+@media(max-width:760px){.landing-headline{font-size:24px;}}
+.landing-sub{font-size:14px;line-height:1.6;color:var(--text);}
+.landing-feature{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.landing-feature:last-child{margin-bottom:0;}
+.landing-feature-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.landing-feature-title{font-size:12px;font-weight:600;color:var(--text);}
+.landing-feature-sub{font-size:11px;color:var(--muted);}
+
+/* ── PREVIEW SECTION ── */
+.preview-section{margin-bottom:1.5rem;}
+.preview-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--teal);margin-bottom:6px;text-align:center;}
+.preview-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:1.25rem;line-height:1.5;}
+.preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:900px){.preview-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.preview-grid{grid-template-columns:1fr;}}
+.preview-card{background:#fff;border-radius:10px;padding:14px;border:1px solid var(--cream2);text-align:center;}
+.preview-card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+.preview-card-title{font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px;font-family:'Playfair Display',serif;}
+.preview-card-sub{font-size:11px;color:var(--muted);line-height:1.4;}
 
 /* ── LAYOUT ── */
 .container{max-width:1160px;margin:0 auto;padding:1.5rem 1.5rem 4rem;}
@@ -72,7 +121,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 
 /* ── TABS ── */
 .tab-bar{display:flex;border-bottom:2px solid var(--cream2);margin-bottom:1.5rem;}
-.tab{padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;}
+.tab{padding:10px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;font-family:'Playfair Display',serif;letter-spacing:.01em;}
 .tab:hover{color:var(--teal);}
 .tab.active{color:var(--teal);border-bottom-color:var(--teal);}
 .tab-badge{background:var(--rust);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:5px;font-weight:700;}
@@ -93,13 +142,17 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 .badges{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
 @media(max-width:600px){.badges{grid-template-columns:1fr;}}
 .badge{border-radius:12px;overflow:hidden;display:flex;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.badge-left{background:var(--teal);padding:14px 18px;font-size:14px;color:rgba(255,255,255,.85);line-height:1.5;min-width:145px;display:flex;align-items:center;}
-.badge-right{background:var(--cream);padding:14px 18px;font-size:20px;font-weight:600;color:var(--text);display:flex;align-items:center;flex:1;}
+.badge-left{background:var(--teal);padding:14px 18px;font-size:16px;color:rgba(255,255,255,.9);line-height:1.5;min-width:145px;display:flex;align-items:center;font-family:'Playfair Display',serif;}
+.badge-right{background:var(--cream);padding:14px 18px;font-size:22px;font-weight:600;color:var(--text);display:flex;align-items:center;flex:1;font-family:'Playfair Display',serif;}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
 @media(max-width:900px){.chart-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:580px){.chart-grid{grid-template-columns:1fr;}}
 .chart-card{background:#fff;border-radius:12px;padding:1.25rem;border:1px solid var(--cream2);box-shadow:0 1px 4px rgba(0,0,0,.04);}
-.cc-title{background:var(--olive);color:#fff;font-size:13px;font-weight:600;padding:5px 12px;border-radius:5px;display:inline-block;margin-bottom:12px;letter-spacing:.02em;}
+.chart-card.clickable{cursor:pointer;transition:all .18s ease;position:relative;}
+.chart-card.clickable:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(45,106,106,.12);transform:translateY(-1px);}
+.chart-card.clickable::after{content:"↓ View details";position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;color:var(--muted);opacity:0;transition:opacity .18s;letter-spacing:.02em;}
+.chart-card.clickable:hover::after{opacity:.7;}
+.cc-title{background:var(--olive);color:#fff;font-size:14px;font-weight:600;padding:5px 14px;border-radius:5px;display:inline-block;margin-bottom:12px;letter-spacing:.01em;font-family:'Playfair Display',serif;}
 .chart-wrap{position:relative;width:100%;}
 .legend{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);}
@@ -110,7 +163,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 @media(max-width:580px){.table-grid{grid-template-columns:1fr;}}
 .tbl-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--cream2);box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .tbl-head{background:var(--olive);padding:8px 14px;}
-.tbl-head-title{color:#fff;font-size:13px;font-weight:600;letter-spacing:.02em;}
+.tbl-head-title{color:#fff;font-size:14px;font-weight:600;letter-spacing:.01em;font-family:'Playfair Display',serif;}
 table.dt{width:100%;border-collapse:collapse;font-size:12px;}
 table.dt th{background:var(--cream2);color:var(--text);font-weight:600;padding:6px 12px;text-align:left;}
 table.dt th:last-child{text-align:right;}
@@ -230,7 +283,7 @@ table.dt tr.expandable-row:hover td{background:#e8f0f8;}
 table.dt tr.sub-row td{background:#f8fbff;font-size:11px;padding:4px 12px 4px 28px;color:var(--muted);border-bottom:.5px solid var(--cream2);}
 table.dt tr.sub-row td:last-child{text-align:right;font-weight:600;color:var(--text);}
 table.dt tr.sub-row:last-child td{border-bottom:none;}
-.expand-icon{font-size:10px;color:var(--muted);transition:transform .15s;display:inline-block;}
+.expand-icon{font-size:13px;color:var(--teal);transition:transform .15s;display:inline-block;font-weight:600;}
 .expand-icon.open{transform:rotate(90deg);}
 
 /* ── FOOTER ── */
@@ -315,9 +368,134 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
 <header class="app-header">
   <div class="app-logo">MyShopLight <span>Spend Smarter</span></div>
+  <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMenu()" aria-label="Open menu">
+    <span style="margin-right:2px;">Menu</span>
+    <div class="hamburger-icon"><span></span><span></span><span></span></div>
+  </button>
 </header>
 
+<!-- HAMBURGER MENU -->
+<div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+<aside class="menu-drawer" id="menu-drawer" aria-hidden="true">
+  <div class="menu-header">
+    <div class="menu-title">Menu</div>
+    <button class="menu-close" onclick="toggleMenu()" aria-label="Close menu">×</button>
+  </div>
+  <div class="menu-body">
+    <div class="menu-section-label">Help &amp; info</div>
+    <button class="menu-item" onclick="openMenuPage('how-to-use')">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 2-2.5 4M12 17h.01"/></svg>
+      How to use this
+    </button>
+    <button class="menu-item" onclick="openMenuPage('faqs')">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      FAQs
+    </button>
+    <button class="menu-item" onclick="openMenuPage('amazon-data')">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      How to get Amazon data
+    </button>
+
+    <div class="menu-section-label">Your data</div>
+    <button class="menu-item" onclick="hamburgerAddData()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Add more data
+    </button>
+    <button class="menu-item" onclick="hamburgerExport()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Export my customizations
+    </button>
+    <button class="menu-item" onclick="hamburgerRestore()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1015.5-6.36L21 8M21 3v5h-5"/></svg>
+      Restore customizations
+    </button>
+    <button class="menu-item danger" onclick="hamburgerStartOver()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      Start over (clear all data)
+    </button>
+  </div>
+</aside>
+
 <div class="container">
+
+  <!-- ═══════════ LANDING VIEW (shown when no data uploaded) ═══════════ -->
+  <div id="landing-view">
+
+  <!-- HERO -->
+  <div class="landing-hero">
+    <div class="landing-hero-grid">
+      <div>
+        <div class="landing-eyebrow">MyShopLight · Spend Smarter</div>
+        <div class="landing-headline">What are you actually buying on Amazon?</div>
+        <div class="landing-sub">Upload your order history and find out — by category, by who it was for, and what was actually essential. No accounts. No tracking. Just clarity.</div>
+      </div>
+      <div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon" style="background:#E1F5EE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A6A" stroke-width="2"><path d="M3 12l4 4L21 4"/></svg>
+          </div>
+          <div>
+            <div class="landing-feature-title">2,210 rules built in</div>
+            <div class="landing-feature-sub">No setup. No labeling.</div>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon" style="background:#FAECE7;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4614A" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div>
+            <div class="landing-feature-title">100% private</div>
+            <div class="landing-feature-sub">Stays in your browser.</div>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon" style="background:#EAF3DE;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7A3A" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+          </div>
+          <div>
+            <div class="landing-feature-title">16 categories</div>
+            <div class="landing-feature-sub">Plus needs vs. wants.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT YOU'LL SEE -->
+  <div class="preview-section">
+    <div class="preview-title">Here's what you'll see</div>
+    <div class="preview-sub">A clear, beautiful dashboard organized around the questions that actually matter.</div>
+    <div class="preview-grid">
+      <div class="preview-card">
+        <div class="preview-card-icon" style="background:#E1F5EE;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D6A6A" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 019 9h-9z" fill="#2D6A6A"/></svg>
+        </div>
+        <div class="preview-card-title">Spend by category</div>
+        <div class="preview-card-sub">Where your money actually goes — household, kids, beauty, pets, and more.</div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-icon" style="background:#FAECE7;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4614A" stroke-width="2"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="9" r="3"/><path d="M3 21v-1a4 4 0 014-4h4a4 4 0 014 4v1M14 16h3a4 4 0 014 4v1"/></svg>
+        </div>
+        <div class="preview-card-title">Spend by audience</div>
+        <div class="preview-card-sub">Who was it actually for — kids, adults, or shared household items.</div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-icon" style="background:#EAF3DE;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7A3A" stroke-width="2"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+        </div>
+        <div class="preview-card-title">Needs vs. wants</div>
+        <div class="preview-card-sub">Essential, flexible, or discretionary — see what was really necessary.</div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-icon" style="background:#F5F0E8;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a6800" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        </div>
+        <div class="preview-card-title">Trends over time</div>
+        <div class="preview-card-sub">Monthly and yearly views to spot patterns and seasonal spending.</div>
+      </div>
+    </div>
+  </div>
 
   <!-- WELCOME / INSTRUCTIONS PANEL -->
   <div class="upload-panel" id="welcome-panel" style="margin-bottom:1.25rem;">
@@ -420,8 +598,10 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div id="success-box" class="success-box"></div>
   </div>
 
+  </div><!-- ═══════════ END LANDING VIEW ═══════════ -->
+
   <!-- TABS -->
-  <div class="tab-bar" id="tab-bar">
+  <div class="tab-bar" id="tab-bar" style="display:none">
     <div class="tab active" id="tab-btn-dashboard" onclick="switchTab('dashboard')" style="display:none">Dashboard</div>
     <div class="tab" id="tab-btn-manager" onclick="switchTab('manager')" style="display:none">
       Item Manager <span class="tab-badge" id="uncat-badge">0</span>
@@ -429,7 +609,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="tab" id="tab-btn-returns" onclick="switchTab('returns')" style="display:none">
       Returns <span class="tab-badge" id="returns-badge" style="background:var(--rust);display:none;">0</span>
     </div>
-    <div class="tab active" id="tab-btn-catmap" onclick="switchTab('catmap')">Category Map</div>
+    <div class="tab" id="tab-btn-catmap" onclick="switchTab('catmap')">Category Map</div>
   </div>
 
   <!-- DASHBOARD TAB -->
@@ -506,22 +686,11 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div class="hero" id="hero-metrics"></div>
       <div class="badges" id="top-badges"></div>
       <div class="chart-grid" style="grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-        <div class="chart-card"><div class="cc-title">Spend by Category</div><div class="legend" id="cat-legend"></div><div class="chart-wrap" style="height:220px"><canvas id="catChart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-title">Top 5 Categories</div><div class="chart-wrap" id="top5-wrap" style="height:220px"><canvas id="top5Chart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-title">Spend by Audience</div><div class="legend" id="aud-legend"></div><div class="chart-wrap" style="height:220px"><canvas id="audChart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-title">Top 5 Subcategories</div><div class="chart-wrap" id="top5sub-wrap" style="height:220px"><canvas id="top5SubChart"></canvas></div></div>
-        <div class="chart-card" style="grid-column:1/-1"><div class="cc-title">Spend by Type</div><div style="display:flex;gap:12px;justify-content:center;margin-bottom:10px;" id="stype-legend"></div><div class="chart-wrap" style="height:180px"><canvas id="stypeChart"></canvas></div></div>
-      </div>
-      <!-- Monthly/Yearly spend — full width -->
-      <div class="full-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-          <div class="cc-title" style="margin-bottom:0" id="spend-chart-title">Monthly Spend</div>
-          <div style="display:flex;gap:4px;">
-            <button id="toggle-monthly" class="btn sm" onclick="setSpendView('monthly')" style="padding:4px 12px;font-size:11px;">Monthly</button>
-            <button id="toggle-yearly" class="btn sm outline" onclick="setSpendView('yearly')" style="padding:4px 12px;font-size:11px;">Yearly</button>
-          </div>
-        </div>
-        <div class="chart-wrap" style="height:210px"><canvas id="monthChart"></canvas></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Spend by Category</div><div class="legend" id="cat-legend"></div><div class="chart-wrap" style="height:220px"><canvas id="catChart"></canvas></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Categories</div><div class="chart-wrap" id="top5-wrap" style="height:220px"><canvas id="top5Chart"></canvas></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('aud')"><div class="cc-title">Spend by Audience</div><div class="legend" id="aud-legend"></div><div class="chart-wrap" style="height:220px"><canvas id="audChart"></canvas></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Subcategories</div><div class="chart-wrap" id="top5sub-wrap" style="height:220px"><canvas id="top5SubChart"></canvas></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('stype')" style="grid-column:1/-1"><div class="cc-title">Spend by Type</div><div style="display:flex;gap:12px;justify-content:center;margin-bottom:10px;" id="stype-legend"></div><div class="chart-wrap" style="height:180px"><canvas id="stypeChart"></canvas></div></div>
       </div>
       <!-- Top 10 Most Expensive Items — full width -->
       <div class="full-card" style="margin-bottom:1.5rem;">
@@ -532,17 +701,36 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </div>
       <!-- Category + Audience breakdown — side by side -->
       <div class="table-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1.5rem;">
-        <div class="tbl-card"><div class="tbl-head"><div class="tbl-head-title">Category Breakdown <span style="font-size:10px;opacity:.7;font-weight:400">— click to expand</span></div></div><table class="dt"><thead><tr><th>Category</th><th>Total Spend</th><th style="width:30px"></th></tr></thead><tbody id="cat-table"></tbody></table></div>
-        <div class="tbl-card"><div class="tbl-head"><div class="tbl-head-title">Audience Breakdown <span style="font-size:10px;opacity:.7;font-weight:400">— click to expand</span></div></div><table class="dt"><thead><tr><th>Audience</th><th>Total Spend</th><th style="width:30px"></th></tr></thead><tbody id="aud-table"></tbody></table></div>
+        <div class="tbl-card" id="cat-breakdown-section"><div class="tbl-head"><div class="tbl-head-title">Category Breakdown <span style="font-size:11px;color:rgba(255,255,255,.85);font-weight:500;font-family:'Source Sans 3',sans-serif;">— click any row to see details</span></div></div><table class="dt"><thead><tr><th>Category</th><th>Total Spend</th><th style="width:30px"></th></tr></thead><tbody id="cat-table"></tbody></table></div>
+        <div class="tbl-card" id="aud-breakdown-section"><div class="tbl-head"><div class="tbl-head-title">Audience Breakdown <span style="font-size:11px;color:rgba(255,255,255,.85);font-weight:500;font-family:'Source Sans 3',sans-serif;">— click any row to see details</span></div></div><table class="dt"><thead><tr><th>Audience</th><th>Total Spend</th><th style="width:30px"></th></tr></thead><tbody id="aud-table"></tbody></table></div>
       </div>
       <!-- Spend Type breakdown — full width -->
-      <div class="full-card" style="margin-bottom:1.5rem;">
+      <div class="full-card" id="stype-breakdown-section" style="margin-bottom:1.5rem;">
         <div class="tbl-head" style="margin:-1.25rem -1.25rem 1rem -1.25rem;border-radius:11px 11px 0 0;padding:8px 14px;">
-          <div class="tbl-head-title">Spend Type Breakdown</div>
+          <div class="tbl-head-title">Spend Type Breakdown <span style="font-size:11px;color:rgba(255,255,255,.85);font-weight:500;font-family:'Source Sans 3',sans-serif;">— click any row to see details</span></div>
         </div>
         <table class="dt" style="width:100%"><thead><tr><th>Type</th><th>Total Spend</th><th>% of Total</th><th style="width:30px"></th></tr></thead><tbody id="stype-table"></tbody></table>
       </div>
-      <div class="full-card"><div class="cc-title">% of Monthly Spend by Category</div><div class="stacked-legend" id="stacked-legend"></div><div class="chart-wrap" style="height:270px"><canvas id="stackedChart"></canvas></div></div>
+      <!-- ── Time-series views grouped at the bottom ── -->
+      <!-- Monthly/Yearly spend — full width -->
+      <div class="full-card" style="margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div class="cc-title" style="margin-bottom:0" id="spend-chart-title">Monthly Spend</div>
+          <div style="display:flex;gap:4px;">
+            <button id="toggle-monthly" class="btn sm" onclick="setSpendView('monthly')" style="padding:4px 12px;font-size:11px;">Monthly</button>
+            <button id="toggle-yearly" class="btn sm outline" onclick="setSpendView('yearly')" style="padding:4px 12px;font-size:11px;">Yearly</button>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:210px"><canvas id="monthChart"></canvas></div>
+      </div>
+      <div class="full-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div class="cc-title" id="stacked-chart-title" style="margin-bottom:0">% of Monthly Spend by Category</div>
+          <div style="font-size:10px;color:var(--muted);font-style:italic;">follows the Monthly / Yearly toggle above</div>
+        </div>
+        <div class="stacked-legend" id="stacked-legend"></div>
+        <div class="chart-wrap" style="height:270px"><canvas id="stackedChart"></canvas></div>
+      </div>
     </div>
   </div>
 
@@ -782,7 +970,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div style="background:var(--cream);border-radius:14px;padding:1.5rem;border:1px solid var(--cream2);margin-bottom:1.25rem;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
         <div>
-          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Returns Manager</div>
+          <div style="font-family:'Playfair Display',serif;font-size:19px;color:var(--teal);margin-bottom:4px;">Returns Manager</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.5;max-width:560px;">Returned items are excluded from your dashboard so your numbers reflect what you actually spent. Review and resolve any items below where we couldn't auto-match a refund.</div>
         </div>
         <div id="returns-summary" style="text-align:right;font-size:12px;color:var(--text);line-height:1.7;"></div>
@@ -1174,6 +1362,9 @@ let uploadedYears = new Set(); // retained for localStorage compatibility
         updateUncatBadge();
         const uncatN = managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat).length;
         document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
+        // Switch to dashboard view since we have data
+        showDashboardView();
+        switchTab('dashboard');
       }
     }
   } catch(e){}
@@ -1450,6 +1641,126 @@ let pendingFile = null;
 let pendingRefundFile = null; // optional Refund Details.csv from Amazon zip
 let pendingRefundMap = null; // { orderId: [{ amount, date, refundId, ... }, ...] }
 let detectedYears = []; // years found in the uploaded CSV
+
+// ── VIEW STATE (landing vs dashboard) ──────────────────────────────────────
+function showLandingView(){
+  const lv = document.getElementById('landing-view');
+  const tb = document.getElementById('tab-bar');
+  const hb = document.getElementById('hamburger-btn');
+  if(lv) lv.style.display = '';
+  if(tb) tb.style.display = 'none';
+  if(hb) hb.classList.remove('visible');
+  // hide all tab panels
+  ['tab-dashboard','tab-manager','tab-returns','tab-catmap'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+}
+function showDashboardView(){
+  const lv = document.getElementById('landing-view');
+  const tb = document.getElementById('tab-bar');
+  const hb = document.getElementById('hamburger-btn');
+  if(lv) lv.style.display = 'none';
+  if(tb) tb.style.display = '';
+  if(hb) hb.classList.add('visible');
+  // default to dashboard tab if nothing currently active
+  if(!document.querySelector('.tab.active')){
+    switchTab('dashboard');
+  }
+}
+
+// ── HAMBURGER MENU ─────────────────────────────────────────────────────────
+function toggleMenu(){
+  const drawer = document.getElementById('menu-drawer');
+  const overlay = document.getElementById('menu-overlay');
+  const isOpen = drawer.classList.contains('open');
+  if(isOpen){
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    drawer.setAttribute('aria-hidden','true');
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.setAttribute('aria-hidden','false');
+  }
+}
+
+function openMenuPage(page){
+  toggleMenu();
+  // For now, alert with placeholder - we'll wire up actual content next
+  const titles = {
+    'how-to-use': 'How to use MyShopLight',
+    'faqs': 'Frequently asked questions',
+    'amazon-data': 'How to get your Amazon data'
+  };
+  alert(titles[page] + ' — coming next session. We\'ll wire up the modal content.');
+}
+
+function hamburgerAddData(){
+  toggleMenu();
+  // Temporarily show the landing view so user can use the upload panel
+  // Future: better solution is a dedicated "add data" modal
+  showLandingView();
+  // Scroll to upload panel
+  setTimeout(()=>{
+    const up = document.getElementById('upload-panel');
+    if(up) up.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+}
+
+function hamburgerExport(){
+  toggleMenu();
+  switchTab('manager');
+  setTimeout(()=>{
+    if(typeof exportCustomizations === 'function'){
+      exportCustomizations();
+    }
+  }, 200);
+}
+
+function hamburgerRestore(){
+  toggleMenu();
+  switchTab('manager');
+  setTimeout(()=>{
+    if(typeof showRestoreUI === 'function'){
+      showRestoreUI();
+    }
+  }, 200);
+}
+
+function hamburgerStartOver(){
+  toggleMenu();
+  if(!confirm('This will clear all your uploaded data and customizations. Are you sure?')) return;
+  // Clear all storage
+  try{
+    localStorage.removeItem(STORAGE_KEY_NEW);
+    localStorage.removeItem(STORAGE_KEY_OVERRIDES);
+    localStorage.removeItem(STORAGE_KEY_AUD_OV);
+    localStorage.removeItem(STORAGE_KEY_STYPE_OV);
+    localStorage.removeItem(STORAGE_KEY_EXCLUDED);
+    localStorage.removeItem(STORAGE_KEY_STRUCTURE);
+    localStorage.removeItem(STORAGE_KEY_UPLOADED);
+    localStorage.removeItem(STORAGE_KEY_SESSIONS);
+  }catch(e){}
+  location.reload();
+}
+
+// ── SCROLL FROM CHART TO BREAKDOWN TABLE ───────────────────────────────────
+function scrollToBreakdown(which){
+  const map = {
+    'cat':   'cat-breakdown-section',
+    'aud':   'aud-breakdown-section',
+    'stype': 'stype-breakdown-section'
+  };
+  const id = map[which];
+  if(!id) return;
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+  // Brief highlight flash so the user sees what we scrolled to
+  el.style.transition = 'box-shadow .35s ease, border-color .35s ease';
+  el.style.boxShadow = '0 0 0 3px rgba(45,106,106,.35)';
+  setTimeout(()=>{ el.style.boxShadow = ''; }, 1100);
+}
 
 function togglePanel(which){
   const bodyId = which==='welcome' ? 'welcome-panel-body' : 'upload-panel-body';
@@ -2271,6 +2582,10 @@ async function runProcessing(){
 
   // collapse welcome + upload panels to free up screen real estate
   collapsePanelsAfterUpload();
+
+  // Switch from landing view to dashboard view
+  showDashboardView();
+  switchTab('dashboard');
 
   // Reset for possible additional upload
   pendingFile=null;
@@ -4200,16 +4515,35 @@ function renderDash(){
   });
   document.getElementById('stype-table').innerHTML=stypeRows;
 
-  // ── Stacked % chart ──
-  const ck=sc.map(([c])=>c),mcd={};
-  months.forEach(m=>mcd[m]={});
-  items.forEach(i=>{if(i.date){try{const d=new Date(i.date);const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(mcd[mk])mcd[mk][i.cat]=(mcd[mk][i.cat]||0)+i.amount;}catch(e){}}});
-  const sds=ck.map(cat=>({label:cat,data:months.map(m=>{const t=monthTotals[m]||1;return Math.round((mcd[m][cat]||0)/t*1000)/10;}),backgroundColor:CAT_COLORS[cat]||'#888',stack:'s'}));
+  // ── Stacked % chart — respects spendView toggle (monthly | yearly) ──
+  const ck=sc.map(([c])=>c);
+  let stackedBuckets, stackedTotals, stackedLabels;
+  if(spendView==='yearly'){
+    // aggregate by year
+    stackedBuckets={}; stackedTotals={};
+    const yearsSet=new Set();
+    items.forEach(i=>{if(i.date){try{const d=new Date(i.date);const yk=String(d.getFullYear());yearsSet.add(yk);if(!stackedBuckets[yk])stackedBuckets[yk]={};stackedBuckets[yk][i.cat]=(stackedBuckets[yk][i.cat]||0)+i.amount;stackedTotals[yk]=(stackedTotals[yk]||0)+i.amount;}catch(e){}}});
+    const sortedYears=[...yearsSet].sort();
+    stackedLabels=sortedYears;
+  } else {
+    // aggregate by month (default)
+    stackedBuckets={}; stackedTotals={};
+    months.forEach(m=>{stackedBuckets[m]={};stackedTotals[m]=monthTotals[m]||0;});
+    items.forEach(i=>{if(i.date){try{const d=new Date(i.date);const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(stackedBuckets[mk])stackedBuckets[mk][i.cat]=(stackedBuckets[mk][i.cat]||0)+i.amount;}catch(e){}}});
+    stackedLabels=months;
+  }
+  const sds=ck.map(cat=>({label:cat,data:stackedLabels.map(k=>{const t=stackedTotals[k]||1;return Math.round(((stackedBuckets[k]&&stackedBuckets[k][cat])||0)/t*1000)/10;}),backgroundColor:CAT_COLORS[cat]||'#888',stack:'s'}));
   document.getElementById('stacked-legend').innerHTML=ck.map(c=>`<span class="leg-item"><span class="leg-dot" style="background:${CAT_COLORS[c]||'#888'}"></span>${c}</span>`).join('');
+  // Update the stacked chart title to match the toggle
+  const stackedTitleEl=document.getElementById('stacked-chart-title');
+  if(stackedTitleEl) stackedTitleEl.textContent = spendView==='yearly' ? '% of Yearly Spend by Category' : '% of Monthly Spend by Category';
+  const displayLabels = spendView==='yearly'
+    ? stackedLabels
+    : stackedLabels.map(m=>{const[y,mo]=m.split('-');return new Date(y,mo-1).toLocaleString('default',{month:'short',year:'2-digit'});});
   if(charts.stacked)charts.stacked.destroy();
   charts.stacked=new Chart(document.getElementById('stackedChart'),{
     type:'bar',
-    data:{labels:months.map(m=>{const[y,mo]=m.split('-');return new Date(y,mo-1).toLocaleString('default',{month:'short',year:'2-digit'});}),datasets:sds},
+    data:{labels:displayLabels,datasets:sds},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'%'}}},
       scales:{
