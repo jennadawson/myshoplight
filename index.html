@@ -5152,34 +5152,36 @@ function restoreCustomizations(){
 
 // ── INIT CATMAP ON DOM READY ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async function(){
-  await loadFromSupabase();
+  // Only load from Supabase if local init found no data
+  if(allItems.length === 0){
+    await loadFromSupabase();
 
-  // Re-read localStorage now that Supabase data is loaded
-  const savedSessions = localStorage.getItem('api_sessions_v2');
-  if(savedSessions){
-    const sd = JSON.parse(savedSessions);
-    sessions = sd.sessions || [];
-    sessionItems = sd.sessionItems || [];
-    allItems = sessionItems.flat();
-    managerItems = sd.managerItems || [];
-    const savedExcluded = localStorage.getItem('api_excluded_items');
-    if(savedExcluded) excludedItems = new Set(JSON.parse(savedExcluded));
-    managerItems.forEach(m=>{
-      m.excluded = excludedItems.has(overrideKey(m.title));
-      m.stypeLocked = !!stypeOverrides[overrideKey(m.title)];
-      if(m.stypeLocked) m.stype = stypeOverrides[overrideKey(m.title)];
-    });
-    if(allItems.length > 0){
-      rebuildYearFilter();rebuildManagerYearFilter();
-      document.getElementById('tab-btn-dashboard').style.display='';
-      document.getElementById('tab-btn-manager').style.display='';
-      document.getElementById('dash-head').style.display='';
-      document.getElementById('dash-body').style.display='';
-      renderSessionBadges();
-      renderDash();
-      updateUncatBadge();
-      document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
-      showDashboardView();
+    const savedSessions = localStorage.getItem('api_sessions_v2');
+    if(savedSessions){
+      const sd = JSON.parse(savedSessions);
+      sessions = sd.sessions || [];
+      sessionItems = sd.sessionItems || [];
+      allItems = sessionItems.flat();
+      managerItems = sd.managerItems || [];
+      const savedExcluded = localStorage.getItem('api_excluded_items');
+      if(savedExcluded) excludedItems = new Set(JSON.parse(savedExcluded));
+      managerItems.forEach(m=>{
+        m.excluded = excludedItems.has(overrideKey(m.title));
+        m.stypeLocked = !!stypeOverrides[overrideKey(m.title)];
+        if(m.stypeLocked) m.stype = stypeOverrides[overrideKey(m.title)];
+      });
+      if(allItems.length > 0){
+        rebuildYearFilter();rebuildManagerYearFilter();
+        document.getElementById('tab-btn-dashboard').style.display='';
+        document.getElementById('tab-btn-manager').style.display='';
+        document.getElementById('dash-head').style.display='';
+        document.getElementById('dash-body').style.display='';
+        renderSessionBadges();
+        renderDash();
+        updateUncatBadge();
+        document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
+        showDashboardView();
+      }
     }
   }
 
