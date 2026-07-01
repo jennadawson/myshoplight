@@ -3,6 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const { createClient } = supabase;
+  const _supabase = createClient(
+    'https://cwcibkvoclsdqdmglhiy.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3Y2lia3ZvY2xzZHFkbWdsaGl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzI4MDUsImV4cCI6MjA5NzEwODgwNX0.9Xwb5Ct4W1Px-lOzv2pJYWCFUm7WUtq1VzmdrSCRBh0'
+  );
+
+  (async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+    const { data: entitlements } = await _supabase
+      .from('user_entitlements')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (!entitlements || entitlements.length === 0) {
+      window.location.href = 'redeem.html';
+    }
+  })();
+</script>
 <title>MyShopLight</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
