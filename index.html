@@ -27,6 +27,63 @@
     }
   })();
 </script>
+  <script>
+async function syncToSupabase() {
+  try {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    const sessionsData = localStorage.getItem('api_sessions_v2');
+    const customizations = {
+      newRules: localStorage.getItem('api_new_rules'),
+      overrides: localStorage.getItem('api_overrides'),
+      audOverrides: localStorage.getItem('api_aud_overrides'),
+      stypeOverrides: localStorage.getItem('api_stype_overrides'),
+      excludedItems: localStorage.getItem('api_excluded_items'),
+      catStructure: localStorage.getItem('api_cat_structure')
+    };
+
+    await _supabase.from('user_data').upsert({
+      user_id: user.id,
+      sessions_data: sessionsData ? JSON.parse(sessionsData) : null,
+      customizations: customizations,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+  } catch(e) {
+    console.error('Supabase sync error:', e);
+  }
+}
+
+async function loadFromSupabase() {
+  try {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    const { data } = await _supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!data) return;
+
+    if (data.sessions_data) {
+      localStorage.setItem('api_sessions_v2', JSON.stringify(data.sessions_data));
+    }
+    if (data.customizations) {
+      const c = data.customizations;
+      if (c.newRules) localStorage.setItem('api_new_rules', c.newRules);
+      if (c.overrides) localStorage.setItem('api_overrides', c.overrides);
+      if (c.audOverrides) localStorage.setItem('api_aud_overrides', c.audOverrides);
+      if (c.stypeOverrides) localStorage.setItem('api_stype_overrides', c.stypeOverrides);
+      if (c.excludedItems) localStorage.setItem('api_excluded_items', c.excludedItems);
+      if (c.catStructure) localStorage.setItem('api_cat_structure', c.catStructure);
+    }
+  } catch(e) {
+    console.error('Supabase load error:', e);
+  }
+}
+</script>
 <title>MyShopLight</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -2600,6 +2657,7 @@ async function runProcessing(){
 
   // persist session data to localStorage
   saveSessionData();
+   syncToSupabase();
 
   // show next-steps callout
   showNextSteps();
@@ -5093,7 +5151,8 @@ function restoreCustomizations(){
 }
 
 // ── INIT CATMAP ON DOM READY ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', async function(){
+  await loadFromSupabase();
   renderCatMap();
 });
 
