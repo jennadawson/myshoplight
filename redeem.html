@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyShopLight – Redeem Your License</title>
+</head>
+<body>
+  <h1>Redeem Your License Key</h1>
+  <p>Enter the license key from your purchase confirmation.</p>
+  <form id="redeem-form">
+    <input type="text" id="license-key" placeholder="XXXX-XXXX-XXXX-XXXX" required /><br/><br/>
+    <button type="submit">Redeem</button>
+  </form>
+  <p id="error-msg" style="color:red;"></p>
+  <p id="success-msg" style="color:green;"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://cwcibkvoclsdqdmglhiy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3Y2lia3ZvY2xzZHFkbWdsaGl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzI4MDUsImV4cCI6MjA5NzEwODgwNX0.9Xwb5Ct4W1Px-lOzv2pJYWCFUm7WUtq1VzmdrSCRBh0'
+    );
+
+    document.getElementById('redeem-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const key = document.getElementById('license-key').value.trim();
+
+      // Get current user
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Look up the license key
+      const { data: license, error: lookupError } = await client
+        .from('license_keys')
+        .select('*')
+        .eq('key', key)
+        .single();
+
+      if (lookupError || !license) {
+        document.getElementById('error-msg').textContent = 'License key not found.';
+        return;
+      }
+
+      if (license.is_redeemed) {
+        document.getElementById('error-msg').textContent = 'This key has already been redeemed.';
+        return;
+      }
+
+      // Mark key as redeemed
+      await client
+        .from('license_keys')
+        .update({ is_redeemed: true, redeemed_by: user.id, redeemed_at: new Date().toISOString() })
+        .eq('id', license.id);
+
+      // Write entitlement
+      await client
+        .from('user_entitlements')
+        .insert({ user_id: user.id, license_key_id: license.id, type: license.type });
+
+      document.getElementById('success-msg').textContent = 'Success! Taking you to your dashboard...';
+      setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+    });
+  </script>
+</body>
+</html>
