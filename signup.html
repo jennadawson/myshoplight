@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyShopLight – Sign Up</title>
+</head>
+<body>
+  <h1>Create Your Account</h1>
+  <form id="signup-form">
+    <input type="email" id="email" placeholder="Email" required /><br/><br/>
+    <input type="password" id="password" placeholder="Password (min 6 characters)" required /><br/><br/>
+    <button type="submit">Create Account</button>
+  </form>
+  <p id="error-msg" style="color:red;"></p>
+  <p id="success-msg" style="color:green;"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://cwcibkvoclsdqdmglhiy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3Y2lia3ZvY2xzZHFkbWdsaGl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzI4MDUsImV4cCI6MjA5NzEwODgwNX0.9Xwb5Ct4W1Px-lOzv2pJYWCFUm7WUtq1VzmdrSCRBh0'
+    );
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const { error } = await client.auth.signUp({ email, password });
+
+      if (error) {
+        document.getElementById('error-msg').textContent = error.message;
+      } else {
+        document.getElementById('success-msg').textContent = 'Account created! Check your email to confirm, then log in.';
+      }
+    });
+  </script>
+</body>
+</html>
