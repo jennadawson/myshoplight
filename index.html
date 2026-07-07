@@ -120,12 +120,12 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .menu-close{background:transparent;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:0 4px;opacity:.85;}
 .menu-close:hover{opacity:1;}
 .menu-body{flex:1;overflow-y:auto;padding:.5rem 0;}
-.menu-section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:14px 1.5rem 6px;}
-.menu-item{display:flex;align-items:center;gap:12px;padding:11px 1.5rem;font-size:13px;color:var(--text);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-family:'Source Sans 3',sans-serif;font-weight:500;transition:background .12s;}
+.menu-section-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:16px 1.5rem 6px;}
+.menu-item{display:flex;align-items:center;gap:12px;padding:10px 1.5rem;font-size:13px;color:var(--text);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-family:'Source Sans 3',sans-serif;font-weight:400;transition:background .12s;}
 .menu-item:hover{background:var(--cream);}
 .menu-item.danger{color:var(--rust);}
 .menu-item.danger:hover{background:#fdf0ee;}
-.menu-icon{width:18px;height:18px;flex-shrink:0;color:var(--teal);}
+.menu-icon{width:18px;height:18px;flex-shrink:0;color:var(--teal);opacity:.9;}
 .menu-item.danger .menu-icon{color:var(--rust);}
 
 /* ── LANDING VIEW ── */
@@ -205,15 +205,15 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .success-box{background:var(--teal-tint);border:1px solid var(--teal-tint);border-radius:8px;padding:.75rem 1rem;font-size:12px;color:var(--teal);margin:.75rem 0;display:none;}
 
 /* ── TABS ── */
-.tab-bar{display:flex;border-bottom:2px solid var(--cream2);margin-bottom:1.5rem;}
-.tab{padding:10px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;font-family:'Playfair Display',serif;letter-spacing:.01em;}
-.tab:hover{color:var(--teal);}
-.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
-.tab-badge{background:var(--rust);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:5px;font-weight:700;}
+.tab-bar{display:flex;gap:6px;padding:0 0 1rem;margin-bottom:1rem;border-bottom:none;}
+.tab{padding:8px 18px;font-size:14px;font-weight:500;cursor:pointer;color:var(--muted);border-radius:20px;border:1.5px solid transparent;transition:all .15s;white-space:nowrap;font-family:'Source Sans 3',sans-serif;background:transparent;}
+.tab:hover{color:var(--teal);background:var(--teal-tint);}
+.tab.active{color:#fff;background:var(--teal);border-color:var(--teal);}
+.tab-badge{background:var(--rust);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:4px;font-weight:700;}
 
 /* ── DASHBOARD ── */
 .dash-head{background:var(--teal);border-radius:10px;padding:.85rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-.dash-title{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:600;color:#fff;letter-spacing:.01em;}
+.dash-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;letter-spacing:.01em;}
 .dash-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:3px;}
 .filters{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
 .filter-group{display:flex;align-items:center;gap:8px;background:var(--cream);border-radius:8px;padding:8px 14px;border:1px solid var(--cream2);}
@@ -392,17 +392,13 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .ms-option.checked{background:var(--teal-tint);}
 
 /* ── VIEW FILTER BUTTONS ── */
-.view-btn{border:none;border-radius:7px;padding:6px 16px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;opacity:.55;}
-.view-btn:hover{opacity:.8;}
-#vbtn-all{background:var(--teal);color:#fff;}
-#vbtn-uncat{background:var(--rust);color:#fff;}
-#vbtn-excluded{background:#888;color:#fff;}
-#vbtn-locked{background:#1a56a0;color:#fff;}
-.view-btn.active{opacity:1;box-shadow:0 0 0 2px #fff,0 0 0 4px currentColor;}
-#vbtn-all.active{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--teal);}
-#vbtn-uncat.active{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--rust);}
-#vbtn-locked.active{box-shadow:0 0 0 2px #fff,0 0 0 4px #1a56a0;}
-#vbtn-excluded.active{box-shadow:0 0 0 2px #fff,0 0 0 4px #888;}
+.view-btn{border:1.5px solid var(--cream2);border-radius:20px;padding:6px 16px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
+.view-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-tint);}
+#vbtn-all.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+#vbtn-uncat.active{background:var(--rust);color:#fff;border-color:var(--rust);}
+#vbtn-excluded.active{background:#888;color:#fff;border-color:#888;}
+#vbtn-locked.active{background:#1a56a0;color:#fff;border-color:#1a56a0;}
+.view-btn.active{opacity:1;}
 
 /* ── ACTION CELL ── */
 .action-sel{border:1px solid var(--cream2);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Source Sans 3',sans-serif;background:#fff;outline:none;cursor:pointer;width:100%;color:var(--text);}
@@ -735,6 +731,13 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <span class="next-steps-dismiss" onclick="dismissNextSteps()">✕ Dismiss</span>
     </div>
 
+    <div class="dash-head" id="dash-head" style="display:none">
+      <div>
+        <div class="dash-title">Spend Spotlights</div>
+        <div class="dash-sub" id="dash-sub"></div>
+      </div>
+    </div>
+
     <!-- Returns indicator banner (shown when refunds detected) -->
     <div id="returns-banner" style="display:none;background:var(--cream);border:1px solid var(--cream2);border-left:3px solid var(--teal);border-radius:8px;padding:10px 14px;margin-bottom:1rem;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div style="font-size:12px;color:var(--text);line-height:1.5;">
@@ -745,13 +748,6 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <input type="checkbox" id="returns-include-toggle" onchange="toggleReturnsInTotals(this.checked)" style="accent-color:var(--teal);">
         Include returns in totals
       </label>
-    </div>
-
-    <div class="dash-head" id="dash-head" style="display:none">
-      <div>
-        <div class="dash-title">Spend Spotlights</div>
-        <div class="dash-sub" id="dash-sub"></div>
-      </div>
     </div>
     <div id="dash-body" style="display:none">
       <div id="insight-strip" class="insight-strip" style="display:none"></div>
@@ -938,60 +934,28 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </div>
     </div><!-- end FAQ panel -->
 
-    <!-- TWO-BOX PANEL: Customizations + AI Suggestions -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-
-      <!-- BOX 1: Save Customizations -->
-      <div style="background:#f0f8f8;border:2px solid var(--teal);border-radius:14px;padding:1.25rem 1.5rem;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:var(--teal);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
-          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--teal);">Saving Customizations</div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Your custom keyword rules, locked items, audience overrides, and spend type changes are saved to this browser only. Export them as a backup so you never lose your work — and restore them anytime you open MyShopLight on a new device or download a new version.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn sm teal" onclick="exportCustomizations()">💾 Export My Customizations</button>
-          <button class="btn sm outline" onclick="toggleRestorePanel()" style="border-color:var(--teal);color:var(--teal);">↩ Restore My Customizations</button>
-        </div>
-        <!-- Restore panel -->
-        <div id="restore-panel" style="display:none;margin-top:1rem;border-top:1px solid var(--cream2);padding-top:1rem;">
-          <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:6px;">Restore from backup</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the contents of your exported customizations file below, then click Restore.</div>
-          <textarea id="restore-textarea" style="width:100%;height:120px;border:1px solid var(--cream2);border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste your exported customizations JSON here…"></textarea>
-          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-            <button class="btn sm teal" onclick="restoreCustomizations()">↩ Restore</button>
-            <button class="btn sm outline" onclick="toggleRestorePanel()">Cancel</button>
-            <span id="restore-status" style="font-size:12px;color:var(--teal);"></span>
-          </div>
+    <!-- AI Category Suggestions -->
+    <div style="background:var(--cream);border:1px solid var(--cream2);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">Still have uncategorized items?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Download a prompt file and paste it into Claude or ChatGPT — they'll return suggested categories you can apply in one click.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex-shrink:0;">
+        <button class="btn sm teal" onclick="downloadAIPrompt()">⬇ Download prompt</button>
+        <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--teal);color:var(--teal);">⬆ Apply suggestions</button>
+      </div>
+      <!-- AI Import panel -->
+      <div id="import-panel" style="display:none;width:100%;border-top:1px solid var(--cream2);padding-top:1rem;margin-top:.25rem;">
+        <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:6px;">Apply AI suggestions</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the CSV that Claude or ChatGPT returned. Only valid categories and subcategories will be applied.</div>
+        <textarea id="import-textarea" style="width:100%;height:100px;border:1px solid var(--cream2);border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste the CSV here — it should start with: keyword,category,subcategory,priority"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+          <button class="btn sm teal" onclick="importAIResults()">Apply suggestions</button>
+          <button class="btn sm outline" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
+          <span id="import-status" style="font-size:12px;color:var(--teal);"></span>
         </div>
       </div>
-
-      <!-- BOX 2: AI Category Suggestions -->
-      <div style="background:#fffbf0;border:2px solid var(--terra);border-radius:14px;padding:1.25rem 1.5rem;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:var(--terra);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
-          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--terra);">Get AI Category Suggestions</div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Have uncategorized items? Download a prompt file containing all your unmatched purchases and paste it into Claude or ChatGPT. They'll return a CSV of suggested categories — upload it here and MyShopLight applies them automatically. Review anything that doesn't look right afterward.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn amber sm" onclick="downloadAIPrompt()">⬇ Download Prompt + Items</button>
-          <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--terra);color:var(--terra);">⬆ Apply AI Suggestions</button>
-        </div>
-        <!-- AI Import panel -->
-        <div id="import-panel" style="display:none;margin-top:1rem;border-top:1px solid #e8d090;padding-top:1rem;">
-          <div style="font-size:12px;font-weight:600;color:var(--terra);margin-bottom:6px;">Apply AI suggestions</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the CSV that Claude or ChatGPT returned. Only valid categories and subcategories will be applied.</div>
-          <textarea id="import-textarea" style="width:100%;height:120px;border:1px solid #e8d090;border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste the CSV here — it should start with: keyword,category,subcategory,priority"></textarea>
-          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-            <button class="btn amber sm" onclick="importAIResults()">Apply Suggestions</button>
-            <button class="btn sm outline" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
-            <span id="import-status" style="font-size:12px;color:var(--teal);"></span>
-          </div>
-        </div>
-      </div>
-
     </div>
-    <!-- responsive stack on mobile -->
-    <style>@media(max-width:640px){#manager-toolboxes{grid-template-columns:1fr!important;}}</style>
 
     <!-- localStorage persistence notice -->
     <div class="storage-bar" id="storage-bar" style="display:none">
@@ -1002,13 +966,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </div>
     </div>
 
-    <div class="pri-legend">
-      <strong>Priority:</strong>
-      <span><span class="pri-pip" style="background:#a05a00"></span><strong>1 — Brand</strong> (e.g. "Purina")</span>
-      <span><span class="pri-pip" style="background:#1a56a0"></span><strong>2 — Specific Phrase</strong> (e.g. "dog food")</span>
-      <span><span class="pri-pip" style="background:#0D5C5C"></span><strong>3 — Product Type</strong> (e.g. "shampoo")</span>
-      <span><span class="pri-pip" style="background:#888"></span><strong>5 — Fallback</strong> (e.g. "toy")</span>
-    </div>
+
 
     <div class="cm-filters" style="margin-bottom:8px;gap:6px;">
       <button class="view-btn" id="vbtn-all" onclick="setFilterView('all')">Show All</button>
@@ -4293,7 +4251,7 @@ function renderDash(){
     const uncatAmt = (catTotals['Uncategorized']||0);
     if(uncatAmt > 0){
       const uncatPct = Math.round(uncatAmt/total*100);
-      insights.push(`<div class="insight-item" style="border-color:#e8c080;background:#fffbf0;">⚠️ <span style="color:var(--terra);font-weight:700;">${fmt(uncatAmt)} (${uncatPct}%)</span> uncategorized<br><a onclick="switchTab('manager')" style="color:var(--teal);cursor:pointer;text-decoration:underline;font-size:13px;">Review in Item Manager →</a></div>`);
+      insights.push(`<div class="insight-item" style="border-color:var(--terra);background:var(--terra-tint);">⚠️ <span style="color:var(--terra);font-weight:700;">${fmt(uncatAmt)} (${uncatPct}%)</span> uncategorized<br><a onclick="switchTab('manager')" style="color:var(--teal);cursor:pointer;text-decoration:underline;font-size:13px;">Review in Item Manager →</a></div>`);
     }
 
     if(insights.length){
