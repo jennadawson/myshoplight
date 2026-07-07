@@ -101,7 +101,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 /* ── HEADER ── */
 .app-header{background:var(--teal);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:relative;}
 .app-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.app-logo-wordmark{font-family:'Source Sans 3',sans-serif;font-size:18px;font-weight:400;letter-spacing:-.02em;line-height:1;color:#fff;}
+.app-logo-wordmark{font-family:'Source Sans 3',sans-serif;font-size:22px;font-weight:400;letter-spacing:-.02em;line-height:1;color:#fff;}
 .app-logo-wordmark .logo-shop{font-weight:700;color:#4DD4A0;}
 .app-logo-wordmark .logo-my{opacity:.5;}
 
@@ -212,8 +212,8 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .tab-badge{background:var(--rust);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:5px;font-weight:700;}
 
 /* ── DASHBOARD ── */
-.dash-head{background:var(--teal);border-radius:14px;padding:1.25rem 1.75rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 8px rgba(45,106,106,.2);}
-.dash-title{font-family:'Playfair Display',serif;font-size:22px;color:#fff;}
+.dash-head{background:var(--teal);border-radius:10px;padding:.85rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.dash-title{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:600;color:#fff;letter-spacing:.01em;}
 .dash-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:3px;}
 .filters{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
 .filter-group{display:flex;align-items:center;gap:8px;background:var(--cream);border-radius:8px;padding:8px 14px;border:1px solid var(--cream2);}
@@ -222,13 +222,13 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
 .hero-card{background:var(--cream);border-radius:12px;padding:14px 18px;border:1px solid var(--cream2);}
 .hc-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
-.hc-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--teal);}
+.hc-val{font-family:'Source Sans 3',sans-serif;font-size:38px;font-weight:600;color:var(--teal);line-height:1.05;letter-spacing:-.02em;}
 .hc-sub{font-size:11px;color:var(--muted);margin-top:3px;}
 .badges{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
 @media(max-width:600px){.badges{grid-template-columns:1fr;}}
-.badge{border-radius:12px;overflow:hidden;display:flex;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.badge-left{background:var(--teal);padding:14px 18px;font-size:16px;color:rgba(255,255,255,.9);line-height:1.5;min-width:145px;display:flex;align-items:center;font-family:'Playfair Display',serif;}
-.badge-right{background:var(--cream);padding:14px 18px;font-size:22px;font-weight:600;color:var(--text);display:flex;align-items:center;flex:1;font-family:'Playfair Display',serif;}
+.badge{border-radius:10px;overflow:hidden;display:flex;border:1px solid var(--cream2);}
+.badge-left{background:var(--teal-tint);padding:12px 16px;font-size:13px;font-weight:600;color:var(--teal);line-height:1.3;min-width:120px;display:flex;align-items:center;font-family:'Source Sans 3',sans-serif;border-right:2px solid var(--mint-tint);}
+.badge-right{background:#fff;padding:12px 16px;font-size:20px;font-weight:600;color:var(--text);display:flex;align-items:center;flex:1;font-family:'Source Sans 3',sans-serif;letter-spacing:-.01em;}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
 @media(max-width:900px){.chart-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:580px){.chart-grid{grid-template-columns:1fr;}}
@@ -351,7 +351,7 @@ table.dt tr:hover td{background:var(--cream);}
 
 /* ── SORTABLE HEADERS ── */
 .items-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
-.items-table th.sortable:hover{background:#5a7830;opacity:.9;}
+.items-table th.sortable:hover{background:var(--teal-light);}
 .items-table th.sort-asc::after{content:' ▲';font-size:9px;opacity:.85;}
 .items-table th.sort-desc::after{content:' ▼';font-size:9px;opacity:.85;}
 
@@ -406,6 +406,20 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
 /* ── ACTION CELL ── */
 .action-sel{border:1px solid var(--cream2);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Source Sans 3',sans-serif;background:#fff;outline:none;cursor:pointer;width:100%;color:var(--text);}
+.action-dropdown-wrap{position:relative;display:inline-block;width:100%;}
+.action-dropdown-btn{background:var(--teal);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;transition:background .15s;white-space:nowrap;}
+.action-dropdown-btn:hover{background:var(--teal-light);}
+.action-dropdown-btn:disabled{opacity:.4;cursor:not-allowed;}
+.action-dropdown-btn .arrow{font-size:9px;opacity:.7;}
+.action-dropdown-menu{position:absolute;top:calc(100% + 3px);right:0;background:#fff;border:1px solid var(--cream2);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;min-width:140px;overflow:hidden;display:none;}
+.action-dropdown-menu.open{display:block;}
+.action-dropdown-menu button{display:block;width:100%;text-align:left;padding:8px 12px;font-size:12px;font-family:'Source Sans 3',sans-serif;background:none;border:none;cursor:pointer;color:var(--text);transition:background .1s;}
+.action-dropdown-menu button:hover{background:var(--cream);}
+.action-dropdown-menu button.adm-exclude{color:var(--terra);}
+.action-dropdown-menu button.adm-exclude:hover{background:var(--terra-tint);}
+.action-dropdown-menu button.adm-delete{color:var(--rust);}
+.action-dropdown-menu button.adm-delete:hover{background:var(--rust-tint);}
+.action-dropdown-menu .adm-divider{height:1px;background:var(--cream2);margin:2px 0;}
 .action-sel:focus{border-color:var(--teal);}
 .action-kw{border:1px solid var(--teal);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Source Sans 3',sans-serif;width:100%;outline:none;margin-top:5px;background:#f0f8ff;}
 .action-kw::placeholder{color:#aaa;}
@@ -453,7 +467,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
 <header class="app-header">
   <div class="app-logo">
-    <svg width="32" height="44" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg">
+    <svg width="38" height="52" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg">
       <polygon points="10,44 30,38 50,44 50,56 30,62 10,56" fill="rgba(77,212,160,.15)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
       <polygon points="10,44 30,38 50,44 30,50" fill="rgba(77,212,160,.25)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
       <line x1="0" y1="40" x2="10" y2="44" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linecap="round"/>
@@ -1682,6 +1696,30 @@ function lockItem(idx){
 }
 
 // ── EXCLUDE / RESTORE / DELETE ─────────────────────────────────────────────
+function toggleActionMenu(idx, e){
+  e.stopPropagation();
+  const menu = document.getElementById('adm-'+idx);
+  const isOpen = menu.classList.contains('open');
+  // close all open menus
+  document.querySelectorAll('.action-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+  if(!isOpen) menu.classList.add('open');
+}
+function closeActionMenu(idx){
+  const menu = document.getElementById('adm-'+idx);
+  if(menu) menu.classList.remove('open');
+}
+// close menus on outside click
+document.addEventListener('click', function(){
+  document.querySelectorAll('.action-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+});
+function showDeleteConfirm(idx){
+  const cell = document.querySelector('#adw-'+idx).closest('td');
+  cell.innerHTML = `<span class="inline-confirm">
+    <span>Delete?</span>
+    <button class="ic-delete" onclick="deleteItem(${idx})" title="Permanently delete from this session.">Delete</button>
+    <button class="ic-cancel" onclick="renderManager()">✕</button>
+  </span>`;
+}
 function showExcludeConfirm(idx){
   const cellId = `excl-cell-${idx}`;
   const cell = document.getElementById(cellId);
@@ -3762,15 +3800,24 @@ function renderManager(){
     } else {
       const hasCat=(item.userCat||item.cat)&&(item.userCat||item.cat)!=='Uncategorized';
       actionCell=`<div style="display:flex;flex-direction:column;gap:4px;">
-        <button class="btn sm teal" onclick="saveItemFull(${gi})" ${hasCat?'':'disabled'} title="Save & lock all selections for this item — protects from re-runs" style="width:100%;">🔒 Save</button>
         <div id="kw-toggle-wrap-${gi}">
-          <a onclick="toggleKwField(${gi})" style="font-size:11px;color:var(--teal);cursor:pointer;text-decoration:underline;display:block;text-align:center;margin-top:1px;">+ Add keyword rule</a>
+          <a onclick="toggleKwField(${gi})" style="font-size:11px;color:var(--teal);cursor:pointer;text-decoration:underline;display:block;text-align:center;margin-bottom:3px;">+ Add keyword rule</a>
         </div>
-        <div id="kw-field-wrap-${gi}" style="display:none;">
+        <div id="kw-field-wrap-${gi}" style="display:none;margin-bottom:3px;">
           <input class="action-kw" id="item-kw-${gi}" type="text" placeholder="e.g. yoga mat" style="margin-bottom:3px;">
           <div style="font-size:10px;color:var(--muted);line-height:1.4;">Future items matching this keyword will auto-categorize the same way.</div>
         </div>
-        <button class="btn sm outline" onclick="showExcludeConfirm(${gi})" style="width:100%;font-size:11px;">⊘ Exclude / Delete</button>
+        <div class="action-dropdown-wrap" id="adw-${gi}">
+          <button class="action-dropdown-btn" ${hasCat?'':'disabled'} onclick="toggleActionMenu(${gi},event)">
+            Actions <span class="arrow">▼</span>
+          </button>
+          <div class="action-dropdown-menu" id="adm-${gi}">
+            <button onclick="saveItemFull(${gi});closeActionMenu(${gi})" title="Save & lock all selections — protects from re-runs">🔒 Save item</button>
+            <div class="adm-divider"></div>
+            <button class="adm-exclude" onclick="closeActionMenu(${gi});showExcludeConfirm(${gi})">⊘ Exclude</button>
+            <button class="adm-delete" onclick="closeActionMenu(${gi});showDeleteConfirm(${gi})">✕ Delete</button>
+          </div>
+        </div>
       </div>`;
     }
 
