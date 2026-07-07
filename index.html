@@ -90,11 +90,13 @@ async function loadFromSupabase() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --teal:#2D6A6A;--teal-light:#3D8080;--rust:#C4614A;--rust-light:#D4795F;
-  --olive:#6B7A3A;--cream:#F5F0E8;--cream2:#EDE8DC;--text:#2A2A2A;--muted:#666;
-  --amber:#9a6800;--amber-light:#b37a00;
+  --teal:#0D5C5C;--teal-light:#1A8C8C;--teal-tint:#E8F7F2;
+  --mint:#4DD4A0;--mint-light:#9FE1CB;--mint-tint:#E8F7F2;
+  --rust:#C4614A;--rust-light:#D4795F;--rust-tint:#FAECE7;
+  --terra:#E0977A;--terra-light:#EDB89F;--terra-tint:#FBF0EB;
+  --cream:#F5F0E8;--cream2:#EDE8DC;--text:#2A2A2A;--muted:#666;
 }
-body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:var(--text);min-height:100vh;}
+body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:var(--text);min-height:100vh;}
 
 /* ── HEADER ── */
 .app-header{background:var(--teal);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:relative;}
@@ -158,16 +160,16 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 .panel-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--teal);margin-bottom:4px;}
 .panel-sub{font-size:12px;color:var(--muted);margin-bottom:1.25rem;line-height:1.5;}
 .step-box{border:2px dashed var(--teal);border-radius:12px;padding:1.25rem;background:#fff;text-align:center;transition:all .2s;}
-.step-box.done{border-style:solid;border-color:var(--olive);background:#f6f9f2;}
+.step-box.done{border-style:solid;border-color:var(--teal);background:var(--teal-tint);}
 .step-box.active:hover{border-color:var(--rust);background:var(--cream);}
 .step-box.locked{border-color:var(--cream2);opacity:.5;pointer-events:none;}
 .step-num{display:inline-block;background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:600;line-height:26px;margin-bottom:8px;}
-.step-box.done .step-num{background:var(--olive);}
+.step-box.done .step-num{background:var(--teal);}
 .step-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--teal);margin-bottom:4px;}
-.step-box.done .step-title{color:var(--olive);}
+.step-box.done .step-title{color:var(--teal);}
 .step-sub{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
 .step-status{font-size:11px;font-weight:600;margin-bottom:10px;color:var(--muted);}
-.status-done{color:var(--olive)!important;}
+.status-done{color:var(--teal)!important;}
 .year-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
 .quick-btns{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
 .qbtn{background:var(--cream2);color:var(--text);border:1px solid var(--cream2);border-radius:6px;padding:5px 16px;font-size:12px;font-family:'Source Sans 3',sans-serif;cursor:pointer;font-weight:600;transition:all .15s;}
@@ -180,12 +182,12 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 .btn.sm{padding:7px 16px;font-size:12px;}
 .btn.rust{background:var(--rust);}
 .btn.rust:hover{background:var(--rust-light);}
-.btn.olive{background:var(--olive);}
-.btn.olive:hover{background:#5a6830;}
+.btn.olive{background:var(--teal);}
+.btn.olive:hover{background:var(--teal-light);}
 .btn.teal{background:var(--teal);}
 .btn.teal:hover{background:var(--teal-light);}
-.btn.amber{background:var(--amber);}
-.btn.amber:hover{background:var(--amber-light);}
+.btn.amber{background:var(--terra);}
+.btn.amber:hover{background:var(--terra-light);}
 .btn.outline{background:transparent;border:1px solid var(--teal);color:var(--teal);}
 .btn.outline:hover{background:var(--teal);color:#fff;}
 
@@ -198,7 +200,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 /* ── ALERTS ── */
 .err-box{background:#fdf0ee;border:1px solid #e8a090;border-radius:8px;padding:.75rem 1rem;font-size:13px;color:#c04040;margin:.75rem 0;display:none;}
 .info-box{background:#f0f6f9;border:1px solid #b0d0e0;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:var(--teal);margin:.75rem 0;display:none;}
-.success-box{background:#f2f8f0;border:1px solid #a0c890;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:var(--olive);margin:.75rem 0;display:none;}
+.success-box{background:var(--teal-tint);border:1px solid var(--teal-tint);border-radius:8px;padding:.75rem 1rem;font-size:12px;color:var(--teal);margin:.75rem 0;display:none;}
 
 /* ── TABS ── */
 .tab-bar{display:flex;border-bottom:2px solid var(--cream2);margin-bottom:1.5rem;}
@@ -233,7 +235,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 .chart-card.clickable:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(45,106,106,.12);transform:translateY(-1px);}
 .chart-card.clickable::after{content:"↓ View details";position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;color:var(--muted);opacity:0;transition:opacity .18s;letter-spacing:.02em;}
 .chart-card.clickable:hover::after{opacity:.7;}
-.cc-title{background:var(--olive);color:#fff;font-size:14px;font-weight:600;padding:5px 14px;border-radius:5px;display:inline-block;margin-bottom:12px;letter-spacing:.01em;font-family:'Playfair Display',serif;}
+.cc-title{background:var(--teal);color:#fff;font-size:14px;font-weight:600;padding:5px 14px;border-radius:5px;display:inline-block;margin-bottom:12px;letter-spacing:.01em;font-family:'Playfair Display',serif;}
 .chart-wrap{position:relative;width:100%;}
 .legend{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);}
@@ -243,7 +245,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F0EBE1;color:v
 @media(max-width:900px){.table-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:580px){.table-grid{grid-template-columns:1fr;}}
 .tbl-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--cream2);box-shadow:0 1px 4px rgba(0,0,0,.04);}
-.tbl-head{background:var(--olive);padding:8px 14px;}
+.tbl-head{background:var(--teal);padding:8px 14px;}
 .tbl-head-title{color:#fff;font-size:14px;font-weight:600;letter-spacing:.01em;font-family:'Playfair Display',serif;}
 table.dt{width:100%;border-collapse:collapse;font-size:12px;}
 table.dt th{background:var(--cream2);color:var(--text);font-weight:600;padding:6px 12px;text-align:left;}
@@ -267,8 +269,8 @@ table.dt tr:hover td{background:var(--cream);}
 .suggest-spin{width:20px;height:20px;border:2px solid var(--cream2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-.storage-bar{background:#f6f9f2;border:1px solid #a0c890;border-radius:10px;padding:.75rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--olive);}
-.storage-bar strong{color:var(--olive);}
+.storage-bar{background:var(--teal-tint);border:1px solid var(--teal-tint);border-radius:10px;padding:.75rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--teal);}
+.storage-bar strong{color:var(--teal);}
 
 .pri-legend{background:var(--cream);border:1px solid var(--cream2);border-radius:8px;padding:.75rem 1.25rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:16px;font-size:11px;color:var(--muted);}
 .pri-legend strong{color:var(--text);}
@@ -284,10 +286,10 @@ table.dt tr:hover td{background:var(--cream);}
 
 .table-wrap{max-height:540px;overflow-y:auto;border:1px solid var(--cream2);border-radius:12px;}
 .items-table{width:100%;border-collapse:collapse;font-size:12px;}
-.items-table th{background:var(--olive);color:#fff;padding:9px 10px;text-align:left;font-weight:600;font-size:11px;position:sticky;top:0;z-index:1;letter-spacing:.02em;}
+.items-table th{background:var(--teal);color:#fff;padding:9px 10px;text-align:left;font-weight:600;font-size:11px;position:sticky;top:0;z-index:1;letter-spacing:.02em;}
 .items-table td{padding:7px 9px;border-bottom:.5px solid var(--cream2);vertical-align:middle;}
 .items-table tr:hover td{background:var(--cream);}
-.items-table tr.categorized td{background:#f6f9f2;}
+.items-table tr.categorized td{background:var(--teal-tint);}
 .items-table tr.categorized:hover td{background:#edf5e6;}
 .items-table tr.suggested td{background:#fffbf0;}
 .items-table tr.suggested:hover td{background:#fff5e0;}
@@ -307,12 +309,12 @@ table.dt tr:hover td{background:var(--cream);}
 .cell-sel.sug{border-color:#c8a000;background:#fffdf0;}
 .pri-1{background:#fef3e2;color:#a05a00;}
 .pri-2{background:#e8f0fe;color:#1a56a0;}
-.pri-3{background:#f0f4f0;color:#3a5a3a;}
+.pri-3{background:var(--teal-tint);color:#0D5C5C;}
 .pri-5{background:#f5f5f5;color:#666;}
 .pri-pill{border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;white-space:nowrap;}
 .tag{display:inline-block;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;}
 .tag.uncat{background:#fdf0ee;color:#c04040;}
-.tag.cat{background:#f0f6f0;color:#3a6a3a;}
+.tag.cat{background:var(--teal-tint);color:#0D5C5C;}
 .tag.sug{background:#fff8e0;color:#8a6000;}
 .ai-badge{display:inline-block;background:#fff8e0;color:#8a6000;border:1px solid #e8d090;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;vertical-align:middle;margin-left:3px;}
 .amt-cell{font-weight:600;white-space:nowrap;}
@@ -321,7 +323,7 @@ table.dt tr:hover td{background:var(--cream);}
 .save-btn:disabled{opacity:.4;cursor:not-allowed;}
 .lock-btn{background:none;border:1px solid var(--cream2);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:13px;line-height:1;transition:all .15s;color:var(--muted);}
 .lock-btn:hover{border-color:var(--teal);color:var(--teal);}
-.lock-btn.locked{border-color:var(--olive);color:var(--olive);background:#f0f8f0;}
+.lock-btn.locked{border-color:var(--teal);color:var(--teal);background:var(--teal-tint);}
 .items-table tr.pinned td{background:#f0f6ff;}
 .items-table tr.pinned:hover td{background:#e8f0fc;}
 
@@ -343,7 +345,7 @@ table.dt tr:hover td{background:var(--cream);}
 .del-btn:hover{border-color:var(--rust);color:var(--rust);background:#fdf0ee;}
 .source-badge{border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;}
 .source-orig{background:var(--cream2);color:var(--muted);}
-.source-new{background:#e8f4e8;color:var(--olive);}
+.source-new{background:var(--teal-tint);color:var(--teal);}
 
 /* ── SORTABLE HEADERS ── */
 .items-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
@@ -385,7 +387,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .ms-option:hover{background:var(--cream);}
 .ms-option input[type=checkbox]{accent-color:var(--teal);width:14px;height:14px;flex-shrink:0;cursor:pointer;}
 .ms-option.all-option{font-weight:600;border-bottom:1px solid var(--cream2);color:var(--teal);}
-.ms-option.checked{background:#f0f8f0;}
+.ms-option.checked{background:var(--teal-tint);}
 
 /* ── VIEW FILTER BUTTONS ── */
 .view-btn{border:none;border-radius:7px;padding:6px 16px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;opacity:.55;}
@@ -414,15 +416,15 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .items-table tr.excluded:hover td{opacity:.6;background:#f5f5f5!important;}
 .exclude-btn{background:none;border:1px solid var(--cream2);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:12px;color:var(--muted);transition:all .15s;line-height:1;}
 .exclude-btn:hover{border-color:var(--rust);color:var(--rust);background:#fdf0ee;}
-.restore-btn{background:none;border:1px solid #a0c890;border-radius:5px;padding:3px 7px;cursor:pointer;font-size:11px;color:var(--olive);transition:all .15s;line-height:1;}
-.restore-btn:hover{background:#f0f8f0;}
+.restore-btn{background:none;border:1px solid var(--teal-tint);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:11px;color:var(--teal);transition:all .15s;line-height:1;}
+.restore-btn:hover{background:var(--teal-tint);}
 .inline-confirm{display:inline-flex;align-items:center;gap:5px;background:#fff8f0;border:1px solid #e8c080;border-radius:6px;padding:3px 7px;font-size:11px;white-space:nowrap;}
 .inline-confirm span{color:var(--muted);}
-.ic-exclude{background:var(--amber);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;font-weight:600;}
+.ic-exclude{background:var(--terra);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;font-weight:600;}
 .ic-delete{background:var(--rust);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;font-weight:600;}
 .ic-cancel{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;}
-.next-steps{background:linear-gradient(135deg,#f0f8f0,#f6f9f2);border:1px solid #a0c890;border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
-.next-steps-text{font-size:13px;color:var(--olive);line-height:1.5;}
+.next-steps{background:var(--teal-tint);border:1px solid var(--teal-tint);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.next-steps-text{font-size:13px;color:var(--teal);line-height:1.5;}
 .next-steps-text strong{color:var(--text);}
 .next-steps-dismiss{font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;opacity:.7;}
 .next-steps-dismiss:hover{opacity:1;color:var(--rust);}
@@ -432,7 +434,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .insight-item{background:var(--cream);border:1px solid var(--cream2);border-radius:10px;padding:.85rem 1.1rem;font-size:15px;color:var(--text);line-height:1.6;}
 .insight-item .insight-val{font-weight:700;color:var(--teal);}
 .insight-item .insight-up{color:var(--rust);font-weight:700;}
-.insight-item .insight-down{color:var(--olive);font-weight:700;}
+.insight-item .insight-down{color:var(--teal);font-weight:700;}
 
 /* ── ITEM MANAGER FAQ ── */
 .faq-item{background:#fff;border:1px solid var(--cream2);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
@@ -531,7 +533,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         </div>
         <div class="landing-feature">
           <div class="landing-feature-icon" style="background:#EAF3DE;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7A3A" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D5C5C" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
           </div>
           <div>
             <div class="landing-feature-title">16 categories</div>
@@ -563,14 +565,14 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </div>
       <div class="preview-card">
         <div class="preview-card-icon" style="background:#EAF3DE;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7A3A" stroke-width="2"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D5C5C" stroke-width="2"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
         </div>
         <div class="preview-card-title">Needs vs. wants</div>
         <div class="preview-card-sub">Essential, flexible, or discretionary — see what was really necessary.</div>
       </div>
       <div class="preview-card">
         <div class="preview-card-icon" style="background:#F5F0E8;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a6800" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E0977A" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
         </div>
         <div class="preview-card-title">Trends over time</div>
         <div class="preview-card-sub">Monthly and yearly views to spot patterns and seasonal spending.</div>
@@ -926,31 +928,31 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
             <button class="btn sm teal" onclick="restoreCustomizations()">↩ Restore</button>
             <button class="btn sm outline" onclick="toggleRestorePanel()">Cancel</button>
-            <span id="restore-status" style="font-size:12px;color:var(--olive);"></span>
+            <span id="restore-status" style="font-size:12px;color:var(--teal);"></span>
           </div>
         </div>
       </div>
 
       <!-- BOX 2: AI Category Suggestions -->
-      <div style="background:#fffbf0;border:2px solid var(--amber);border-radius:14px;padding:1.25rem 1.5rem;">
+      <div style="background:#fffbf0;border:2px solid var(--terra);border-radius:14px;padding:1.25rem 1.5rem;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:var(--amber);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
-          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--amber);">Get AI Category Suggestions</div>
+          <span style="background:var(--terra);color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--terra);">Get AI Category Suggestions</div>
         </div>
         <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Have uncategorized items? Download a prompt file containing all your unmatched purchases and paste it into Claude or ChatGPT. They'll return a CSV of suggested categories — upload it here and MyShopLight applies them automatically. Review anything that doesn't look right afterward.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn amber sm" onclick="downloadAIPrompt()">⬇ Download Prompt + Items</button>
-          <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--amber);color:var(--amber);">⬆ Apply AI Suggestions</button>
+          <button class="btn sm outline" onclick="showImportPanel()" style="border-color:var(--terra);color:var(--terra);">⬆ Apply AI Suggestions</button>
         </div>
         <!-- AI Import panel -->
         <div id="import-panel" style="display:none;margin-top:1rem;border-top:1px solid #e8d090;padding-top:1rem;">
-          <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px;">Apply AI suggestions</div>
+          <div style="font-size:12px;font-weight:600;color:var(--terra);margin-bottom:6px;">Apply AI suggestions</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Paste the CSV that Claude or ChatGPT returned. Only valid categories and subcategories will be applied.</div>
           <textarea id="import-textarea" style="width:100%;height:120px;border:1px solid #e8d090;border-radius:7px;padding:8px 10px;font-size:11px;font-family:monospace;resize:vertical;outline:none;" placeholder="Paste the CSV here — it should start with: keyword,category,subcategory,priority"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
             <button class="btn amber sm" onclick="importAIResults()">Apply Suggestions</button>
             <button class="btn sm outline" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
-            <span id="import-status" style="font-size:12px;color:var(--olive);"></span>
+            <span id="import-status" style="font-size:12px;color:var(--teal);"></span>
           </div>
         </div>
       </div>
@@ -963,8 +965,8 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="storage-bar" id="storage-bar" style="display:none">
       <div><strong>Auto-save on:</strong> New rules and locked items are saved to your browser. They'll be here next time you open this file.</div>
       <div style="display:flex;gap:8px;">
-        <span id="storage-counts" style="font-size:11px;color:var(--olive);align-self:center;"></span>
-        <button class="btn sm outline" onclick="clearNewRules()" style="font-size:11px;color:var(--olive);border-color:var(--olive)">Clear saved rules</button>
+        <span id="storage-counts" style="font-size:11px;color:var(--teal);align-self:center;"></span>
+        <button class="btn sm outline" onclick="clearNewRules()" style="font-size:11px;color:var(--teal);border-color:var(--teal)">Clear saved rules</button>
       </div>
     </div>
 
@@ -972,7 +974,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <strong>Priority:</strong>
       <span><span class="pri-pip" style="background:#a05a00"></span><strong>1 — Brand</strong> (e.g. "Purina")</span>
       <span><span class="pri-pip" style="background:#1a56a0"></span><strong>2 — Specific Phrase</strong> (e.g. "dog food")</span>
-      <span><span class="pri-pip" style="background:#3a5a3a"></span><strong>3 — Product Type</strong> (e.g. "shampoo")</span>
+      <span><span class="pri-pip" style="background:#0D5C5C"></span><strong>3 — Product Type</strong> (e.g. "shampoo")</span>
       <span><span class="pri-pip" style="background:#888"></span><strong>5 — Fallback</strong> (e.g. "toy")</span>
     </div>
 
@@ -1288,7 +1290,7 @@ const ALL_CATS  = Object.keys(CAT_SUBS).sort();
 const CAT_COLORS = {
   // Warm reds / oranges — high energy, family-oriented
   'Kids':            '#C4614A',  // deep rust-red — anchor color
-  'Celebrations':    '#E8834A',  // warm amber-orange
+  'Celebrations':    '#E0977A',  // warm amber-orange
   'Apparel':         '#D4955A',  // muted terracotta
 
   // Cool teals / blues — calm, practical
@@ -1316,15 +1318,15 @@ const CAT_COLORS = {
   'Other':           '#888'
 };
 const AUD_COLORS = {'Kids':'#C4614A','Household':'#2D6A6A','Adult':'#8A7A4A'};
-const SESSION_COLORS = ['#2D6A6A','#C4614A','#6B7A3A','#8A7A4A','#5A6A8A'];
+const SESSION_COLORS = ['#0D5C5C','#C4614A','#4DD4A0','#E0977A','#1A8C8C'];
 const VALID_AUDS = ['Kids','Adult','Household'];
 const KIDS_WORDS = ['baby','toddler','kids','kid','girls','boys','youth','infant','child','children','teen','junior'];
 const HOUSEHOLD_CATS = new Set(['Household','Grocery','Celebrations','Pets','Kitchen','Office & Crafts']);
 const ADULT_CATS = new Set(['Apparel','Beauty','Fitness','Health','Electronics','Outdoor','Travel','Home Improvement']);
 const VALID_STYPES = ['Essential','Flexible','Discretionary'];
-const STYPE_COLORS  = {'Essential':'#6B7A3A','Flexible':'#9a6800','Discretionary':'#C4614A'};
+const STYPE_COLORS  = {'Essential':'#0D5C5C','Flexible':'#E0977A','Discretionary':'#C4614A'};
 const STYPE_LABELS  = {'Essential':'Essential','Flexible':'Flexible','Discretionary':'Discretionary'};
-const STYPE_DOT     = {'Essential':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6B7A3A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Flexible':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#9a6800;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Discretionary':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#C4614A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>'};
+const STYPE_DOT     = {'Essential':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0D5C5C;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Flexible':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#E0977A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Discretionary':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#C4614A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>'};
 const SPEND_TYPE_MAP = {
   'Apparel': {'Accessories':'Discretionary', 'Clothing':'Flexible', 'Footwear':'Flexible', 'Jewelry':'Discretionary', 'Outerwear':'Flexible'},
   'Auto & Vehicle': {'Accessories':'Flexible', 'Emergency':'Essential', 'Exterior':'Flexible', 'Interior':'Flexible', 'Maintenance':'Flexible'},
@@ -3294,9 +3296,9 @@ function showNextSteps(){
   const callout = document.getElementById('next-steps-callout');
   const text = document.getElementById('next-steps-text');
   if(uncatN > 0){
-    text.innerHTML = `✅ Your dashboard is ready! <strong>${uncatN} item${uncatN>1?'s':''} still need${uncatN===1?'s':''} a category</strong> — head to the <a onclick="switchTab('manager')" style="color:var(--olive);font-weight:600;cursor:pointer;text-decoration:underline;">Item Manager</a> tab to review them and improve your results.`;
+    text.innerHTML = `✅ Your dashboard is ready! <strong>${uncatN} item${uncatN>1?'s':''} still need${uncatN===1?'s':''} a category</strong> — head to the <a onclick="switchTab('manager')" style="color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;">Item Manager</a> tab to review them and improve your results.`;
   } else {
-    text.innerHTML = `✅ Your dashboard is ready and <strong>fully categorized!</strong> Explore the charts below or visit the <a onclick="switchTab('manager')" style="color:var(--olive);font-weight:600;cursor:pointer;text-decoration:underline;">Item Manager</a> tab to fine-tune any categories.`;
+    text.innerHTML = `✅ Your dashboard is ready and <strong>fully categorized!</strong> Explore the charts below or visit the <a onclick="switchTab('manager')" style="color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;">Item Manager</a> tab to fine-tune any categories.`;
   }
   callout.style.display = '';
 }
@@ -4010,7 +4012,7 @@ function onActionChange(idx){
 
   // Delete and Exclude don't need a category selected; lock and rule do
   if(action==='exclude'||action==='delete'){
-    if(btn){btn.disabled=false; btn.textContent=action==='exclude'?'Exclude':'Delete'; btn.style.background=action==='delete'?'var(--rust)':'var(--amber)';}
+    if(btn){btn.disabled=false; btn.textContent=action==='exclude'?'Exclude':'Delete'; btn.style.background=action==='delete'?'var(--rust)':'var(--terra)';}
   } else if(action==='lock'||action==='rule'){
     const hasCat=(item.userCat||item.cat)&&(item.userCat||item.cat)!=='Uncategorized';
     if(btn){btn.disabled=!hasCat; btn.textContent='Apply'; btn.style.background='';}
@@ -4219,14 +4221,14 @@ function renderDash(){
       const flexPct=Math.round(flexAmt/total*100);
       const discPct=Math.round(discAmt/total*100);
       const dot=(color)=>`<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:${color};vertical-align:middle;margin-right:3px;"></span>`;
-      insights.push(`<div class="insight-item">${dot('#6B7A3A')}<strong>${essPct}%</strong> Essential &nbsp; ${dot('#9a6800')}<strong>${flexPct}%</strong> Flexible &nbsp; ${dot('#C4614A')}<strong>${discPct}%</strong> Discretionary<br><span style="font-size:13px;color:var(--muted);">${fmt(essAmt)} · ${fmt(flexAmt)} · ${fmt(discAmt)}</span></div>`);
+      insights.push(`<div class="insight-item">${dot('#0D5C5C')}<strong>${essPct}%</strong> Essential &nbsp; ${dot('#E0977A')}<strong>${flexPct}%</strong> Flexible &nbsp; ${dot('#C4614A')}<strong>${discPct}%</strong> Discretionary<br><span style="font-size:13px;color:var(--muted);">${fmt(essAmt)} · ${fmt(flexAmt)} · ${fmt(discAmt)}</span></div>`);
     }
 
     // Insight 4: uncategorized callout
     const uncatAmt = (catTotals['Uncategorized']||0);
     if(uncatAmt > 0){
       const uncatPct = Math.round(uncatAmt/total*100);
-      insights.push(`<div class="insight-item" style="border-color:#e8c080;background:#fffbf0;">⚠️ <span style="color:var(--amber);font-weight:700;">${fmt(uncatAmt)} (${uncatPct}%)</span> uncategorized<br><a onclick="switchTab('manager')" style="color:var(--teal);cursor:pointer;text-decoration:underline;font-size:13px;">Review in Item Manager →</a></div>`);
+      insights.push(`<div class="insight-item" style="border-color:#e8c080;background:#fffbf0;">⚠️ <span style="color:var(--terra);font-weight:700;">${fmt(uncatAmt)} (${uncatPct}%)</span> uncategorized<br><a onclick="switchTab('manager')" style="color:var(--teal);cursor:pointer;text-decoration:underline;font-size:13px;">Review in Item Manager →</a></div>`);
     }
 
     if(insights.length){
