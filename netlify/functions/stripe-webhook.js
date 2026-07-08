@@ -1,14 +1,14 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_S_KEY);
 const { createClient } = require('@supabase/supabase-js');
 const { Resend } = require('resend');
 
 // Supabase admin client — bypasses RLS, server-side only
 const supabase = createClient(
   'https://cwcibkvoclsdqdmglhiy.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_S_SERVICE_KEY
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_S_KEY);
 
 exports.handler = async (event) => {
   // Only accept POST
