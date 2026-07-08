@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     stripeEvent = stripe.webhooks.constructEvent(
       event.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_S_WEBHOOK
     );
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
