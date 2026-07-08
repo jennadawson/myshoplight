@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>myshoplight — See what you really spend on Amazon</title>
+  <meta name="description" content="myshoplight breaks down your Amazon order history by category — Essential, Flexible, and Discretionary — so you finally know what's behind that monthly charge." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0D5C5C;
+      --teal-hover: #1A8C8C;
+      --teal-tint: #E8F7F2;
+      --mint: #4DD4A0;
+      --mint-light: #9FE1CB;
+      --rust: #C4614A;
+      --rust-tint: #FAECE7;
+      --terra: #E0977A;
+      --terra-tint: #FBF0EB;
+      --cream: #F5F0E8;
+      --cream2: #EDE8DC;
+      --text: #2A2A2A;
+      --muted: #666666;
+      --font-sans: 'Source Sans 3', sans-serif;
+      --font-serif: 'Playfair Display', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── UTILITIES ── */
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--teal);
+    }
+    .section-label.mint { color: var(--mint); }
+
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 24px;
+    }
+
+    section { padding: 56px 24px; }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .bg-white { background: #ffffff; }
+    .bg-cream { background: var(--cream); }
+    .bg-teal  { background: var(--teal); }
+    .bg-cream2 { background: var(--cream2); }
+
+    /* ── NAV ── */
+    .nav {
+      background: var(--teal);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .wordmark {
+      font-family: var(--font-sans);
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .wordmark .my    { color: rgba(255,255,255,0.45); font-weight: 400; }
+    .wordmark .shop  { color: var(--mint); font-weight: 700; }
+    .wordmark .light { color: #fff; font-weight: 700; }
+
+    .nav-cta {
+      background: var(--mint);
+      color: var(--teal);
+      border: none;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: #3bc490; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--teal);
+      padding: 64px 24px 56px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .hero .eyebrow { color: var(--mint); }
+
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .hero h1 span { color: var(--mint); }
+
+    .hero-sub {
+      font-size: 18px;
+      color: rgba(255,255,255,0.75);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .hero-body {
+      font-size: 15px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.65;
+      max-width: 500px;
+      margin: 0 auto 36px;
+    }
+
+    /* ── BUY BOX ── */
+    .buy-box {
+      background: var(--cream);
+      border-radius: 18px;
+      padding: 28px 28px 24px;
+      max-width: 380px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .buy-box-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .buy-price {
+      font-size: 38px;
+      font-weight: 600;
+      color: var(--teal);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .buy-price sup { font-size: 20px; vertical-align: super; }
+
+    .buy-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--teal-hover); }
+
+    .secure-note {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* ── PROOF STRIP ── */
+    .proof-strip {
+      background: var(--cream2);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .proof-item strong { color: var(--teal); }
+    .proof-dot { color: var(--mint); font-size: 14px; }
+
+    /* ── PAIN LIST ── */
+    .pain-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .pain-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .pain-icon {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      background: var(--rust-tint);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--rust);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* ── SPEND TYPES ── */
+    .spend-types {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .spend-card {
+      border-radius: 10px;
+      padding: 18px 14px;
+    }
+    .spend-card.essential    { background: var(--teal-tint); }
+    .spend-card.flexible     { background: var(--terra-tint); }
+    .spend-card.discretionary { background: var(--rust-tint); }
+    .spend-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .spend-card.essential    .spend-card-label { color: var(--teal); }
+    .spend-card.flexible     .spend-card-label { color: #8A3A10; }
+    .spend-card.discretionary .spend-card-label { color: var(--rust); }
+    .spend-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .spend-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 0;
+    }
+    .spend-note strong { color: var(--text); }
+
+    .callout {
+      background: var(--teal-tint);
+      border-left: 3px solid var(--mint);
+      border-radius: 0 10px 10px 0;
+      padding: 18px 20px;
+      margin-top: 24px;
+    }
+    .callout-q {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+    .callout-a {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .feat-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--cream2);
+      padding: 20px 18px;
+    }
+    .bg-teal .feat-card { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
+    .feat-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--teal-tint);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .feat-icon svg { width: 16px; height: 16px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .feat-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .feat-card p  { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 24px; }
+    .step  { display: flex; align-items: flex-start; gap: 18px; }
+    .step-num {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .step p  { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── TESTIMONIALS ── */
+    .testi-grid { display: flex; flex-direction: column; gap: 14px; }
+    .testi {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .bg-teal h2 { color: #fff; }
+    .testi-q { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.65; margin-bottom: 10px; }
+    .testi-who { font-size: 12px; color: var(--mint); font-weight: 600; }
+
+    /* ── SECOND BUY ── */
+    .buy2 { text-align: center; }
+    .buy2 h2 { color: var(--text); }
+    .buy2-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; margin-top: -12px; }
+    .buy2-box {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--cream2);
+      padding: 28px;
+      max-width: 360px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; }
+    .faq-item {
+      border-bottom: 1px solid var(--cream2);
+      padding: 20px 0;
+    }
+    .faq-item:first-child { border-top: 1px solid var(--cream2); }
+    .faq-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .faq-a {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .faq-a strong { color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--teal);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+    /* ── LOADING STATE ── */
+    .btn-loading { opacity: 0.7; cursor: wait; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 540px) {
+      .spend-types      { grid-template-columns: 1fr; }
+      .features-grid    { grid-template-columns: 1fr; }
+      .proof-strip      { gap: 12px; }
+      .buy-box, .buy2-box { padding: 22px 18px; }
+      h2                { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="#" class="logo">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="6" y="18" width="28" height="18" rx="2" stroke="white" stroke-width="1.8"/>
+        <path d="M6 22l14-4 14 4" stroke="white" stroke-width="1.8"/>
+        <path d="M6 18l4-6h20l4 6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="10" r="6" stroke="#4DD4A0" stroke-width="1.8" fill="rgba(77,212,160,0.12)"/>
+        <line x1="18.2" y1="14.2" x2="22" y2="18" stroke="#4DD4A0" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="14" cy="10" r="2.5" fill="#4DD4A0" opacity="0.5"/>
+      </svg>
+      <span class="wordmark"><span class="my">my</span><span class="shop">shop</span><span class="light">light</span></span>
+    </a>
+    <button class="nav-cta" onclick="handleCheckout()">Buy now — $27</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Amazon spending analysis</p>
+      <h1>$750 on Amazon.<br>But <span>what did you actually buy?</span></h1>
+      <p class="hero-sub">You know what you spent. You have no idea what you bought.</p>
+      <p class="hero-body">Your bank statement shows one number. myshoplight shows you everything behind it — every category, every pattern, broken down by what your family actually needed vs. what just showed up in a box.</p>
+
+      <div class="buy-box">
+        <p class="buy-box-label">One-time purchase</p>
+        <p class="buy-price"><sup>$</sup>27</p>
+        <p class="buy-note">Yours forever. No subscription. No monthly fees.</p>
+        <button class="btn-primary" id="hero-btn" onclick="handleCheckout()">Reveal my spending habits</button>
+        <p class="secure-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure checkout via Stripe
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF STRIP -->
+  <div class="proof-strip">
+    <div class="proof-item"><span class="proof-dot">●</span> <strong>Your real order data</strong> — not estimates</div>
+    <div class="proof-item"><span class="proof-dot">●</span> <strong>No bank login</strong> — ever</div>
+    <div class="proof-item"><span class="proof-dot">●</span> <strong>One-time $27</strong> — no subscription</div>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <section class="bg-white">
+    <div class="container">
+      <p class="section-label">The problem</p>
+      <h2>Amazon is a black hole for family spending</h2>
+      <ul class="pain-list">
+        <li>
+          <div class="pain-icon" aria-hidden="true">✕</div>
+          <span>Your bank statement lumps diapers, dog food, and impulse buys into one line: <strong>Amazon — $750</strong>. That number tells you nothing.</span>
+        </li>
+        <li>
+          <div class="pain-icon" aria-hidden="true">✕</div>
+          <span>You can categorize grocery stores and some retailers easily. Amazon is different — it sells everything, so it explains nothing.</span>
+        </li>
+        <li>
+          <div class="pain-icon" aria-hidden="true">✕</div>
+          <span>The convenience of the platform makes it easy for unnecessary spending to inflate quietly, month after month.</span>
+        </li>
+        <li>
+          <div class="pain-icon" aria-hidden="true">✕</div>
+          <span>You suspect some of it is essential. You have no idea how much of it isn't.</span>
+        </li>
+        <li>
+          <div class="pain-icon" aria-hidden="true">✕</div>
+          <span>Every package that lands on the porch starts a conversation. Was it necessary? Did we need that? You shouldn't have to defend your household spending without the receipts to back it up.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- HOW IT SORTS -->
+  <section class="bg-cream">
+    <div class="container">
+      <p class="section-label">How myshoplight sorts it</p>
+      <h2>Essential, Flexible, or Discretionary — now you'll actually know</h2>
+      <div class="spend-types">
+        <div class="spend-card essential">
+          <p class="spend-card-label">Essential</p>
+          <p>Diapers, pet food, household basics — the stuff your family genuinely needs</p>
+        </div>
+        <div class="spend-card flexible">
+          <p class="spend-card-label">Flexible</p>
+          <p>Clothing, home goods — needed, but timing and amount are choices</p>
+        </div>
+        <div class="spend-card discretionary">
+          <p class="spend-card-label">Discretionary</p>
+          <p>Gadgets, décor, trend purchases — the category worth watching</p>
+        </div>
+      </div>
+      <p class="spend-note">myshoplight categorizes your orders automatically using a library of <strong>2,000+ rules</strong> — then lets you customize it to match your family's real purchase patterns. Because your household isn't the same as everyone else's.</p>
+      <div class="callout">
+        <p class="callout-q">Amazon accounts don't always map neatly to one household.</p>
+        <p class="callout-a">Still sharing a legacy account with a parent? Split households where partners each have their own account? No problem. myshoplight sorts by shipping address so you see only your household's spending — and you can upload data from multiple accounts to get the full picture in one place.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="bg-white">
+    <div class="container">
+      <p class="section-label">What you get</p>
+      <h2>Everything Amazon won't show you</h2>
+      <div class="features-grid">
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h12"/></svg></div>
+          <h3>Auto-categorization</h3>
+          <p>2,000+ rules sort every order instantly. Customize any category to match your family's habits.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <h3>Monthly and yearly trends</h3>
+          <p>See exactly when your Amazon spending crept up — and which categories drove it.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          <h3>Audience segmentation</h3>
+          <p>Filter by family member or address. Finally see your spending, separate from everyone else's.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <h3>Most expensive and most purchased</h3>
+          <p>Your top items by spend and by frequency — the patterns hiding in plain sight.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <h3>Return tracker</h3>
+          <p>Fold return data into your dashboard to see net spend — not just what you ordered, but what you actually kept.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3>Your real data</h3>
+          <p>Direct from Amazon. Not estimates, not averages — your actual orders, down to the item.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="bg-cream">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <h2>Three steps. Your entire Amazon history.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <div>
+            <h3>Download your Amazon order history</h3>
+            <p>Request your data directly from Amazon through their privacy portal — it takes about 24 hours to arrive. After you purchase, we send you a step-by-step guide so you know exactly what to request.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <div>
+            <h3>Upload it to myshoplight</h3>
+            <p>Drop in your file from a desktop browser — that's the easiest way to handle the initial setup. No bank login required. No Amazon password. Your data stays yours.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <div>
+            <h3>See everything behind the number</h3>
+            <p>Every category, every trend, every pattern — broken down the way your bank statement never will be. Then check in from any device, any time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="bg-teal">
+    <div class="container">
+      <p class="section-label mint">What people are saying</p>
+      <h2>They knew what they spent. They had no idea what they bought.</h2>
+      <div class="testi-grid">
+        <div class="testi">
+          <p class="testi-q">"I thought Amazon was mostly household stuff. Turns out 40% of it was discretionary purchases I'd completely forgotten about. That was the wake-up call."</p>
+          <p class="testi-who">— Sarah M., mom of three</p>
+        </div>
+        <div class="testi">
+          <p class="testi-q">"We share an account with my husband and I never knew what was his vs. mine. The address filter changed everything."</p>
+          <p class="testi-who">— Jessica T., shared account household</p>
+        </div>
+        <div class="testi">
+          <p class="testi-q">"The return tracker showed me I actually got everything refunded that I sent back. I had no idea — I assumed I was losing money every time."</p>
+          <p class="testi-who">— Amanda R., frequent returner</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECOND BUY -->
+  <section class="bg-cream buy2">
+    <div class="container">
+      <h2>Ready to see what you really spend on?</h2>
+      <p class="buy2-sub">One-time, $27. Your real data. No guesswork.</p>
+      <div class="buy2-box">
+        <p class="buy-box-label">One-time purchase</p>
+        <p class="buy-price"><sup>$</sup>27</p>
+        <p class="buy-note">No subscription. No monthly fees. No bank login.</p>
+        <button class="btn-primary" id="buy2-btn" onclick="handleCheckout()">Reveal my spending habits</button>
+        <p class="secure-note" style="margin-top: 4px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure checkout via Stripe
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="bg-white">
+    <div class="container">
+      <p class="section-label">Questions</p>
+      <h2>A few things people ask before buying</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <p class="faq-q">How do I get my Amazon order history?</p>
+          <p class="faq-a">You request it directly from Amazon through their data privacy portal. It takes about <strong>24 hours</strong> to arrive in your inbox as a downloadable file. After you purchase myshoplight, we send you a step-by-step guide so you know exactly what to request and where to find it.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">Is my data safe? Does myshoplight store my order history?</p>
+          <p class="faq-a">Your Amazon data is stored securely in your myshoplight account — it's never sold or shared with anyone. We don't connect to Amazon directly and we never ask for your Amazon password.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">How far back does it go?</p>
+          <p class="faq-a">As far back as Amazon's data export covers — typically <strong>several years</strong> of order history. The more history you have, the more patterns myshoplight can surface.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">We share an Amazon account. Will it still work?</p>
+          <p class="faq-a">Yes. myshoplight filters by shipping address, so even a shared account breaks down cleanly by household. And if you and your partner have separate accounts, you can upload both and see everything together in one dashboard.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">Can I use it on my phone?</p>
+          <p class="faq-a">Yes — myshoplight works across all your devices and your dashboard is accessible on phone, tablet, or desktop once your data is uploaded. That said, <strong>we recommend doing the initial file upload from a computer</strong>. Downloading your Amazon data export and uploading it is a bit easier to manage on a desktop browser. After that, checking in on your spending from your phone works just fine.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">Is this a subscription?</p>
+          <p class="faq-a">No. It's a <strong>one-time purchase of $27</strong>. You get access to myshoplight on any device, forever — no monthly fees, no renewal reminders.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">What if the categories don't match how my family shops?</p>
+          <p class="faq-a">myshoplight starts with 2,000+ built-in categorization rules, but every family is different. You can customize any category to match your household's actual habits — so your dashboard reflects your life, not a generic template.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-copy">© 2026 Caliet Ventures LLC</p>
+    <nav class="footer-links" aria-label="Footer links">
+      <a href="/privacy">Privacy policy</a>
+      <a href="/terms">Terms of use</a>
+      <a href="mailto:help@myshoplight.com">help@myshoplight.com</a>
+    </nav>
+  </footer>
+
+  <script>
+    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51TlAliLUtIAnF8kmEYgwyoCZzJgUPqAp36vomNemOCbdqe84by4QuadDknzuROt6u2mel1uMKN9mbXGsL0bVdnGZ00cn4Mh10c';
+    const PRICE_ID = 'price_1Tqf6LLUtIAnF8kmiHgBLSwv'; // ← swap this once you have it
+
+    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+    async function handleCheckout() {
+      const btns = document.querySelectorAll('.btn-primary');
+      btns.forEach(b => { b.textContent = 'Redirecting to checkout…'; b.classList.add('btn-loading'); b.disabled = true; });
+
+      try {
+        const { error } = await stripe.redirectToCheckout({
+          lineItems: [{ price: PRICE_ID, quantity: 1 }],
+          mode: 'payment',
+          successUrl: window.location.origin + '/welcome',
+          cancelUrl: window.location.href,
+          billingAddressCollection: 'auto',
+        });
+
+        if (error) {
+          console.error(error);
+          btns.forEach(b => { b.textContent = 'Reveal my spending habits'; b.classList.remove('btn-loading'); b.disabled = false; });
+          alert('Something went wrong starting checkout. Please try again or contact help@myshoplight.com.');
+        }
+      } catch (err) {
+        console.error(err);
+        btns.forEach(b => { b.textContent = 'Reveal my spending habits'; b.classList.remove('btn-loading'); b.disabled = false; });
+      }
+    }
+  </script>
+
+</body>
+</html>
