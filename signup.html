@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>myshoplight – Create account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --teal:#0D5C5C;--teal-light:#1A8C8C;--teal-tint:#E8F7F2;
+      --mint:#4DD4A0;--rust:#C4614A;--rust-tint:#FAECE7;
+      --terra:#E0977A;--terra-tint:#FBF0EB;
+      --cream:#F5F0E8;--cream2:#EDE8DC;--text:#2A2A2A;--muted:#666;
+    }
+    body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+    .auth-header{background:var(--teal);padding:1rem 2rem;display:flex;align-items:center;}
+    .auth-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .auth-logo-wordmark{font-family:'Source Sans 3',sans-serif;font-size:20px;font-weight:400;letter-spacing:-.02em;color:#fff;}
+    .auth-logo-wordmark .logo-my{opacity:.5;}
+    .auth-logo-wordmark .logo-shop{font-weight:700;color:#4DD4A0;}
+
+    .auth-main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .auth-card{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 2px 16px rgba(13,92,92,.08);}
+    .auth-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--teal);margin-bottom:6px;}
+    .auth-sub{font-size:14px;color:var(--muted);margin-bottom:2rem;line-height:1.5;}
+
+    .form-group{margin-bottom:1.25rem;}
+    .form-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+    .form-input{width:100%;border:1.5px solid var(--cream2);border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;background:#fff;}
+    .form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint);}
+    .form-input::placeholder{color:#bbb;}
+
+    .form-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+
+    .btn-primary{width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;font-family:'Source Sans 3',sans-serif;cursor:pointer;transition:background .15s;margin-top:.5rem;}
+    .btn-primary:hover{background:var(--teal-light);}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+
+    .auth-error{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem;display:none;}
+    .auth-error.show{display:block;}
+    .auth-error.error{background:var(--rust-tint);border:1px solid var(--rust);color:var(--rust);}
+    .auth-error.success{background:var(--teal-tint);border:1px solid var(--teal);color:var(--teal);}
+
+    .auth-links{margin-top:1.5rem;text-align:center;font-size:13px;color:var(--muted);}
+    .auth-links a{color:var(--teal);text-decoration:none;font-weight:600;}
+    .auth-links a:hover{text-decoration:underline;}
+    .auth-divider{border:none;border-top:1px solid var(--cream2);margin:1.25rem 0;}
+
+    .auth-footer{text-align:center;padding:1.5rem;font-size:11px;color:var(--muted);}
+    .auth-footer a{color:var(--muted);text-decoration:underline;}
+  </style>
+</head>
+<body>
+
+  <header class="auth-header">
+    <a href="index.html" class="auth-logo">
+      <svg width="32" height="44" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="10,44 30,38 50,44 50,56 30,62 10,56" fill="rgba(77,212,160,.15)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
+        <polygon points="10,44 30,38 50,44 30,50" fill="rgba(77,212,160,.25)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
+        <line x1="0" y1="40" x2="10" y2="44" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linecap="round"/>
+        <polygon points="0,36 10,40 10,44 0,40" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
+        <line x1="50" y1="44" x2="60" y2="40" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linecap="round"/>
+        <polygon points="50,44 60,40 60,36 50,40" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.88)" stroke-width="2.2" stroke-linejoin="round"/>
+        <circle cx="30" cy="18" r="13" fill="none" stroke="#4DD4A0" stroke-width="2.8"/>
+        <circle cx="30" cy="18" r="8.5" fill="rgba(77,212,160,.18)" stroke="rgba(77,212,160,.55)" stroke-width="1.5"/>
+        <line x1="40" y1="28" x2="50" y2="40" stroke="#4DD4A0" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="22,38 38,38 35,22 25,22" fill="rgba(77,212,160,.35)" stroke="none"/>
+      </svg>
+      <div class="auth-logo-wordmark">
+        <span class="logo-my">my</span><span class="logo-shop">shop</span><span>light</span>
+      </div>
+    </a>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div class="auth-title">Create your account</div>
+      <div class="auth-sub">One account, your Amazon spending — finally explained.</div>
+
+      <div class="auth-error" id="msg-box"></div>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" required autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="••••••••" required autocomplete="new-password" minlength="6"/>
+          <div class="form-hint">At least 6 characters</div>
+        </div>
+        <button class="btn-primary" type="submit" id="submit-btn">Create account</button>
+      </form>
+
+      <hr class="auth-divider"/>
+      <div class="auth-links">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="auth-footer">
+    &copy; 2026 Caliet Ventures LLC &nbsp;·&nbsp;
+    <a href="#">Privacy</a> &nbsp;·&nbsp;
+    <a href="#">Terms</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://cwcibkvoclsdqdmglhiy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3Y2lia3ZvY2xzZHFkbWdsaGl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzI4MDUsImV4cCI6MjA5NzEwODgwNX0.9Xwb5Ct4W1Px-lOzv2pJYWCFUm7WUtq1VzmdrSCRBh0'
+    );
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account…';
+      hideMsg();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await client.auth.signUp({ email, password });
+
+      if (error) {
+        showMsg(error.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+        return;
+      }
+
+      // Account created or already existed — check for an entitlement
+      // (Stripe buyers will have one; Etsy buyers won't yet)
+      btn.textContent = 'Setting up your account…';
+
+      try {
+        const { data: entitlements, error: entError } = await client
+          .from('user_entitlements')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .limit(1);
+
+        if (!entError && entitlements && entitlements.length > 0) {
+          // Stripe buyer — entitlement exists, go straight to dashboard
+          window.location.href = 'index.html';
+        } else {
+          // Etsy buyer — no entitlement yet, go redeem license key
+          window.location.href = 'redeem.html';
+        }
+      } catch (err) {
+        // If the check fails for any reason, default to redeem
+        // (safer than landing in dashboard without entitlement)
+        window.location.href = 'redeem.html';
+      }
+    });
+
+    function showMsg(msg, type) {
+      const el = document.getElementById('msg-box');
+      el.textContent = msg;
+      el.className = 'auth-error show ' + type;
+    }
+    function hideMsg() {
+      document.getElementById('msg-box').classList.remove('show');
+    }
+  </script>
+</body>
+</html>
