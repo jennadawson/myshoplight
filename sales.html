@@ -11,9 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
 
-  <!-- Stripe.js -->
-  <script src="https://js.stripe.com/v3/"></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -713,26 +710,14 @@
     const STRIPE_PUBLISHABLE_KEY = 'pk_live_51TlAliLUtIAnF8kmEYgwyoCZzJgUPqAp36vomNemOCbdqe84by4QuadDknzuROt6u2mel1uMKN9mbXGsL0bVdnGZ00cn4Mh10c';
     const PRICE_ID = 'price_1Tqf6LLUtIAnF8kmiHgBLSwv'; // ← swap this once you have it
 
-    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-
     async function handleCheckout() {
       const btns = document.querySelectorAll('.btn-primary');
       btns.forEach(b => { b.textContent = 'Redirecting to checkout…'; b.classList.add('btn-loading'); b.disabled = true; });
 
       try {
-        const { error } = await stripe.redirectToCheckout({
-          lineItems: [{ price: PRICE_ID, quantity: 1 }],
-          mode: 'payment',
-          successUrl: window.location.origin + '/welcome',
-          cancelUrl: window.location.href,
-          billingAddressCollection: 'auto',
-        });
-
-        if (error) {
-          console.error(error);
-          btns.forEach(b => { b.textContent = 'Reveal my spending habits'; b.classList.remove('btn-loading'); b.disabled = false; });
-          alert('Something went wrong starting checkout. Please try again or contact help@myshoplight.com.');
-        }
+        // Create a Stripe Checkout session via Payment Link redirect
+        // Using the hosted Payment Link directly is the most reliable approach
+        window.location.href = 'https://buy.stripe.com/14AeVe1KT1Yp2zH2Ka3AY00';
       } catch (err) {
         console.error(err);
         btns.forEach(b => { b.textContent = 'Reveal my spending habits'; b.classList.remove('btn-loading'); b.disabled = false; });
