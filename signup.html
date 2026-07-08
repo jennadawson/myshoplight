@@ -126,28 +126,29 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      // Try signing in first — Stripe buyers already have an account created by the webhook
-      // If that fails, create a new account (Etsy buyers)
-      let userId;
-      const { data: signInData, error: signInError } = await client.auth.signInWithPassword({ email, password });
+      // Step 1: Call signUp — for Stripe buyers this sets their password on the
+      // existing webhook-created account. For new Etsy buyers this creates the account.
+      const { data: signUpData, error: signUpError } = await client.auth.signUp({ email, password });
 
-      if (signInData?.user) {
-        // Existing account (Stripe buyer) — signed in successfully
-        userId = signInData.user.id;
-      } else {
-        // New account (Etsy buyer or first time) — create it
-        const { data: signUpData, error: signUpError } = await client.auth.signUp({ email, password });
-
-        if (signUpError) {
-          showMsg(signUpError.message, 'error');
-          btn.disabled = false;
-          btn.textContent = 'Create account';
-          return;
-        }
-        userId = signUpData.user.id;
+      if (signUpError) {
+        showMsg(signUpError.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+        return;
       }
 
-      // Check for entitlement to decide where to send them
+      // Step 2: Sign in with the password they just set
+      const { data: signInData, error: signInError } = await client.auth.signInWithPassword({ email, password });
+
+      if (signInError || !signInData?.user) {
+        showMsg('Account created — check your email to confirm before logging in.', 'success');
+        btn.textContent = 'Check your email';
+        return;
+      }
+
+      const userId = signInData.user.id;
+
+      // Step 3: Check entitlement to route correctly
       try {
         const { data: entitlements } = await client
           .from('user_entitlements')
@@ -156,10 +157,8 @@
           .limit(1);
 
         if (entitlements && entitlements.length > 0) {
-          // Stripe buyer — go straight to dashboard
           window.location.href = 'index.html';
         } else {
-          // Etsy buyer — go redeem license key
           window.location.href = 'redeem.html';
         }
       } catch (err) {
