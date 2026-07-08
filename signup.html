@@ -80,7 +80,7 @@
       <div class="auth-title">Create your account</div>
       <div class="auth-sub">One account, your Amazon spending — finally explained.</div>
 
-      <div class="auth-error" id="msg-box"></div>
+<div class="auth-error" id="msg-box"></div>
 
       <form id="signup-form">
         <div class="form-group">
@@ -120,41 +120,49 @@
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
-      btn.textContent = 'Creating account…';
+      btn.textContent = 'Setting up your account…';
       hideMsg();
 
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const { data, error } = await client.auth.signUp({ email, password });
 
-      if (error) {
-        showMsg(error.message, 'error');
-        btn.disabled = false;
-        btn.textContent = 'Create account';
-        return;
+      // Try signing in first — Stripe buyers already have an account created by the webhook
+      // If that fails, create a new account (Etsy buyers)
+      let userId;
+      const { data: signInData, error: signInError } = await client.auth.signInWithPassword({ email, password });
+
+      if (signInData?.user) {
+        // Existing account (Stripe buyer) — signed in successfully
+        userId = signInData.user.id;
+      } else {
+        // New account (Etsy buyer or first time) — create it
+        const { data: signUpData, error: signUpError } = await client.auth.signUp({ email, password });
+
+        if (signUpError) {
+          showMsg(signUpError.message, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Create account';
+          return;
+        }
+        userId = signUpData.user.id;
       }
 
-      // Account created or already existed — check for an entitlement
-      // (Stripe buyers will have one; Etsy buyers won't yet)
-      btn.textContent = 'Setting up your account…';
-
+      // Check for entitlement to decide where to send them
       try {
-        const { data: entitlements, error: entError } = await client
+        const { data: entitlements } = await client
           .from('user_entitlements')
           .select('id')
-          .eq('user_id', data.user.id)
+          .eq('user_id', userId)
           .limit(1);
 
-        if (!entError && entitlements && entitlements.length > 0) {
-          // Stripe buyer — entitlement exists, go straight to dashboard
+        if (entitlements && entitlements.length > 0) {
+          // Stripe buyer — go straight to dashboard
           window.location.href = 'index.html';
         } else {
-          // Etsy buyer — no entitlement yet, go redeem license key
+          // Etsy buyer — go redeem license key
           window.location.href = 'redeem.html';
         }
       } catch (err) {
-        // If the check fails for any reason, default to redeem
-        // (safer than landing in dashboard without entitlement)
         window.location.href = 'redeem.html';
       }
     });
