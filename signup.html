@@ -49,9 +49,6 @@
     .auth-links a:hover{text-decoration:underline;}
     .auth-divider{border:none;border-top:1px solid var(--cream2);margin:1.25rem 0;}
 
-    .value-strip{background:var(--teal-tint);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.75rem;font-size:13px;color:var(--teal);line-height:1.6;}
-    .value-strip strong{font-weight:600;}
-
     .auth-footer{text-align:center;padding:1.5rem;font-size:11px;color:var(--muted);}
     .auth-footer a{color:var(--muted);text-decoration:underline;}
   </style>
@@ -82,10 +79,6 @@
     <div class="auth-card">
       <div class="auth-title">Create your account</div>
       <div class="auth-sub">One account, your Amazon spending — finally explained.</div>
-
-      <div class="value-strip">
-        <strong>Already purchased?</strong> Create your account, then <a href="redeem.html" style="color:var(--teal);font-weight:600;">redeem your license key</a> to unlock your dashboard.
-      </div>
 
       <div class="auth-error" id="msg-box"></div>
 
@@ -132,15 +125,37 @@
 
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const { error } = await client.auth.signUp({ email, password });
+      const { data, error } = await client.auth.signUp({ email, password });
 
       if (error) {
         showMsg(error.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Create account';
-      } else {
-        showMsg('Account created! Check your email to confirm, then log in.', 'success');
-        btn.textContent = 'Check your email';
+        return;
+      }
+
+      // Account created or already existed — check for an entitlement
+      // (Stripe buyers will have one; Etsy buyers won't yet)
+      btn.textContent = 'Setting up your account…';
+
+      try {
+        const { data: entitlements, error: entError } = await client
+          .from('user_entitlements')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .limit(1);
+
+        if (!entError && entitlements && entitlements.length > 0) {
+          // Stripe buyer — entitlement exists, go straight to dashboard
+          window.location.href = 'index.html';
+        } else {
+          // Etsy buyer — no entitlement yet, go redeem license key
+          window.location.href = 'redeem.html';
+        }
+      } catch (err) {
+        // If the check fails for any reason, default to redeem
+        // (safer than landing in dashboard without entitlement)
+        window.location.href = 'redeem.html';
       }
     });
 
