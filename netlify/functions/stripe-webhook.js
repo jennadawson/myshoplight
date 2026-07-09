@@ -1,10 +1,13 @@
 const stripe = require('stripe')(process.env.STRIPE_S_KEY);
 const { createClient } = require('@supabase/supabase-js');
+const { Resend } = require('resend');
 
 const supabase = createClient(
   'https://cwcibkvoclsdqdmglhiy.supabase.co',
   process.env.SUPABASE_S_SERVICE_KEY
 );
+
+const resend = new Resend(process.env.RESEND_S_KEY);
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -89,6 +92,25 @@ exports.handler = async (event) => {
       }
 
       console.log(`Entitlement written for: ${email}`);
+    }
+
+    // 3. Send welcome email via Resend template
+    const setPasswordUrl = `${process.env.SITE_URL}/setpassword.html?email=${encodeURIComponent(email)}`;
+
+    try {
+      await resend.emails.send({
+        from: 'Jenna at myshoplight <jenna@myshoplight.com>',
+        to: email,
+        subject: 'Ready to dig into your Amazon spending?',
+        template: 'purchase-welcome',
+        data: {
+          setPasswordUrl,
+        },
+      });
+      console.log(`Welcome email sent to: ${email}`);
+    } catch (emailError) {
+      // Don't fail the webhook if email fails — entitlement is already written
+      console.error('Failed to send welcome email:', emailError);
     }
 
     return { statusCode: 200, body: JSON.stringify({ received: true }) };
