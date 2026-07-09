@@ -302,94 +302,6 @@
     }
     .email-address:hover { text-decoration: underline; }
 
-    /* WHILE YOU WAIT */
-    .wait-section {
-      background: #fff;
-      padding: 48px 0;
-    }
-
-    .wait-section h2 {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 20px;
-      line-height: 1.25;
-    }
-
-    .wait-card {
-      background: var(--terra-tint);
-      border-left: 3px solid var(--terra);
-      border-radius: 0 10px 10px 0;
-      padding: 22px 20px;
-    }
-
-    .wait-card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .wait-card-header svg {
-      width: 18px;
-      height: 18px;
-      stroke: var(--terra);
-      fill: none;
-      stroke-width: 2;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .wait-card-header strong { font-size: 14px; color: var(--text); line-height: 1.4; }
-
-    .wait-steps { display: flex; flex-direction: column; gap: 10px; }
-
-    .wait-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 13px;
-      color: #555;
-      line-height: 1.55;
-    }
-
-    .mini-num {
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      border-radius: 50%;
-      background: var(--terra);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 2px;
-    }
-    .mini-num.alert { background: var(--rust); }
-
-    .confirm-note {
-      background: var(--rust-tint);
-      border-radius: 6px;
-      padding: 10px 12px;
-      margin-top: 6px;
-      margin-left: 30px;
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
-      font-size: 12px;
-      color: var(--rust);
-      line-height: 1.55;
-    }
-    .confirm-note svg {
-      width: 13px;
-      height: 13px;
-      stroke: var(--rust);
-      fill: none;
-      stroke-width: 2.5;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
 
     /* FOOTER */
     footer {
@@ -439,8 +351,7 @@
 
   <section class="next-steps">
     <div class="container">
-      <p class="section-label">What happens next</p>
-      <h2>Four things, in order</h2>
+      <h2>What happens next</h2>
       <div class="steps">
 
         <div class="step">
@@ -456,7 +367,8 @@
           <div class="step-num muted" aria-hidden="true">2</div>
           <div class="step-body">
             <h3>Request your Amazon order history</h3>
-            <p>Head to Amazon's privacy portal and request your order data. Your welcome email includes a step-by-step guide — or follow the instructions below.</p>
+            <p>Head to Amazon's privacy portal and request your order data. Select "Your Orders" and click Submit Request.</p>
+            <p style="margin-top:8px;"><a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" style="color:var(--teal);font-weight:600;">Go to Amazon's data request page &rarr;</a></p>
             <span class="tag soon">Takes ~24 hours</span>
           </div>
         </div>
@@ -497,56 +409,17 @@
       </div>
       <h3>Can't find the myshoplight email?</h3>
       <p>Check your spam folder first. If it's not there after a few minutes, reach out and we'll get it sorted.</p>
-      <a href="mailto:help@myshoplight.com" class="email-address">help@myshoplight.com</a>
+      <a href="mailto:jenna@myshoplight.com" class="email-address">jenna@myshoplight.com</a>
     </div>
   </div>
 
-  <section class="wait-section">
-    <div class="container">
-      <p class="section-label">While you wait</p>
-      <h2>How to request your Amazon data —<br>and actually get it</h2>
-      <div class="wait-card">
-        <div class="wait-card-header">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <strong>Start this now — there's a confirmation step most people miss</strong>
-        </div>
-        <div class="wait-steps">
-          <div class="wait-step">
-            <div class="mini-num" aria-hidden="true">1</div>
-            <span>Go to <strong>amazon.com &#8594; Account &#8594; Data &amp; Privacy &#8594; Request your data</strong></span>
-          </div>
-          <div class="wait-step">
-            <div class="mini-num" aria-hidden="true">2</div>
-            <span>Select <strong>"Order History"</strong> from the list and submit your request</span>
-          </div>
-          <div>
-            <div class="wait-step">
-              <div class="mini-num alert" aria-hidden="true">3</div>
-              <span>Check your inbox for <span class="subj">&#9993; Your Data Request Confirmation</span> from Amazon and click the button inside — <strong>this is required to start processing</strong></span>
-            </div>
-            <div class="confirm-note">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <span>Without clicking that confirmation, nothing gets sent. Check spam if you don't see it within a few minutes.</span>
-            </div>
-          </div>
-          <div class="wait-step">
-            <div class="mini-num" aria-hidden="true">4</div>
-            <span>Within ~24 hours, Amazon sends <span class="subj-teal">&#9993; Your Data Request</span> with your downloadable file</span>
-          </div>
-          <div class="wait-step">
-            <div class="mini-num" aria-hidden="true">5</div>
-            <span>Log in to myshoplight from a desktop browser and upload your file to see everything</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <footer>
     <p class="footer-copy">&#169; 2026 Caliet Ventures LLC</p>
     <nav class="footer-links" aria-label="Footer links">
       <a href="/privacy">Privacy policy</a>
-      <a href="mailto:help@myshoplight.com">help@myshoplight.com</a>
+      <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a>
     </nav>
   </footer>
 
