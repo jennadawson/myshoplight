@@ -98,18 +98,24 @@ exports.handler = async (event) => {
     const setPasswordUrl = `${process.env.SITE_URL}/setpassword.html?email=${encodeURIComponent(email)}`;
 
     try {
-      await resend.emails.send({
+      const { data: emailData, error: emailError } = await resend.emails.send({
         from: 'Jenna at myshoplight <jenna@myshoplight.com>',
         to: email,
         subject: 'Ready to dig into your Amazon spending?',
-        template: 'purchase-welcome',
-        data: {
-          setPasswordUrl,
+        template: {
+          id: 'purchase-welcome',
+          variables: {
+            setPasswordUrl,
+          },
         },
       });
-      console.log(`Welcome email sent to: ${email}`);
+
+      if (emailError) {
+        console.error('Resend error:', JSON.stringify(emailError));
+      } else {
+        console.log(`Welcome email sent to: ${email}, id: ${emailData.id}`);
+      }
     } catch (emailError) {
-      // Don't fail the webhook if email fails — entitlement is already written
       console.error('Failed to send welcome email:', emailError);
     }
 
