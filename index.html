@@ -890,6 +890,14 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         </div>
       </div>
 
+      <!-- Hub sort control -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Sort items by:</span>
+        <button id="hub-sort-cat-price" onclick="setHubSort('cat-price')" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1.5px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer;">Category + Price</button>
+        <button id="hub-sort-price-year" onclick="setHubSort('price-year')" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1.5px solid var(--cream2);background:#fff;color:var(--text);cursor:pointer;">Price + Year</button>
+        <button id="hub-sort-year-price" onclick="setHubSort('year-price')" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1.5px solid var(--cream2);background:#fff;color:var(--text);cursor:pointer;">Year + Price</button>
+      </div>
+
       <!-- Task cards -->
       <div style="display:flex;flex-direction:column;gap:12px;">
 
@@ -932,6 +940,24 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           <div style="font-size:18px;color:var(--muted);flex-shrink:0;">›</div>
         </div>
 
+        <!-- Export Item Data -->
+        <div style="background:#fff;border:1px solid var(--cream2);border-radius:14px;padding:1.25rem 1.5rem;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="width:36px;height:36px;background:var(--teal-tint);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📊</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);">Export Item Data</div>
+          </div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.5;padding-left:46px;margin-bottom:12px;">Download a CSV of your items with category, confidence level, and matched keyword — useful for auditing or spotting gaps in categorization.</div>
+          <div style="padding-left:46px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <select id="export-filter" style="font-size:12px;border:1.5px solid var(--cream2);border-radius:8px;padding:5px 10px;background:#fff;color:var(--text);font-family:'Source Sans 3',sans-serif;cursor:pointer;">
+              <option value="all">All items</option>
+              <option value="low">Low confidence only</option>
+              <option value="uncat">Uncategorized only</option>
+              <option value="pinned">Saved/locked only</option>
+            </select>
+            <button onclick="exportItemData()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:background .15s;" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='var(--teal)'">↓ Download CSV</button>
+          </div>
+        </div>
+
       </div><!-- /task cards -->
 
 
@@ -951,9 +977,17 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         </div>
       </div>
 
-      <!-- Search -->
-      <div style="margin-bottom:12px;">
-        <input type="text" id="card-search" placeholder="Search items…" oninput="renderCardView()" style="width:100%;font-size:13px;border:1px solid var(--cream2);border-radius:8px;padding:8px 12px;background:#fff;box-sizing:border-box;">
+      <!-- Sort + Search row -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="card-search" placeholder="Search items…" oninput="renderCardView()" style="flex:1;min-width:160px;font-size:13px;border:1px solid var(--cream2);border-radius:8px;padding:8px 12px;background:#fff;box-sizing:border-box;">
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span style="font-size:11px;color:var(--muted);font-weight:600;">Sort:</span>
+          <select id="card-sort-sel" onchange="setCardSort(this.value)" style="font-size:11px;border:1.5px solid var(--cream2);border-radius:8px;padding:4px 8px;background:#fff;color:var(--text);font-family:'Source Sans 3',sans-serif;cursor:pointer;">
+            <option value="cat-price">Category + Price</option>
+            <option value="price-year">Price + Year</option>
+            <option value="year-price">Year + Price</option>
+          </select>
+        </div>
       </div>
 
       <!-- Stats bar -->
@@ -1574,6 +1608,8 @@ let cardViewMode  = 'uncat';   // 'uncat' | 'all'
 let openCardIdx   = null;
 let kwSectionOpen = {};
 let confidenceFilter = 'all'; // 'all' | 'low' | 'saved' | 'uncat'
+let hubSort = 'cat-price';    // global default: 'cat-price' | 'price-year' | 'year-price'
+let cardViewSort = null;       // per-view override; null = inherit hubSort
 // ── Returns tracking ─────────────────────────────────────────────────────
 let returnsData = {
   refundMap: null,       // raw refund map by Order ID (from Refund Details parse)
@@ -2831,10 +2867,119 @@ function switchTab(tab){
 
 // ── ITEM MANAGER HUB ────────────────────────────────────────────────────────
 
+function setHubSort(val){
+  hubSort = val;
+  cardViewSort = null; // clear any per-view override
+  // update hub pill styling
+  ['cat-price','price-year','year-price'].forEach(v=>{
+    const btn = document.getElementById('hub-sort-'+v);
+    if(!btn) return;
+    const active = v === val;
+    btn.style.background = active ? 'var(--teal)' : '#fff';
+    btn.style.color = active ? '#fff' : 'var(--text)';
+    btn.style.borderColor = active ? 'var(--teal)' : 'var(--cream2)';
+  });
+  // sync card view dropdown if open
+  const sortSel = document.getElementById('card-sort-sel');
+  if(sortSel) sortSel.value = val;
+  // re-render if card view is open
+  if(document.getElementById('manager-card-view').style.display !== 'none'){
+    renderCardView();
+  }
+}
+
+function setCardSort(val){
+  cardViewSort = val; // per-view override
+  renderCardView();
+}
+
+function exportItemData(){
+  if(!managerItems || !managerItems.length){
+    showMsg('err','No item data to export. Upload your Amazon CSV first.');
+    return;
+  }
+  const filter = (document.getElementById('export-filter')||{}).value || 'all';
+  const activeSort = cardViewSort || hubSort;
+
+  let items = managerItems.filter(m=>!m.excluded);
+
+  if(filter==='low'){
+    items = items.filter(m=>!m.pinned && (m.userCat||m.cat)!=='Uncategorized' && (m.matchedPri==null||m.matchedPri>=3));
+  } else if(filter==='uncat'){
+    items = items.filter(m=>(m.userCat||m.cat)==='Uncategorized');
+  } else if(filter==='pinned'){
+    items = items.filter(m=>m.pinned);
+  }
+
+  // apply sort
+  items = [...items].sort((a,b)=>{
+    const ac=(a.userCat||a.cat||'').toLowerCase();
+    const bc=(b.userCat||b.cat||'').toLowerCase();
+    const ay=String(a.year||'');
+    const by=String(b.year||'');
+    const aa=b.amount||0, ba=a.amount||0;
+    if(activeSort==='cat-price'){
+      if(ac<bc) return -1; if(ac>bc) return 1; return aa-ba;
+    } else if(activeSort==='price-year'){
+      if(aa!==ba) return aa-ba;
+      return by<ay?-1:by>ay?1:0;
+    } else {
+      if(by!==ay) return by<ay?-1:1; return aa-ba;
+    }
+  });
+
+  const sortLabel = {'cat-price':'Category then Price','price-year':'Price then Year','year-price':'Year then Price'}[activeSort]||activeSort;
+  const filterLabel = {'all':'All items','low':'Low confidence','uncat':'Uncategorized','pinned':'Saved/locked'}[filter]||filter;
+
+  function confidence(m){
+    if((m.userCat||m.cat)==='Uncategorized') return 'Uncategorized';
+    if(m.pinned) return 'Saved';
+    if(m.matchedPri==null||m.matchedPri>=3) return 'Low';
+    return 'High';
+  }
+
+  function csvCell(v){
+    const s = String(v==null?'':v);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }
+
+  const headers = ['Title','Amount','Year','Month','Category','Subcategory','Confidence','Matched Keyword','Pinned'];
+  const rows = items.map(m=>[
+    csvCell(m.title),
+    csvCell((m.amount||0).toFixed(2)),
+    csvCell(m.year||''),
+    csvCell(m.month||''),
+    csvCell(m.userCat||m.cat||''),
+    csvCell(m.userSub||m.matchedSub||''),
+    csvCell(confidence(m)),
+    csvCell(m.matchedKw||''),
+    csvCell(m.pinned?'Yes':'No')
+  ].join(','));
+
+  const csv = [
+    '# myshoplight item export',
+    '# Filter: '+filterLabel+' | Sort: '+sortLabel+' | Generated: '+new Date().toLocaleDateString(),
+    '',
+    headers.join(','),
+    ...rows
+  ].join('\n');
+
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'myshoplight-items-'+filter+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showMsg('success', `Downloaded ${items.length} item${items.length!==1?'s':''} as CSV.`);
+}
+
 function renderManagerHub(){
   document.getElementById('manager-hub').style.display='block';
   document.getElementById('manager-card-view').style.display='none';
   document.getElementById('manager-returns-view').style.display='none';
+  // sync hub sort pill styling
+  setHubSort(hubSort);
   // update counts
   const uncatN = managerItems.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat&&!isFullyReturned(m)&&!m.excluded).length;
   const returnsN = managerItems.filter(m=>m.amountReturned>0).length;
@@ -2857,19 +3002,23 @@ function openManagerView(mode){
     return;
   }
   cardViewMode = mode;
+  cardViewSort = null; // reset per-view override — inherit hub sort
   openCardIdx = null;
   kwSectionOpen = {};
   document.getElementById('manager-card-view').style.display='block';
   document.getElementById('manager-returns-view').style.display='none';
+  // sync sort dropdown to current active sort
+  const sortSel = document.getElementById('card-sort-sel');
+  if(sortSel) sortSel.value = hubSort;
   const titleEl = document.getElementById('card-view-title');
   const subEl = document.getElementById('card-view-sub');
   if(mode==='uncat'){
     titleEl.textContent='Assign Uncategorized Items';
-    subEl.textContent='Tap an item to assign its category. Items sorted by year then price.';
+    subEl.textContent='Tap an item to assign its category.';
     document.getElementById('cv-confidence-wrap').style.display='none';
   } else {
     titleEl.textContent='Review All Items';
-    subEl.textContent='Browse your full purchase history. Tap any item to edit. Sorted by category, then price.';
+    subEl.textContent='Browse your full purchase history. Tap any item to edit.';
     // show confidence filter only in all-items view
     document.getElementById('cv-confidence-wrap').style.display='';
   }
@@ -2920,22 +3069,26 @@ function _renderCardView(){
   let items = managerItems.filter(m=>!m.excluded&&!isFullyReturned(m));
   if(cardViewMode==='uncat'){
     items = items.filter(m=>m.cat==='Uncategorized'&&!m.suggested&&!m.userCat);
-    // sort: year desc, then amount desc
-    items = [...items].sort((a,b)=>{
-      if((b.year||'')<(a.year||'')) return -1;
-      if((b.year||'')>(a.year||'')) return 1;
-      return (b.amount||0)-(a.amount||0);
-    });
-  } else {
-    // sort: category asc, then amount desc
-    items = [...items].sort((a,b)=>{
-      const ac=(a.userCat||a.cat||'').toLowerCase();
-      const bc=(b.userCat||b.cat||'').toLowerCase();
-      if(ac<bc) return -1;
-      if(ac>bc) return 1;
-      return (b.amount||0)-(a.amount||0);
-    });
   }
+  // apply sort — per-view override or global hub sort
+  const activeSort = cardViewSort || hubSort;
+  items = [...items].sort((a,b)=>{
+    const ac=(a.userCat||a.cat||'').toLowerCase();
+    const bc=(b.userCat||b.cat||'').toLowerCase();
+    const ay=String(a.year||'');
+    const by=String(b.year||'');
+    const aa=b.amount||0, ba=a.amount||0; // desc
+    if(activeSort==='cat-price'){
+      if(ac<bc) return -1; if(ac>bc) return 1;
+      return aa-ba;
+    } else if(activeSort==='price-year'){
+      if(aa!==ba) return aa-ba;
+      return by<ay?-1:by>ay?1:0;
+    } else { // year-price
+      if(by!==ay) return by<ay?-1:1;
+      return aa-ba;
+    }
+  });
   if(search) items=items.filter(m=>m.title.toLowerCase().includes(search));
 
   // confidence filter (all-items mode only)
