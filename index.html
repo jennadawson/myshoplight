@@ -55,9 +55,11 @@ async function syncToSupabase() {
 }
 
 async function loadFromSupabase() {
+  // Returns true if the server had a saved copy of the user's items, false otherwise.
+  // The caller uses this to decide whether to back up local-only data to the server.
   try {
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
+    if (!user) return false;
 
     const { data } = await _supabase
       .from('user_data')
@@ -65,7 +67,7 @@ async function loadFromSupabase() {
       .eq('user_id', user.id)
       .single();
 
-    if (!data) return;
+    if (!data) return false;
 
     if (data.sessions_data) {
       localStorage.setItem('api_sessions_v2', JSON.stringify(data.sessions_data));
@@ -79,8 +81,10 @@ async function loadFromSupabase() {
       if (c.excludedItems) localStorage.setItem('api_excluded_items', c.excludedItems);
       if (c.catStructure) localStorage.setItem('api_cat_structure', c.catStructure);
     }
+    return !!data.sessions_data;
   } catch(e) {
     console.error('Supabase load error:', e);
+    return false;
   }
 }
 </script>
@@ -780,9 +784,8 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <div class="tab" id="tab-btn-manager" onclick="switchTab('manager')" style="display:none">
       Item Manager <span class="tab-badge" id="uncat-badge">0</span>
     </div>
+    <div class="tab" id="tab-btn-returns" onclick="switchTab('returns')" style="display:none">Returns <span class="tab-badge" id="returns-badge" style="display:none">0</span></div>
     <div class="tab" id="tab-btn-catmap" onclick="switchTab('catmap')">Category Map</div>
-    <!-- returns tab hidden — now lives inside Item Manager hub -->
-    <div id="tab-btn-returns" style="display:none"></div>
   </div>
 
   <!-- DASHBOARD TAB -->
@@ -870,7 +873,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <div class="tbl-head" style="margin:-1.25rem -1.25rem 1rem -1.25rem;border-radius:11px 11px 0 0;padding:8px 14px;">
           <div class="tbl-head-title">Top 10 Most Expensive Items</div>
         </div>
-        <div class="table-scroll"><table class="dt" style="width:100%"><thead><tr><th>Item</th><th>Category</th><th>Subcategory</th><th>Year</th><th>Spend Type</th><th>Price</th></tr></thead><tbody id="top-items-table"></tbody></table></div>
+        <div class="table-scroll"><table class="dt" style="width:100%"><thead><tr><th>Item</th><th>Price</th><th>Category</th><th>Subcategory</th><th>Year</th><th style="text-align:left">Spend Type</th></tr></thead><tbody id="top-items-table"></tbody></table></div>
       </div>
       <!-- Category + Audience breakdown — side by side -->
       <div class="table-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1.5rem;">
@@ -1056,8 +1059,8 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <button onclick="closeManagerView()" style="background:none;border:none;font-size:20px;color:var(--teal);cursor:pointer;padding:0;line-height:1;">←</button>
         <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--teal);">Review Returns</div>
       </div>
-      <!-- Returns content rendered here by renderReturns() -->
-      <div id="tab-returns" style="display:block"></div>
+      <!-- Returns now render in the standalone Returns tab -->
+      <div id="manager-returns-legacy" style="display:none"></div>
     </div><!-- /manager-returns-view -->
 
   </div><!-- /tab-manager -->
@@ -1663,41 +1666,10 @@ let catMapSort = { col: 'cat', dir: 'asc' };
 let _syncTimer = null;
 
 function syncCustomizationsToSupabase(){
-  // Debounce — wait 2 seconds after last save before hitting Supabase
+  // Debounce — 2s after the last change — then push a full snapshot (items + customizations)
+  // to user_data, the SAME table/format loadFromSupabase reads, so edits reach other devices.
   if(_syncTimer) clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(async () => {
-    try {
-      const { data: { user } } = await _supabase.auth.getUser();
-      if(!user) return;
-
-      // Build cat_structure — only custom additions
-      const catStructure = {};
-      Object.entries(CAT_SUBS).forEach(([cat, subs]) => {
-        const origSubs = (window._ORIG_CAT_SUBS || {})[cat];
-        if(!origSubs){ catStructure[cat] = subs; return; }
-        const added = subs.filter(s => !origSubs.includes(s));
-        if(added.length) catStructure[cat] = added;
-      });
-
-      const { error } = await _supabase
-        .from('user_customizations')
-        .upsert({
-          user_id: user.id,
-          keyword_rules: newRules,
-          item_overrides: overrides,
-          aud_overrides: audOverrides,
-          stype_overrides: stypeOverrides,
-          excluded_items: [...excludedItems],
-          cat_structure: catStructure,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
-
-      if(error) console.warn('Supabase sync error:', error);
-      else console.log('Customizations synced to Supabase');
-    } catch(e){
-      console.warn('Could not sync customizations to Supabase:', e);
-    }
-  }, 2000);
+  _syncTimer = setTimeout(() => { syncToSupabase(); }, 2000);
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
@@ -2881,26 +2853,20 @@ async function runProcessing(){
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  // returns is now inside manager hub — treat as manager tab
-  const resolvedTab = tab==='returns' ? 'manager' : tab;
   const tabBtnId =
-    resolvedTab==='dashboard' ? 'tab-btn-dashboard' :
-    resolvedTab==='manager'   ? 'tab-btn-manager'   :
-                                'tab-btn-catmap';
+    tab==='dashboard' ? 'tab-btn-dashboard' :
+    tab==='manager'   ? 'tab-btn-manager'   :
+    tab==='returns'   ? 'tab-btn-returns'   :
+                        'tab-btn-catmap';
   const activeBtn = document.getElementById(tabBtnId);
   if(activeBtn) activeBtn.classList.add('active');
-  document.getElementById('tab-dashboard').style.display=resolvedTab==='dashboard'?'':'none';
-  document.getElementById('tab-manager').style.display=resolvedTab==='manager'?'':'none';
-  document.getElementById('tab-catmap').style.display=resolvedTab==='catmap'?'':'none';
-  if(resolvedTab==='manager'){
-    if(tab==='returns'){
-      // open directly to returns sub-view
-      openManagerView('returns');
-    } else {
-      renderManagerHub();
-    }
-  }
-  if(resolvedTab==='catmap')renderCatMap();
+  document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'':'none';
+  document.getElementById('tab-manager').style.display=tab==='manager'?'':'none';
+  document.getElementById('tab-catmap').style.display=tab==='catmap'?'':'none';
+  document.getElementById('tab-returns').style.display=tab==='returns'?'':'none';
+  if(tab==='manager')renderManagerHub();
+  if(tab==='returns')renderReturns();
+  if(tab==='catmap')renderCatMap();
 }
 
 // ── ITEM MANAGER HUB ────────────────────────────────────────────────────────
@@ -3034,9 +3000,7 @@ function renderManagerHub(){
 function openManagerView(mode){
   document.getElementById('manager-hub').style.display='none';
   if(mode==='returns'){
-    document.getElementById('manager-card-view').style.display='none';
-    document.getElementById('manager-returns-view').style.display='block';
-    renderReturns();
+    switchTab('returns');
     return;
   }
   cardViewMode = mode;
@@ -4558,11 +4522,11 @@ function renderDash(){
     const stColor=STYPE_COLORS[st]||'#888';
     return`<tr>
       <td style="font-size:11px">${escHtml(i.title.slice(0,38))}${i.title.length>38?'…':''}</td>
+      <td style="font-weight:600;white-space:nowrap">${fmt(i.amount)}</td>
       <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(i.cat)}</span></td>
       <td style="font-size:11px;color:var(--muted)">${escHtml(subLabel)}</td>
       <td style="font-size:11px;color:var(--muted);text-align:center">${escHtml(i.year||'—')}</td>
-      <td><span style="display:inline-flex;align-items:center;background:${stColor};color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;gap:4px;">${STYPE_DOT[st]||''}${escHtml(st)}</span></td>
-      <td>${fmt(i.amount)}</td>
+      <td style="text-align:left"><span style="display:inline-flex;align-items:center;background:${stColor};color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;gap:4px;">${STYPE_DOT[st]||''}${escHtml(st)}</span></td>
     </tr>`;
   }).join('');
 
@@ -5130,9 +5094,9 @@ function exportCustomizations(){
 
 // ── INIT CATMAP ON DOM READY ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async function(){
-  // Only load from Supabase if local init found no data
+  // Pull the latest server copy into local storage before we render
   if(allItems.length === 0){
-    await loadFromSupabase();
+    const hadServerData = await loadFromSupabase();
 
     const savedSessions = localStorage.getItem('api_sessions_v2');
     if(savedSessions){
@@ -5159,6 +5123,9 @@ document.addEventListener('DOMContentLoaded', async function(){
         updateUncatBadge();
         document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
         showDashboardView();
+        // Backfill: if this device has data but the server had none, seed the server now
+        // so the data (and future edits) are available on other devices.
+        if(!hadServerData) syncToSupabase();
       }
     }
   }
