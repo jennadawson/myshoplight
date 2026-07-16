@@ -1271,6 +1271,7 @@ const STORAGE_KEY_SESSIONS  = 'api_sessions_v2';    // persisted session data
 const STORAGE_KEY_EXCLUDED  = 'api_excluded_items'; // Set of overrideKey'd titles
 const STORAGE_KEY_STYPE_OV  = 'api_stype_overrides'; // {titleKey -> spendType}
 const STORAGE_KEY_RULE_OV   = 'api_rule_overrides'; // {keyword -> {cat, sub}} — moved keyword rules
+const STORAGE_KEY_RETURNS   = 'api_returns'; // returns session state (refund map, review queue, totals)
 const ANTHROPIC_API_KEY = ''; // Leave blank — users enter their own, or omit for keyword-only mode
 
 
@@ -1871,10 +1872,41 @@ function categorize(title,rules){
   return{cat:'Uncategorized',sub:'',kw:'',pri:null};
 }
 
+// Returns state holds references to item objects (candidate.itemRef) which can't be
+// serialized directly. Strip them on save; re-link them by title on load.
+function serializeReturns(){
+  return {
+    refundMap: returnsData.refundMap,
+    ambiguous: (returnsData.ambiguous||[]).map(a=>({
+      orderId:a.orderId, refundAmount:a.refundAmount, refundDate:a.refundDate,
+      candidates:(a.candidates||[]).map(c=>({title:c.title, amount:c.amount, qty:c.qty}))
+    })),
+    unmatched: returnsData.unmatched||[],
+    autoMatchedCount: returnsData.autoMatchedCount||0,
+    totalRefundAmount: returnsData.totalRefundAmount||0,
+    includeInTotals: !!returnsData.includeInTotals
+  };
+}
+function restoreReturns(saved){
+  if(!saved) return;
+  returnsData.refundMap = saved.refundMap || null;
+  returnsData.unmatched = saved.unmatched || [];
+  returnsData.autoMatchedCount = saved.autoMatchedCount || 0;
+  returnsData.totalRefundAmount = saved.totalRefundAmount || 0;
+  returnsData.includeInTotals = !!saved.includeInTotals;
+  returnsData.ambiguous = (saved.ambiguous||[]).map(a=>({
+    orderId:a.orderId, refundAmount:a.refundAmount, refundDate:a.refundDate,
+    candidates:(a.candidates||[]).map(c=>({
+      title:c.title, amount:c.amount, qty:c.qty,
+      itemRef: managerItems.find(m=>m.title===c.title) || allItems.find(i=>i.title===c.title) || null
+    }))
+  }));
+}
+
 function saveSessionData(){
   try{
     localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify({
-      sessions, sessionItems, managerItems
+      sessions, sessionItems, managerItems, returns: serializeReturns()
     }));
     localStorage.setItem(STORAGE_KEY_EXCLUDED, JSON.stringify([...excludedItems]));
     localStorage.setItem(STORAGE_KEY_STYPE_OV, JSON.stringify(stypeOverrides));
@@ -3935,6 +3967,7 @@ function toggleReturnsInTotals(checked){
   returnsData.includeInTotals = !!checked;
   if(allItems.length) renderDash();
   updateReturnsBanner();
+  saveSessionData();
 }
 
 function updateReturnsBanner(){
@@ -5277,10 +5310,16 @@ document.addEventListener('DOMContentLoaded', async function(){
         m.stypeLocked = !!stypeOverrides[overrideKey(m.title)];
         if(m.stypeLocked) m.stype = stypeOverrides[overrideKey(m.title)];
       });
+      // Restore the returns review queue / refund totals saved with this session.
+      restoreReturns(sd.returns);
       if(allItems.length > 0){
         rebuildYearFilter();rebuildManagerYearFilter();
         document.getElementById('tab-btn-dashboard').style.display='';
         document.getElementById('tab-btn-manager').style.display='';
+        // Show the Returns tab if this data has any returns (refunds detected or items marked returned).
+        if((returnsData.refundMap && Object.keys(returnsData.refundMap).length) || managerItems.some(m=>m.amountReturned>0)){
+          const _rb=document.getElementById('tab-btn-returns'); if(_rb) _rb.style.display='';
+        }
         document.getElementById('dash-head').style.display='';
         document.getElementById('dash-body').style.display='';
         renderSessionBadges();
