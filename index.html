@@ -628,7 +628,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
   </div>
 
   <!-- HERO -->
-  <div class="landing-hero">
+  <div class="landing-hero" id="landing-hero-section">
     <div class="landing-hero-grid">
       <div>
         <div class="landing-eyebrow">MyShopLight · Spend Smarter</div>
@@ -668,7 +668,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
   </div>
 
   <!-- WHAT YOU'LL SEE -->
-  <div class="preview-section">
+  <div class="preview-section" id="landing-preview-section">
     <div class="preview-title">Here's what you'll see</div>
     <div class="preview-sub">A clear, beautiful dashboard organized around the questions that actually matter.</div>
     <div class="preview-grid">
@@ -2016,9 +2016,24 @@ function showLandingView(){
   const lv = document.getElementById('landing-view');
   const tb = document.getElementById('tab-bar');
   const hb = document.getElementById('hamburger-btn');
+  const hasData = allItems.length > 0;
   if(lv) lv.style.display = '';
   if(tb) tb.style.display = 'none';
-  if(hb) hb.classList.remove('visible');
+  // Returning users keep the hamburger available; first-time visitors don't need it yet.
+  if(hb){ if(hasData) hb.classList.add('visible'); else hb.classList.remove('visible'); }
+  // Marketing sections are only useful to brand-new visitors. If the user already has a
+  // dashboard and just came here to add data, hide them and show only the uploader.
+  ['landing-hero-section','landing-preview-section'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display = hasData ? 'none' : '';
+  });
+  // Keep the "How to get your Amazon data" panel available, but collapse it by
+  // default for returning users so it doesn't take up space (they can re-open it).
+  const wpBody = document.getElementById('welcome-panel-body');
+  const wpChev = document.getElementById('welcome-chevron');
+  if(wpBody) wpBody.style.display = hasData ? 'none' : '';
+  if(wpChev) wpChev.style.transform = hasData ? 'rotate(-90deg)' : '';
+  const backBar = document.getElementById('landing-back-bar');
+  if(backBar) backBar.style.display = hasData ? '' : 'none';
   // hide all tab panels
   ['tab-dashboard','tab-manager','tab-returns','tab-catmap'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
@@ -2079,16 +2094,9 @@ function openMenuPage(page){
 
 function hamburgerAddData(){
   toggleMenu();
-  // Temporarily show the landing view so user can use the upload panel
+  // showLandingView() handles hiding the marketing sections and showing the
+  // "View Dashboard" bar when the user already has data.
   showLandingView();
-  // If the user already has data loaded, give them a way back to the dashboard:
-  // show the on-screen "View Dashboard" bar and keep the hamburger available.
-  if(allItems.length > 0){
-    const backBar = document.getElementById('landing-back-bar');
-    if(backBar) backBar.style.display = '';
-    const hb = document.getElementById('hamburger-btn');
-    if(hb) hb.classList.add('visible');
-  }
   // Scroll to upload panel
   setTimeout(()=>{
     const up = document.getElementById('upload-panel');
@@ -3999,25 +4007,57 @@ function resolveAmbiguous(idx, kind){
 }
 
 function overrideReturn(title){
-  // Flip a matched item back to NOT returned (clears amountReturned)
+  // Flip a matched item back to NOT returned, and re-surface its refund into
+  // "Needs Review" so the refund can be reassigned to the correct item (or dismissed).
   const item = allItems.find(i => i.title === title && i.amountReturned > 0);
+  const orderId = item ? item.orderId : null;
+  const refundDate = item ? item.refundDate : null;
   if(item){
     item.amountReturned = 0;
-    item.returnOverridden = true;
     delete item.refundDate;
     delete item.returnMatchType;
   }
   const mi = managerItems.find(m => m.title === title && m.amountReturned > 0);
   if(mi){
     mi.amountReturned = 0;
-    mi.returnOverridden = true;
     mi.refundDate = null;
     mi.returnMatchType = null;
   }
+
+  // Put the refund back into the review queue, if we still know the refund for this order.
+  let requeued = false;
+  if(orderId && returnsData.refundMap && returnsData.refundMap[orderId]){
+    const refunds = returnsData.refundMap[orderId];
+    const refund = refunds.find(r => r.date === refundDate) || refunds[0];
+    const dup = returnsData.ambiguous.some(a => a.orderId === orderId
+      && refund && Math.abs((a.refundAmount||0) - refund.amount) < 0.01
+      && a.refundDate === refund.date);
+    if(refund && !dup){
+      const orderItems = allItems.filter(it => it.orderId === orderId);
+      returnsData.ambiguous.push({
+        orderId,
+        refundAmount: refund.amount,
+        refundDate: refund.date,
+        candidates: orderItems.map(it => ({ title: it.title, amount: it.amount, qty: it.qty || 1, itemRef: it }))
+      });
+      requeued = true;
+    }
+  }
+
+  // If we couldn't re-queue a refund, treat it as a genuine "not returned" and
+  // preserve that decision across future re-matches.
+  if(!requeued){
+    if(item) item.returnOverridden = true;
+    if(mi) mi.returnOverridden = true;
+  }
+
   saveSessionData();
   if(allItems.length) renderDash();
+  if(requeued) returnsTabFilter = 'review'; // jump to the queue so they see it
   renderReturns();
-  showMsg('info','Item moved back to Item Manager — categorize it there if needed.');
+  showMsg('info', requeued
+    ? 'Refund moved to Needs Review — pick the item that was actually returned, or dismiss it.'
+    : 'Item moved back to your spending — it now counts toward your totals again.');
 }
 
 function toggleReturnsInTotals(checked){
