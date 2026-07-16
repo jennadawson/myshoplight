@@ -2555,14 +2555,33 @@ function matchRefundsToItems(items, refundMap){
         return;
       }
 
-      // CASE 1: Single item in order → auto-match (treat as full return).
-      // The user can convert to partial via the Auto-matched section if qty > 1.
+      // CASE 1: Single item in order → auto-match ONLY if the refund resembles a
+      // full return of that item (item price, allowing for tax). A refund that's
+      // materially larger (likely a combined multi-item return) or smaller (likely
+      // a partial return) is sent to Needs Review instead of silently matching.
       if(availableItems.length === 1 && orderItems.length === 1){
         const item = availableItems[0];
-        item.amountReturned = item.amount;
-        item.refundDate = refund.date;
-        item.returnMatchType = 'auto-single';
-        autoMatched++;
+        const lo = item.amount * 0.90;   // small under-refund tolerance
+        const hi = item.amount * 1.15;   // allow sales tax on top of the item price
+        if(refund.amount >= lo && refund.amount <= hi){
+          item.amountReturned = item.amount;
+          item.refundDate = refund.date;
+          item.returnMatchType = 'auto-single';
+          autoMatched++;
+          return;
+        }
+        // Amount doesn't look like a clean full return of this item → review it
+        ambiguous.push({
+          orderId,
+          refundAmount: refund.amount,
+          refundDate: refund.date,
+          candidates: orderItems.map(it => ({
+            title: it.title,
+            amount: it.amount,
+            qty: it.qty || 1,
+            itemRef: it
+          }))
+        });
         return;
       }
 
