@@ -595,6 +595,10 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       How to get Amazon data
     </button>
+    <button class="menu-item" onclick="openMenuPage('categorization')">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+      How categorization works
+    </button>
     <button class="menu-item" onclick="openFeedback()">
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
       Send feedback
@@ -609,10 +613,6 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       Add more data
     </button>
-    <button class="menu-item" onclick="hamburgerExport()">
-      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-      Export my customizations
-    </button>
 
     <button class="menu-item danger" onclick="hamburgerStartOver()">
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
@@ -620,6 +620,34 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     </button>
   </div>
 </aside>
+
+<!-- ── HELP & INFO MODAL ───────────────────────────────────────────────────── -->
+<style>
+  .hi-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1.5rem;background:rgba(13,92,92,.28);}
+  .hi-modal.open{display:flex;}
+  .hi-card{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(13,92,92,.18);padding:2rem 2rem 1.75rem;position:relative;}
+  .hi-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:4px;z-index:1;}
+  .hi-close:hover{color:var(--text);}
+  .hi-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--teal);margin-bottom:1rem;padding-right:1.75rem;}
+  .hi-body{font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--text);line-height:1.6;}
+  .hi-body h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--teal);margin:1.35rem 0 .35rem;}
+  .hi-body h4:first-child{margin-top:0;}
+  .hi-body p{margin:0 0 .6rem;}
+  .hi-body ul{margin:.3rem 0 .85rem;padding-left:1.15rem;}
+  .hi-body li{margin-bottom:.4rem;}
+  .hi-body a{color:var(--teal);font-weight:600;text-decoration:none;}
+  .hi-body a:hover{text-decoration:underline;}
+  .hi-body strong{font-weight:600;}
+  .hi-muted{color:var(--muted);font-size:13px;}
+  .hi-note{background:var(--teal-tint);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);margin:.5rem 0 .85rem;}
+</style>
+<div class="hi-modal" id="hi-modal" onclick="if(event.target===this)closeMenuPage()">
+  <div class="hi-card" role="dialog" aria-modal="true" aria-labelledby="hi-title">
+    <button class="hi-close" onclick="closeMenuPage()" aria-label="Close">&times;</button>
+    <div class="hi-title" id="hi-title"></div>
+    <div class="hi-body" id="hi-body"></div>
+  </div>
+</div>
 
 <!-- ── SEND FEEDBACK MODAL ─────────────────────────────────────────────────── -->
 <style>
@@ -1152,6 +1180,24 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <div id="cv-conf-helptext" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">
           <strong style="color:var(--terra);">⚠ Low confidence</strong> items were matched by a broad keyword rule and are most likely to be miscategorized. Open the item and tap Save to confirm it's correct — this protects it from future re-runs.
         </div>
+      </div>
+
+      <!-- Category / Subcategory / Keyword filter (Review All Items only) -->
+      <div id="cv-catfilter-wrap" style="display:none;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Filter by:</span>
+          <select id="im-cat-filter" onchange="setImCatFilter(this.value)" style="font-size:11px;border:1.5px solid var(--cream2);border-radius:8px;padding:5px 10px;background:#fff;color:var(--text);font-family:'Source Sans 3',sans-serif;cursor:pointer;max-width:220px;">
+            <option value="">All categories</option>
+          </select>
+          <select id="im-sub-filter" onchange="setImSubFilter(this.value)" disabled style="font-size:11px;border:1.5px solid var(--cream2);border-radius:8px;padding:5px 10px;background:#fff;color:var(--text);font-family:'Source Sans 3',sans-serif;cursor:pointer;max-width:220px;">
+            <option value="">All subcategories</option>
+          </select>
+          <select id="im-kw-filter" onchange="setImKwFilter(this.value)" style="font-size:11px;border:1.5px solid var(--cream2);border-radius:8px;padding:5px 10px;background:#fff;color:var(--text);font-family:'Source Sans 3',sans-serif;cursor:pointer;max-width:240px;">
+            <option value="">All keywords</option>
+          </select>
+          <button id="im-clear-filter" onclick="clearImFilters()" style="display:none;font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid var(--cream2);background:#fff;color:var(--muted);cursor:pointer;font-family:'Source Sans 3',sans-serif;">Clear filters</button>
+        </div>
+        <div id="im-filter-summary" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;"></div>
       </div>
 
       <!-- Card list -->
@@ -1772,6 +1818,7 @@ let charts        = {};
 let filterView    = 'all';
 let spendView     = 'monthly'; // 'monthly' | 'yearly'
 let cardViewMode  = 'uncat';   // 'uncat' | 'all'
+let imCatFilter = '', imSubFilter = '', imKwFilter = '';  // Review All Items drill-down filters
 let openCardIdx   = null;
 let kwSectionOpen = {};
 let confidenceFilter = 'all'; // 'all' | 'low' | 'saved' | 'uncat'
@@ -2161,15 +2208,100 @@ function toggleMenu(){
   }
 }
 
+const HELP_CONTENT = {
+  'how-to-use': {
+    title: 'How to use this',
+    html: `
+      <h4>The short version</h4>
+      <p>Upload your Amazon order history and myshoplight turns it into a picture of what you actually spend on: by category, by who it was for, and by what was truly essential.</p>
+      <h4>Your dashboard (Spend Spotlights)</h4>
+      <p>This is home base. It surfaces the highlights: your biggest categories, who your spending was for, and how much fell into essential vs. flexible vs. discretionary. Start here to get the story at a glance.</p>
+      <h4>Item Manager</h4>
+      <p>Where you make it yours. Every order gets auto-sorted into a category, but you know your household better than any rule does. Open Item Manager to review items, fix anything that landed in the wrong place, and clear out anything marked uncategorized (that little number badge on the tab is your to-do count). Use <strong>Review All Items</strong> to page through everything and reassign in bulk.</p>
+      <h4>Category Map</h4>
+      <p>The rulebook behind the scenes. This shows how myshoplight decides where things go &mdash; the keywords and categories doing the sorting. Peek in here when you want to understand <em>why</em> something was categorized a certain way, or tune the rules for how your family actually shops.</p>
+      <h4>Returns</h4>
+      <p>Refunds and returned items live here, broken out separately so they don't muddy your real spending. If we spot refunds in your data, you'll see a banner offering to include or exclude them from your totals.</p>
+      <h4>Spend types and audiences</h4>
+      <p>Two lenses that make the data click: spend type (Essential / Flexible / Discretionary) tells you what was necessary vs. nice-to-have, and audience (who it was for) breaks spending down by the people in your household.</p>
+      <h4>From the menu, you can also</h4>
+      <ul>
+        <li><strong>Add more data</strong> &mdash; upload another Amazon export any time to fold it into your dashboard.</li>
+        <li><strong>Start over</strong> &mdash; clear everything and begin fresh.</li>
+      </ul>`
+  },
+  'faqs': {
+    title: 'FAQs',
+    html: `
+      <h4>How do I get my Amazon order history?</h4>
+      <p>You request it directly from Amazon through their data privacy portal. It takes about 24 hours to arrive in your inbox as a downloadable file. See "How to get your Amazon data" in this menu for the step-by-step.</p>
+      <h4>Is my data safe? Does myshoplight store my order history?</h4>
+      <p>Your Amazon data is stored securely in your myshoplight account &mdash; it's never sold or shared with anyone. We don't connect to Amazon directly, and we never ask for your Amazon password.</p>
+      <h4>How far back does it go?</h4>
+      <p>As far back as Amazon's data export covers &mdash; typically from the point of account creation, spanning multiple years of order history. The more history you upload, the more patterns myshoplight can surface.</p>
+      <h4>We share an Amazon account. Will it still work?</h4>
+      <p>Yes. myshoplight filters by shipping address, so even a shared account breaks down cleanly by household. And if you and your partner have separate accounts, you can upload both and see everything together.</p>
+      <h4>Can I use it on my phone?</h4>
+      <p>Yes. Your dashboard works on phone, tablet, or desktop. We do recommend doing the initial file upload from a computer, since downloading and uploading the Amazon export is easier there &mdash; but you can complete the upload on mobile too.</p>
+      <h4>Is this a subscription?</h4>
+      <p>No. It's a one-time purchase. No monthly fees, no renewal reminders.</p>
+      <h4>Why are some of my items uncategorized?</h4>
+      <p>A handful of orders won't match any rule &mdash; odd product names, one-offs, that kind of thing. They show up in Item Manager with a badge so you can assign them in a few clicks. Once you do, they fold into your dashboard.</p>
+      <h4>Can I change how something's categorized?</h4>
+      <p>Absolutely. That's what Item Manager and Category Map are for. Recategorize any item, and adjust the keyword rules so future uploads follow your lead.</p>`
+  },
+  'amazon-data': {
+    title: 'How to get your Amazon data',
+    html: `
+      <p>Getting your order history from Amazon takes about a day, and most of that is just waiting on Amazon. Three steps:</p>
+      <h4>1. Request your Amazon order history</h4>
+      <p>Head to Amazon's privacy portal and request your order data. Select "Your Orders" and click Submit Request.</p>
+      <p><a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" rel="noopener">Go to Amazon's data request page &rarr;</a><br><span class="hi-muted">Takes ~24 hours.</span></p>
+      <h4>2. Confirm your request via email from Amazon &mdash; don't skip this</h4>
+      <p>Amazon sends a confirmation email right after you submit. You must click the button inside to start processing &mdash; without it, your data file never gets sent. Look for the subject line: <strong>"Your Data Request Confirmation."</strong> It's easy to miss.</p>
+      <h4>3. Upload when your data file arrives</h4>
+      <p>Once Amazon processes your confirmed request, you'll get an email with your file. Look for the subject line: <strong>"Your Data Request."</strong> Log in to myshoplight &mdash; a desktop browser is easiest for the upload &mdash; upload the file, and your whole Amazon history is ready to explore.</p>`
+  },
+  'categorization': {
+    title: 'How categorization works',
+    html: `
+      <h4>The overall concept</h4>
+      <p>myshoplight sorts every order by matching words in the product title against a library of keyword rules, grouped into set categories and subcategories. Each rule says "if you see this word, file it here." You start with 2,000+ built-in rules, and you can add both your own keywords and your own categories/subcategories. This lets you tune your dashboard to match exactly how your household shops.</p>
+      <h4>The three priority tiers</h4>
+      <p>When you add a keyword, you pick a priority tier that describes how specific it is:</p>
+      <ul>
+        <li><strong>1 &mdash; Brand name</strong> (KitchenAid, Skechers, Aveeno). Use this when a brand almost always means the same kind of purchase. Brand rules are the most confident signal.</li>
+        <li><strong>2 &mdash; Specific phrase</strong> (body lotion, bathing suit, floor mat). Use this for multi-word descriptions that pin down a product without naming a brand.</li>
+        <li><strong>3 &mdash; Product type</strong> (shampoo, multivitamin, notebook). Use this for broad, single-word catch-alls that cover a lot of items.</li>
+      </ul>
+      <p><em>Rule of thumb:</em> the more specific your keyword, the higher the tier (lower the number). If you're not sure, match the tier to how exact the word is &mdash; a brand goes in 1, a descriptive phrase in 2, a generic product word in 3.</p>
+      <p class="hi-note"><strong>Before you add a keyword,</strong> search for it on the Category Map first, so you're not duplicating a rule that already exists.</p>
+      <h4>Which keyword wins when several match</h4>
+      <p>An item can match more than one rule at once. When that happens, myshoplight picks the <strong>most specific match first</strong> &mdash; the longest, most exact keyword &mdash; and uses the priority tier to break ties from there.</p>
+      <h4>How audience gets assigned</h4>
+      <p>Audience (Kids / Household / Adult) isn't something you set on every item &mdash; myshoplight infers it automatically from the category, plus a scan of the item title for kid-related words. So a toy lands in "Kids," cleaning supplies land in "Household," and so on. If it ever guesses wrong, you can override the audience on any item in Item Manager.</p>
+      <h4>How spend type gets assigned</h4>
+      <p>Spend type (Essential / Flexible / Discretionary) is also assigned automatically, based on the category and subcategory an item falls into &mdash; groceries and medicine read as Essential, d&eacute;cor and gadgets as Discretionary, and plenty sits in Flexible between them. You can view which spend type is assigned to each category/subcategory on the Category Map. Like audience, you can override it on any item when your judgment differs from the default.</p>
+      <h4>One thing to know: changes apply going forward</h4>
+      <p>When you add a keyword or move one to a different category, it re-sorts items on your <strong>next upload or data run</strong>. It doesn't reach back and re-file items you've already categorized unless you re-run them. So if you want a rule change to clean up existing items too, you'll re-run your data (or reassign those items directly in Item Manager).</p>`
+  }
+};
+
 function openMenuPage(page){
-  toggleMenu();
-  // For now, alert with placeholder - we'll wire up actual content next
-  const titles = {
-    'how-to-use': 'How to use MyShopLight',
-    'faqs': 'Frequently asked questions',
-    'amazon-data': 'How to get your Amazon data'
-  };
-  alert(titles[page] + ' — coming next session. We\'ll wire up the modal content.');
+  toggleMenu(); // close the drawer
+  const c = HELP_CONTENT[page];
+  if(!c){ return; }
+  document.getElementById('hi-title').textContent = c.title;
+  document.getElementById('hi-body').innerHTML = c.html;
+  const modal = document.getElementById('hi-modal');
+  modal.classList.add('open');
+  modal.scrollTop = 0;
+  const card = modal.querySelector('.hi-card');
+  if(card) card.scrollTop = 0;
+}
+
+function closeMenuPage(){
+  document.getElementById('hi-modal').classList.remove('open');
 }
 
 // ── SEND FEEDBACK ──────────────────────────────────────────────────────────
@@ -3385,11 +3517,16 @@ function openManagerView(mode){
     titleEl.textContent='Assign Uncategorized Items';
     subEl.textContent='Tap an item to assign its category.';
     document.getElementById('cv-confidence-wrap').style.display='none';
+    document.getElementById('cv-catfilter-wrap').style.display='none';
   } else {
     titleEl.textContent='Review All Items';
     subEl.textContent='Browse your full purchase history. Tap any item to edit.';
     // show confidence filter only in all-items view
     document.getElementById('cv-confidence-wrap').style.display='';
+    // reset + populate the category / subcategory / keyword filters
+    imCatFilter=''; imSubFilter=''; imKwFilter='';
+    document.getElementById('cv-catfilter-wrap').style.display='';
+    populateImFilters();
   }
   renderCardView();
 }
@@ -3423,7 +3560,88 @@ function closeManagerView(){
   openCardIdx = null;
   kwSectionOpen = {};
   confidenceFilter = 'all';
+  imCatFilter=''; imSubFilter=''; imKwFilter='';
   renderManagerHub();
+}
+
+// ── ITEM MANAGER: CATEGORY / SUBCATEGORY / KEYWORD FILTERS ─────────────────
+function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function imFilterBase(){
+  return managerItems.filter(m=>!m.excluded && !isFullyReturned(m));
+}
+
+function populateImFilters(){
+  const base = imFilterBase();
+  const catSel = document.getElementById('im-cat-filter');
+  if(!catSel) return;
+  const cats = [...new Set(base.map(m=>m.userCat||m.cat||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  if(cats.indexOf(imCatFilter)===-1) imCatFilter='';
+  catSel.innerHTML = '<option value="">All categories</option>' + cats.map(c=>{
+    const n = base.filter(m=>(m.userCat||m.cat||'')===c).length;
+    return `<option value="${escAttr(c)}">${escHtml(c)} (${n})</option>`;
+  }).join('');
+  catSel.value = imCatFilter;
+  refreshImSubKw(base);
+}
+
+function refreshImSubKw(base){
+  base = base || imFilterBase();
+  const subSel = document.getElementById('im-sub-filter');
+  const kwSel  = document.getElementById('im-kw-filter');
+  if(!subSel || !kwSel) return;
+  const scope = imCatFilter ? base.filter(m=>(m.userCat||m.cat||'')===imCatFilter) : base;
+
+  // Subcategories — only meaningful once a category is chosen
+  if(imCatFilter){
+    subSel.disabled = false;
+    const subs = [...new Set(scope.map(m=>m.userSub||m.matchedSub||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    if(subs.indexOf(imSubFilter)===-1) imSubFilter='';
+    subSel.innerHTML = '<option value="">All subcategories</option>' + subs.map(s=>{
+      const n = scope.filter(m=>(m.userSub||m.matchedSub||'')===s).length;
+      return `<option value="${escAttr(s)}">${escHtml(s)} (${n})</option>`;
+    }).join('');
+    subSel.value = imSubFilter;
+  } else {
+    imSubFilter='';
+    subSel.disabled = true;
+    subSel.innerHTML = '<option value="">All subcategories</option>';
+    subSel.value = '';
+  }
+
+  // Keywords — scoped by the current category (and subcategory, if set)
+  const kwScope = imSubFilter ? scope.filter(m=>(m.userSub||m.matchedSub||'')===imSubFilter) : scope;
+  const kws = [...new Set(kwScope.map(m=>m.matchedKw||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const noneCount = kwScope.filter(m=>!(m.matchedKw)).length;
+  if(imKwFilter==='__none__'){ if(!noneCount) imKwFilter=''; }
+  else if(kws.indexOf(imKwFilter)===-1){ imKwFilter=''; }
+  let opts = '<option value="">All keywords</option>' + kws.map(k=>{
+    const n = kwScope.filter(m=>(m.matchedKw||'')===k).length;
+    return `<option value="${escAttr(k)}">${escHtml(k)} (${n})</option>`;
+  }).join('');
+  if(noneCount) opts += `<option value="__none__">(no keyword) (${noneCount})</option>`;
+  kwSel.innerHTML = opts;
+  kwSel.value = imKwFilter;
+  updateImFilterSummary();
+}
+
+function setImCatFilter(v){ imCatFilter=v; imSubFilter=''; imKwFilter=''; refreshImSubKw(); renderCardView(); }
+function setImSubFilter(v){ imSubFilter=v; imKwFilter=''; refreshImSubKw(); renderCardView(); }
+function setImKwFilter(v){ imKwFilter=v; updateImFilterSummary(); renderCardView(); }
+function clearImFilters(){ imCatFilter=''; imSubFilter=''; imKwFilter=''; populateImFilters(); renderCardView(); }
+
+function updateImFilterSummary(){
+  const btn = document.getElementById('im-clear-filter');
+  const any = !!(imCatFilter||imSubFilter||imKwFilter);
+  if(btn) btn.style.display = any ? '' : 'none';
+  const sum = document.getElementById('im-filter-summary');
+  if(!sum) return;
+  if(!any){ sum.textContent=''; return; }
+  const parts=[];
+  if(imCatFilter) parts.push('Category: '+imCatFilter);
+  if(imSubFilter) parts.push('Subcategory: '+imSubFilter);
+  if(imKwFilter) parts.push('Keyword: '+(imKwFilter==='__none__'?'(no keyword)':imKwFilter));
+  sum.textContent = parts.join('  ·  ');
 }
 
 function renderCardView(){
@@ -3467,6 +3685,14 @@ function _renderCardView(){
     items=items.filter(m=>m.pinned);
   } else if(cardViewMode==='all' && confidenceFilter==='uncat'){
     items=items.filter(m=>(m.userCat||m.cat)==='Uncategorized');
+  }
+
+  // category / subcategory / keyword drill-down filters (all-items mode only)
+  if(cardViewMode==='all'){
+    if(imCatFilter) items=items.filter(m=>(m.userCat||m.cat||'')===imCatFilter);
+    if(imSubFilter) items=items.filter(m=>(m.userSub||m.matchedSub||'')===imSubFilter);
+    if(imKwFilter==='__none__') items=items.filter(m=>!(m.matchedKw));
+    else if(imKwFilter) items=items.filter(m=>(m.matchedKw||'')===imKwFilter);
   }
 
   // update stats
