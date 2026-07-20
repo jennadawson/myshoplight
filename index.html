@@ -595,6 +595,10 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       How to get Amazon data
     </button>
+    <button class="menu-item" onclick="openFeedback()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      Send feedback
+    </button>
 
     <div class="menu-section-label">Your data</div>
     <button class="menu-item" id="menu-view-dashboard" onclick="hamburgerViewDashboard()" style="display:none">
@@ -616,6 +620,82 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     </button>
   </div>
 </aside>
+
+<!-- ── SEND FEEDBACK MODAL ─────────────────────────────────────────────────── -->
+<style>
+  .fb-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1.5rem;background:rgba(13,92,92,.28);}
+  .fb-modal.open{display:flex;}
+  .fb-card{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(13,92,92,.18);padding:2rem 2rem 1.75rem;position:relative;}
+  .fb-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:4px;}
+  .fb-close:hover{color:var(--text);}
+  .fb-title{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;color:var(--teal);margin-bottom:6px;}
+  .fb-sub{font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:1.1rem;}
+  .fb-examples-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+  .fb-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.25rem;}
+  .fb-chip{font-size:12px;font-weight:600;color:var(--teal);background:var(--teal-tint);border:1px solid transparent;border-radius:20px;padding:5px 12px;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:border-color .12s,background .12s;}
+  .fb-chip:hover{border-color:var(--teal);}
+  .fb-field{margin-bottom:1.1rem;}
+  .fb-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+  .fb-textarea{width:100%;border:1.5px solid var(--cream2);border-radius:8px;padding:11px 14px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--text);outline:none;resize:vertical;min-height:120px;line-height:1.5;transition:border-color .15s,box-shadow .15s;background:#fff;}
+  .fb-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint);}
+  .fb-input{width:100%;border:1.5px solid var(--cream2);border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;background:#fff;}
+  .fb-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint);}
+  .fb-input::placeholder,.fb-textarea::placeholder{color:#bbb;}
+  .fb-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+  .fb-btn{width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;font-family:'Source Sans 3',sans-serif;cursor:pointer;transition:background .15s;margin-top:.25rem;}
+  .fb-btn:hover{background:var(--teal-light);}
+  .fb-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .fb-error{background:var(--rust-tint);border:1px solid var(--rust);color:var(--rust);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem;display:none;line-height:1.5;}
+  .fb-error.show{display:block;}
+  .fb-success{text-align:center;padding:1rem 0 .5rem;display:none;}
+  .fb-success-icon{width:52px;height:52px;border-radius:50%;background:var(--teal-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+  .fb-success-icon svg{width:26px;height:26px;stroke:var(--teal);}
+  .fb-success-title{font-family:'Playfair Display',serif;font-size:21px;color:var(--teal);margin-bottom:6px;}
+  .fb-success-sub{font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:1.25rem;}
+</style>
+<div class="fb-modal" id="fb-modal" onclick="if(event.target===this)closeFeedback()">
+  <div class="fb-card" role="dialog" aria-modal="true" aria-labelledby="fb-title">
+    <button class="fb-close" onclick="closeFeedback()" aria-label="Close">&times;</button>
+
+    <div id="fb-form-state">
+      <div class="fb-title" id="fb-title">Send feedback</div>
+      <div class="fb-sub">Tell us what's working, what's clunky, or what you wish myshoplight did. We read every note.</div>
+
+      <div class="fb-examples-label">A few things people share</div>
+      <div class="fb-chips">
+        <button type="button" class="fb-chip" onclick="fbAddExample('Categorization / defaults')">Categorization &amp; defaults</button>
+        <button type="button" class="fb-chip" onclick="fbAddExample('UX / UI experience')">UX / UI experience</button>
+        <button type="button" class="fb-chip" onclick="fbAddExample('Dashboard visualizations')">Dashboard visualizations</button>
+        <button type="button" class="fb-chip" onclick="fbAddExample('Filters &amp; sorting')">Filters &amp; sorting</button>
+        <button type="button" class="fb-chip" onclick="fbAddExample('Something else')">Something else</button>
+      </div>
+
+      <div class="fb-error" id="fb-error"></div>
+
+      <form id="fb-form" onsubmit="submitFeedback(event)">
+        <div class="fb-field">
+          <label class="fb-label" for="fb-message">Your feedback</label>
+          <textarea class="fb-textarea" id="fb-message" placeholder="What's working, what's not, or what you'd love to see next…" required></textarea>
+        </div>
+        <div class="fb-field">
+          <label class="fb-label" for="fb-email">Email (optional)</label>
+          <input class="fb-input" type="email" id="fb-email" placeholder="you@example.com" autocomplete="email"/>
+          <div class="fb-hint">Add it if you'd like a reply.</div>
+        </div>
+        <button class="fb-btn" type="submit" id="fb-submit">Send feedback</button>
+      </form>
+    </div>
+
+    <div class="fb-success" id="fb-success-state">
+      <div class="fb-success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div class="fb-success-title">Got it — thank you</div>
+      <div class="fb-success-sub">Every note gets read. If you left your email, we'll reach out when it makes sense.</div>
+      <button class="fb-btn" type="button" onclick="closeFeedback()">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="container">
 
@@ -2090,6 +2170,104 @@ function openMenuPage(page){
     'amazon-data': 'How to get your Amazon data'
   };
   alert(titles[page] + ' — coming next session. We\'ll wire up the modal content.');
+}
+
+// ── SEND FEEDBACK ──────────────────────────────────────────────────────────
+function openFeedback(){
+  // Close the hamburger drawer if it's open
+  const drawer = document.getElementById('menu-drawer');
+  if(drawer && drawer.classList.contains('open')){ toggleMenu(); }
+  // Reset to a clean form state
+  document.getElementById('fb-form-state').style.display = 'block';
+  document.getElementById('fb-success-state').style.display = 'none';
+  const errEl = document.getElementById('fb-error');
+  errEl.classList.remove('show');
+  errEl.textContent = '';
+  document.getElementById('fb-message').value = '';
+  const submitBtn = document.getElementById('fb-submit');
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send feedback';
+  // Pre-fill email from the logged-in user (leave editable / optional)
+  const emailInput = document.getElementById('fb-email');
+  emailInput.value = '';
+  _supabase.auth.getUser().then(({ data: { user } }) => {
+    if(user && user.email && !emailInput.value){ emailInput.value = user.email; }
+  }).catch(() => {});
+  document.getElementById('fb-modal').classList.add('open');
+  setTimeout(() => document.getElementById('fb-message').focus(), 60);
+}
+
+function closeFeedback(){
+  document.getElementById('fb-modal').classList.remove('open');
+}
+
+// Clicking an example chip drops a starter line into the message box
+function fbAddExample(label){
+  const ta = document.getElementById('fb-message');
+  const clean = label.replace(/&amp;/g, '&');
+  const starter = clean + ': ';
+  if(!ta.value.trim()){
+    ta.value = starter;
+  } else if(ta.value.indexOf(starter) === -1){
+    ta.value = ta.value.replace(/\s*$/, '') + '\n' + starter;
+  }
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+function showFbError(msg){
+  const el = document.getElementById('fb-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+async function submitFeedback(e){
+  e.preventDefault();
+  const btn = document.getElementById('fb-submit');
+  const message = document.getElementById('fb-message').value.trim();
+  const email = document.getElementById('fb-email').value.trim();
+  document.getElementById('fb-error').classList.remove('show');
+
+  if(!message){
+    showFbError('Add a quick note first, then send.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  let userId = null;
+  try {
+    const { data: { user } } = await _supabase.auth.getUser();
+    userId = user ? user.id : null;
+
+    const { error } = await _supabase.from('feedback').insert({
+      message: message,
+      email: email || null,
+      user_id: userId
+    });
+    if(error) throw error;
+  } catch(err){
+    console.error('feedback insert error:', err);
+    showFbError('That didn\'t go through. Try again in a moment.');
+    btn.disabled = false;
+    btn.textContent = 'Send feedback';
+    return;
+  }
+
+  // Notify Jenna by email — best-effort, don't block the confirmation on it
+  try {
+    await fetch('/.netlify/functions/feedback-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: message, email: email || null, userId: userId })
+    });
+  } catch(err){
+    console.error('feedback-notify error:', err);
+  }
+
+  document.getElementById('fb-form-state').style.display = 'none';
+  document.getElementById('fb-success-state').style.display = 'block';
 }
 
 function hamburgerAddData(){
