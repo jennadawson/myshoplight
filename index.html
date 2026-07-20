@@ -41,6 +41,7 @@ async function syncToSupabase() {
       stypeOverrides: localStorage.getItem('api_stype_overrides'),
       excludedItems: localStorage.getItem('api_excluded_items'),
       catStructure: localStorage.getItem('api_cat_structure'),
+      catStypes: localStorage.getItem('api_cat_stypes'),
       ruleOverrides: localStorage.getItem('api_rule_overrides')
     };
 
@@ -81,6 +82,7 @@ async function loadFromSupabase() {
       if (c.stypeOverrides) localStorage.setItem('api_stype_overrides', c.stypeOverrides);
       if (c.excludedItems) localStorage.setItem('api_excluded_items', c.excludedItems);
       if (c.catStructure) localStorage.setItem('api_cat_structure', c.catStructure);
+      if (c.catStypes) localStorage.setItem('api_cat_stypes', c.catStypes);
       if (c.ruleOverrides) localStorage.setItem('api_rule_overrides', c.ruleOverrides);
     }
     return !!data.sessions_data;
@@ -1281,7 +1283,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <!-- New Category form -->
       <div id="cat-section" style="display:none;border-top:1px solid var(--cream2);padding-top:12px;margin-top:4px;">
         <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:8px;">Create New Category</div>
-        <div class="catmap-inline-grid" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;">
+        <div class="catmap-inline-grid" style="display:grid;grid-template-columns:1fr 1fr 150px auto;gap:10px;align-items:end;">
           <div class="catmap-form-group">
             <label>Category Name <span style="color:var(--rust)">*</span></label>
             <input type="text" id="new-cat-name" class="cm-search" placeholder="e.g. Subscriptions" style="width:100%">
@@ -1290,15 +1292,23 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
             <label>First Subcategory (optional)</label>
             <input type="text" id="new-cat-sub" class="cm-search" placeholder="e.g. Streaming" style="width:100%">
           </div>
+          <div class="catmap-form-group">
+            <label>Spend Type</label>
+            <select id="new-cat-stype" class="cm-filter-sel" style="width:100%">
+              <option value="Essential">Essential</option>
+              <option value="Flexible" selected>Flexible</option>
+              <option value="Discretionary">Discretionary</option>
+            </select>
+          </div>
           <button class="btn sm" onclick="createCategory()">Create</button>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px;">New categories appear immediately in all dropdowns and the dashboard.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;">New categories appear immediately in all dropdowns and the dashboard. Spend type applies to the first subcategory.</div>
       </div>
 
       <!-- New Subcategory form -->
       <div id="sub-section" style="display:none;border-top:1px solid var(--cream2);padding-top:12px;margin-top:4px;">
         <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:8px;">Add Subcategory to Existing Category</div>
-        <div class="catmap-inline-grid" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;">
+        <div class="catmap-inline-grid" style="display:grid;grid-template-columns:1fr 1fr 150px auto;gap:10px;align-items:end;">
           <div class="catmap-form-group">
             <label>Category <span style="color:var(--rust)">*</span></label>
             <select id="sub-cat-select" class="cm-filter-sel" style="width:100%">
@@ -1308,6 +1318,14 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           <div class="catmap-form-group">
             <label>New Subcategory Name <span style="color:var(--rust)">*</span></label>
             <input type="text" id="new-sub-name" class="cm-search" placeholder="e.g. Streaming" style="width:100%">
+          </div>
+          <div class="catmap-form-group">
+            <label>Spend Type</label>
+            <select id="new-sub-stype" class="cm-filter-sel" style="width:100%">
+              <option value="Essential">Essential</option>
+              <option value="Flexible" selected>Flexible</option>
+              <option value="Discretionary">Discretionary</option>
+            </select>
           </div>
           <button class="btn sm" onclick="addSubcategory()">Add</button>
         </div>
@@ -1408,6 +1426,7 @@ const STORAGE_KEY_NEW       = 'api_new_rules';
 const STORAGE_KEY_OVERRIDES = 'api_overrides';
 const STORAGE_KEY_AUD_OV    = 'api_aud_overrides'; // {titleKey -> audience}
 const STORAGE_KEY_STRUCTURE = 'api_cat_structure';
+const STORAGE_KEY_CAT_STYPES = 'api_cat_stypes'; // {cat -> {sub -> spendType}} custom cat/sub spend types
 const STORAGE_KEY_UPLOADED  = 'api_uploaded_years'; // years successfully processed at least once
 const STORAGE_KEY_SESSIONS  = 'api_sessions_v2';    // persisted session data
 const STORAGE_KEY_EXCLUDED  = 'api_excluded_items'; // Set of overrideKey'd titles
@@ -1663,7 +1682,8 @@ const SPEND_TYPE_MAP = {
   "Cleaning & Laundry": {
     "Cleaning Supplies": "Essential",
     "Laundry": "Essential",
-    "Paper Goods": "Essential"
+    "Paper Goods": "Essential",
+    "Tools & Equipment": "Flexible"
   },
   "Clothing & Outerwear": {
     "Clothing": "Flexible",
@@ -1703,6 +1723,7 @@ const SPEND_TYPE_MAP = {
   },
   "Health": {
     "First Aid": "Essential",
+    "General": "Flexible",
     "Medicine": "Essential",
     "Oral Care": "Essential",
     "Supplements": "Flexible",
@@ -1751,7 +1772,8 @@ const SPEND_TYPE_MAP = {
   },
   "Outdoor Living": {
     "Garden & Lawn": "Flexible",
-    "Outdoor Accessories": "Flexible"
+    "Outdoor Accessories": "Flexible",
+    "Outdoor Furniture": "Flexible"
   },
   "Party & Seasonal": {
     "Holiday & Seasonal": "Discretionary",
@@ -1787,7 +1809,8 @@ const SPEND_TYPE_MAP = {
     "Racquet & Paddle Sports": "Flexible",
     "Team Sports": "Flexible",
     "Water Sports": "Flexible",
-    "Winter Sports": "Flexible"
+    "Winter Sports": "Flexible",
+    "Other Sports": "Flexible"
   },
   "Travel": {
     "Accessories": "Flexible",
@@ -1811,6 +1834,7 @@ let ruleOverrides = {}; // {keyword -> {cat, sub}} — reassigns a built-in rule
 let overrides     = {};
 let audOverrides  = {}; // {titleKey -> audience} permanent audience overrides
 let stypeOverrides = {}; // {titleKey -> spendType} permanent spend type overrides
+let customCatStypes = {}; // {cat -> {sub -> spendType}} user-set spend types for custom cats/subs
 let excludedItems = new Set(); // overrideKey'd titles excluded from all analysis
 let allItems      = [];
 let sessionItems  = [];
@@ -1875,6 +1899,13 @@ function hydrateCustomizations(){
       });
     });
   }
+
+  // Merge saved custom spend types into SPEND_TYPE_MAP (drives Category Map pills + getSpendType).
+  customCatStypes = parse(STORAGE_KEY_CAT_STYPES, {}) || {};
+  Object.entries(customCatStypes).forEach(([cat, subs])=>{
+    if(!SPEND_TYPE_MAP[cat]) SPEND_TYPE_MAP[cat] = {};
+    Object.entries(subs||{}).forEach(([sub, st])=>{ if(sub && st) SPEND_TYPE_MAP[cat][sub] = st; });
+  });
 
   applyRuleOverrides();
 }
@@ -5395,6 +5426,7 @@ function _reRunCategorization(btn){
 function saveStructure(){
   // persist only user-added cats/subs (not the hardcoded ones)
   try{localStorage.setItem(STORAGE_KEY_STRUCTURE, JSON.stringify(CAT_SUBS));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY_CAT_STYPES, JSON.stringify(customCatStypes));}catch(e){}
   syncCustomizationsToSupabase();
 }
 
@@ -5436,12 +5468,22 @@ function updateDelSubOptions(){
   });
 }
 
+function setCustomStype(cat, sub, stype){
+  if(!cat || !sub || !stype) return;
+  if(!SPEND_TYPE_MAP[cat]) SPEND_TYPE_MAP[cat] = {};
+  SPEND_TYPE_MAP[cat][sub] = stype;
+  if(!customCatStypes[cat]) customCatStypes[cat] = {};
+  customCatStypes[cat][sub] = stype;
+}
+
 function createCategory(){
   const name=(document.getElementById('new-cat-name').value||'').trim();
   const firstSub=(document.getElementById('new-cat-sub').value||'').trim();
   if(!name){showMsg('err','Enter a category name.');return;}
   if(CAT_SUBS[name]){showMsg('err',`"${name}" already exists.`);return;}
   CAT_SUBS[name] = firstSub ? [firstSub] : [];
+  const catStype=(document.getElementById('new-cat-stype')||{}).value||'Flexible';
+  if(firstSub) setCustomStype(name, firstSub, catStype);
   saveStructure();
   // refresh all dropdowns
   initCatMapForm();
@@ -5461,6 +5503,8 @@ function addSubcategory(){
   if(CAT_SUBS[cat].includes(sub)){showMsg('err',`"${sub}" already exists in ${cat}.`);return;}
   CAT_SUBS[cat].push(sub);
   CAT_SUBS[cat].sort();
+  const subStype=(document.getElementById('new-sub-stype')||{}).value||'Flexible';
+  setCustomStype(cat, sub, subStype);
   saveStructure();
   initCatMapForm();
   populateCatSelects();
@@ -5481,6 +5525,8 @@ function removeCategory(){
   if(sub){
     // Remove just a subcategory
     if(CAT_SUBS[cat]) CAT_SUBS[cat]=CAT_SUBS[cat].filter(s=>s!==sub);
+    if(customCatStypes[cat]) delete customCatStypes[cat][sub];
+    if(SPEND_TYPE_MAP[cat]) delete SPEND_TYPE_MAP[cat][sub];
     // Handle affected new rules
     newRules.forEach(r=>{
       if(r.cat===cat&&r.sub===sub){
@@ -5491,6 +5537,7 @@ function removeCategory(){
   } else {
     // Remove entire category
     delete CAT_SUBS[cat];
+    delete customCatStypes[cat];
     newRules.forEach(r=>{
       if(r.cat===cat){
         if(moveTo){r.cat=moveTo;r.sub='';}
