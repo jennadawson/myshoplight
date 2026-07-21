@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of use — myshoplight</title>
+  <meta name="description" content="The terms that govern your use of myshoplight." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0D5C5C;
+      --teal-hover: #1A8C8C;
+      --teal-tint: #E8F7F2;
+      --mint: #4DD4A0;
+      --mint-light: #9FE1CB;
+      --rust: #C4614A;
+      --cream: #F5F0E8;
+      --cream2: #EDE8DC;
+      --text: #2A2A2A;
+      --muted: #666666;
+      --font-sans: 'Source Sans 3', sans-serif;
+      --font-serif: 'Playfair Display', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      background: var(--teal);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .wordmark { font-family: var(--font-sans); font-size: 20px; letter-spacing: -0.02em; line-height: 1; }
+    .wordmark .my    { color: rgba(255,255,255,0.45); font-weight: 400; }
+    .wordmark .shop  { color: var(--mint); font-weight: 700; }
+    .wordmark .light { color: #fff; font-weight: 700; }
+    .nav a.back { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); text-decoration: none; }
+    .nav a.back:hover { color: #fff; }
+
+    /* ── DOC ── */
+    .doc { max-width: 760px; margin: 0 auto; padding: 56px 24px 72px; }
+    .doc .eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 12px;
+    }
+    .doc h1 { font-family: var(--font-serif); font-size: clamp(30px, 5vw, 40px); font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+    .doc .updated { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .doc .intro { font-size: 16px; margin: 24px 0 8px; }
+    .doc h2 {
+      font-family: var(--font-serif); font-size: 22px; font-weight: 700;
+      line-height: 1.3; margin: 40px 0 14px; color: var(--teal);
+    }
+    .doc h3 { font-size: 16px; font-weight: 600; margin: 22px 0 6px; }
+    .doc p { margin-bottom: 14px; }
+    .doc ul { margin: 0 0 16px 22px; }
+    .doc li { margin-bottom: 8px; }
+    .doc a { color: var(--teal-hover); font-weight: 600; }
+    .doc strong { font-weight: 600; }
+    .callout {
+      background: var(--teal-tint); border: 1px solid var(--mint-light);
+      border-radius: 10px; padding: 16px 18px; margin: 20px 0; font-size: 15px;
+    }
+    .legal-emph { text-transform: uppercase; font-size: 14px; letter-spacing: 0.01em; }
+    .hr { height: 1px; background: var(--cream2); border: 0; margin: 40px 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--teal); padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/sales.html" class="logo" aria-label="myshoplight home">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="6" y="18" width="28" height="18" rx="2" stroke="white" stroke-width="1.8"/>
+        <path d="M6 22l14-4 14 4" stroke="white" stroke-width="1.8"/>
+        <path d="M6 18l4-6h20l4 6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="10" r="6" stroke="#4DD4A0" stroke-width="1.8" fill="rgba(77,212,160,0.12)"/>
+        <line x1="18.2" y1="14.2" x2="22" y2="18" stroke="#4DD4A0" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="14" cy="10" r="2.5" fill="#4DD4A0" opacity="0.5"/>
+      </svg>
+      <span class="wordmark"><span class="my">my</span><span class="shop">shop</span><span class="light">light</span></span>
+    </a>
+    <a href="/sales.html" class="back">&larr; Back to site</a>
+  </nav>
+
+  <main class="doc">
+    <p class="eyebrow">Legal</p>
+    <h1>Terms of use</h1>
+    <p class="updated"><strong>Effective date:</strong> July 21, 2026</p>
+    <p class="updated"><strong>Last updated:</strong> July 21, 2026</p>
+
+    <p class="intro">These Terms of Use ("Terms") are a legal agreement between you and Caliet Ventures LLC ("Caliet Ventures," "we," "us," or "our"), which operates myshoplight (the "Service"). By purchasing, accessing, or using myshoplight, you agree to these Terms. If you do not agree, please do not use the Service.</p>
+
+    <h2>1. What myshoplight does</h2>
+    <p>myshoplight is a web application that helps you understand your Amazon spending. You request your order-history report directly from Amazon, upload it to myshoplight, and the Service categorizes and visualizes it so you can see where your money goes. myshoplight does not connect to your Amazon account and works only with the data you choose to provide.</p>
+
+    <div class="callout">
+      myshoplight is an independent product and is <strong>not affiliated with, endorsed by, or sponsored by Amazon.com, Inc.</strong> "Amazon" is a trademark of Amazon.com, Inc. or its affiliates, used here only to describe what the Service does.
+    </div>
+
+    <h2>2. Eligibility and your account</h2>
+    <p>You must be at least 18 years old and able to form a binding contract to use myshoplight. You are responsible for keeping your login credentials secure and for all activity that happens under your account. Please let us know promptly if you believe your account has been used without your permission. You agree to provide accurate information when you create your account.</p>
+
+    <h2>3. Purchase, license, and access</h2>
+    <p>myshoplight is offered as a one-time purchase that grants you a personal, non-exclusive, non-transferable, revocable license to access and use the Service for your own personal, non-commercial use. Your access may be tied to a license key or your account credentials. You may not resell, sublicense, or share your access with others.</p>
+
+    <h2>4. Payment and refunds</h2>
+    <p>Payments are processed by Stripe. Prices are shown at the point of purchase and are payable in the currency indicated. Because myshoplight provides immediate access to a digital product, purchases are generally non-refundable except where required by law. If something isn't working or you're not satisfied, email us at <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a> — we'll do our best to make it right.</p>
+
+    <h2>5. Your data and content</h2>
+    <p>The Amazon order data, customizations, and other content you upload or create remain <strong>yours</strong>. You grant us a limited license to store and process that content solely to provide the Service to you — for example, to categorize your data and display your dashboard. We handle your information as described in our <a href="/privacy">Privacy policy</a>. You are responsible for ensuring you have the right to upload the data you provide.</p>
+
+    <h2>6. Acceptable use</h2>
+    <p>When using myshoplight, you agree not to:</p>
+    <ul>
+      <li>Use the Service for any unlawful purpose or in violation of these Terms.</li>
+      <li>Upload data that you do not have the right to use, or that belongs to someone else without their permission.</li>
+      <li>Attempt to gain unauthorized access to the Service, other users' data, or our systems.</li>
+      <li>Reverse engineer, copy, resell, or create derivative works from the Service, except as permitted by law.</li>
+      <li>Interfere with or disrupt the integrity or performance of the Service.</li>
+      <li>Use automated means to scrape or overload the Service.</li>
+    </ul>
+
+    <h2>7. Intellectual property</h2>
+    <p>The Service — including its software, design, categorization rules, text, and branding (including the myshoplight name and logo) — is owned by Caliet Ventures LLC and protected by intellectual-property laws. These Terms do not transfer any ownership rights to you beyond the limited license described above.</p>
+
+    <h2>8. Not financial advice</h2>
+    <p>myshoplight is an informational tool that organizes and visualizes your own spending data. It does <strong>not</strong> provide financial, investment, tax, or legal advice, and nothing in the Service should be relied on as such. Categorizations are generated automatically and may be imperfect; you are responsible for how you interpret and act on the information.</p>
+
+    <h2>9. Disclaimers</h2>
+    <p class="legal-emph">The Service is provided "as is" and "as available," without warranties of any kind, whether express or implied, including implied warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Service will be uninterrupted, error-free, or that categorizations will be accurate or complete.</p>
+
+    <h2>10. Limitation of liability</h2>
+    <p class="legal-emph">To the maximum extent permitted by law, Caliet Ventures LLC will not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of data, profits, or goodwill, arising out of or related to your use of the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us for myshoplight in the twelve months before the claim.</p>
+
+    <h2>11. Indemnification</h2>
+    <p>You agree to indemnify and hold harmless Caliet Ventures LLC and its owners and affiliates from any claims, damages, losses, or expenses (including reasonable legal fees) arising from your misuse of the Service, your violation of these Terms, or your violation of any law or the rights of a third party.</p>
+
+    <h2>12. Termination</h2>
+    <p>You may stop using myshoplight at any time. We may suspend or terminate your access if you violate these Terms or misuse the Service. If we discontinue the Service entirely, we will make reasonable efforts to let active users know. Sections that by their nature should survive termination — such as intellectual property, disclaimers, limitation of liability, and indemnification — will continue to apply.</p>
+
+    <h2>13. Changes to these Terms</h2>
+    <p>We may update these Terms from time to time. When we make material changes, we will update the "Last updated" date above. Your continued use of myshoplight after an update means you accept the revised Terms.</p>
+
+    <h2>14. Governing law</h2>
+    <p>These Terms are governed by the laws of the State of Maryland, without regard to its conflict-of-laws rules. You agree that any dispute arising from these Terms or the Service will be resolved in the state or federal courts located in Maryland, and you consent to their jurisdiction.</p>
+
+    <h2>15. Contact us</h2>
+    <p>Questions about these Terms? Email us at <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a>.</p>
+
+    <hr class="hr" />
+    <p class="updated">Caliet Ventures LLC &middot; myshoplight</p>
+  </main>
+
+  <footer>
+    <p class="footer-copy">&copy; 2026 Caliet Ventures LLC</p>
+    <nav class="footer-links" aria-label="Footer links">
+      <a href="/privacy">Privacy policy</a>
+      <a href="/terms">Terms of use</a>
+      <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a>
+    </nav>
+  </footer>
+</body>
+</html>
