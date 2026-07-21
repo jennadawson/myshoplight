@@ -5344,19 +5344,27 @@ function renderTopItems(items){
   if(topItemsView==='frequent'){
     if(title) title.textContent='Top 10 Most Purchased Items';
     if(head) head.innerHTML='<th>Item</th><th>Category</th><th style="text-align:center">Times ordered</th><th>Total spent</th>';
-    // Group by normalized product title; count separate purchase rows (≈ times ordered).
-    const freq={};
+    // Group flavor/size variants into a product family: first 4 words of the normalized
+    // title. Collapses e.g. every BodyArmor flavor into one row instead of many.
+    const fam={};
     items.forEach(i=>{
-      const k=overrideKey(i.title);
-      if(!freq[k]) freq[k]={title:i.title,cat:i.cat,count:0,total:0};
-      freq[k].count++; freq[k].total+=i.amount;
+      const norm=overrideKey(i.title);
+      const key=norm.split(' ').filter(Boolean).slice(0,4).join(' ')||norm;
+      if(!fam[key]) fam[key]={rep:i.title,cat:i.cat,count:0,total:0,titles:new Set(),catCount:{}};
+      const g=fam[key];
+      g.count++; g.total+=i.amount; g.titles.add(i.title);
+      g.catCount[i.cat]=(g.catCount[i.cat]||0)+1;
+      if(i.title.length<g.rep.length) g.rep=i.title;                 // shortest title ≈ base product
     });
-    const tf=Object.values(freq).sort((a,b)=>b.count-a.count||b.total-a.total).slice(0,10);
+    const tf=Object.values(fam).sort((a,b)=>b.count-a.count||b.total-a.total).slice(0,10);
     body.innerHTML=tf.map(r=>{
-      const catColor=CAT_COLORS[r.cat]||'#888';
+      const cat=Object.entries(r.catCount).sort((a,b)=>b[1]-a[1])[0][0]; // most common category in the family
+      const catColor=CAT_COLORS[cat]||'#888';
+      const vcount=r.titles.size;
+      const vnote=vcount>1?` <span style="color:var(--muted);font-weight:400;font-size:10px;">· ${vcount} variants</span>`:'';
       return`<tr>
-        <td style="font-size:11px">${escHtml(r.title.slice(0,38))}${r.title.length>38?'…':''}</td>
-        <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(r.cat)}</span></td>
+        <td style="font-size:11px">${escHtml(r.rep.slice(0,36))}${r.rep.length>36?'…':''}${vnote}</td>
+        <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(cat)}</span></td>
         <td style="text-align:center;font-weight:600;white-space:nowrap">${r.count}&times;</td>
         <td style="white-space:nowrap">${fmt(r.total)}</td>
       </tr>`;
