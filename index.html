@@ -143,12 +143,12 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .landing-eyebrow{display:inline-block;background:#fff;border:1px solid var(--cream2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--teal);font-weight:600;margin-bottom:14px;}
 .landing-headline{font-family:'Playfair Display',serif;font-size:30px;line-height:1.2;color:var(--teal);margin-bottom:12px;}
 @media(max-width:760px){.landing-headline{font-size:24px;}}
-.landing-sub{font-size:14px;line-height:1.6;color:var(--text);}
+.landing-sub{font-size:15px;line-height:1.6;color:var(--text);}
 .landing-feature{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .landing-feature:last-child{margin-bottom:0;}
 .landing-feature-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.landing-feature-title{font-size:13px;font-weight:600;color:var(--text);}
-.landing-feature-sub{font-size:13px;color:var(--muted);}
+.landing-feature-title{font-size:15px;font-weight:600;color:var(--text);}
+.landing-feature-sub{font-size:14px;color:var(--muted);}
 
 /* ── PREVIEW SECTION ── */
 .preview-section{margin-bottom:1.5rem;}
@@ -261,6 +261,9 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .tbl-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--cream2);box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .tbl-head{background:var(--teal);padding:8px 14px;}
 .tbl-head-title{color:#fff;font-size:15px;font-weight:600;letter-spacing:.01em;font-family:'Playfair Display',serif;}
+.tbl-toggle{border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;border-radius:14px;padding:3px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:all .15s;white-space:nowrap;}
+.tbl-toggle:hover{background:rgba(255,255,255,.15);}
+.tbl-toggle.active{background:#fff;color:var(--teal);border-color:#fff;}
 table.dt{width:100%;border-collapse:collapse;font-size:13px;}
 table.dt th{background:var(--cream2);color:var(--text);font-weight:600;padding:6px 12px;text-align:left;}
 table.dt th:last-child{text-align:right;}
@@ -824,21 +827,21 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div id="welcome-chevron" style="font-size:16px;color:var(--teal);margin-left:12px;transition:transform .25s;">▼</div>
     </div>
     <div id="welcome-panel-body" style="margin-top:1.1rem;">
-    <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:1.25rem;">
+    <div style="font-size:15px;color:var(--text);line-height:1.7;margin-bottom:1.25rem;">
       myshoplight turns your Amazon order history into a clear picture of exactly where your money goes — by category, by year, by audience, and more. To get started, you'll need to download your order data directly from Amazon. Here's how:
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Log into your <strong>Amazon account</strong>, then <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600;text-decoration:underline;">click this link</a> and submit your data request.</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.6;">Log into your <strong>Amazon account</strong>, then <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600;text-decoration:underline;">click this link</a> and submit your data request.</div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Amazon will email you immediately — open it and click the <strong>"Confirm Data Request"</strong> button. Once confirmed, they'll send a second email with your <strong>download link typically within 24–48 hours</strong>.</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.6;">Amazon will email you immediately — open it and click the <strong>"Confirm Data Request"</strong> button. Once confirmed, they'll send a second email with your <strong>download link typically within 24–48 hours</strong>.</div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream2);">
         <div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file and open it. The two files you'll need are <strong>"Order History.csv"</strong> (in the <em>Your Amazon Orders</em> folder) and optionally <strong>"Refund Details.csv"</strong> (in the <em>Your Returns &amp; Refunds</em> folder, only needed if you want returned items excluded). Upload them below. ⬇️</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.6;">Download the <strong>Your Orders.zip</strong> file and open it. The two files you'll need are <strong>"Order History.csv"</strong> (in the <em>Your Amazon Orders</em> folder) and optionally <strong>"Refund Details.csv"</strong> (in the <em>Your Returns &amp; Refunds</em> folder, only needed if you want returned items excluded). Upload them below. ⬇️</div>
       </div>
     </div>
     </div><!-- end welcome-panel-body -->
@@ -1007,12 +1010,16 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Subcategories</div><div class="chart-wrap" id="top5sub-wrap" style="height:220px"><canvas id="top5SubChart"></canvas></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('stype')" style="grid-column:1/-1"><div class="cc-title">Spend by Type</div><div class="chart-wrap" style="height:180px"><canvas id="stypeChart"></canvas></div><div style="display:flex;gap:16px;justify-content:center;margin-top:12px;" id="stype-legend"></div></div>
       </div>
-      <!-- Top 10 Most Expensive Items — full width -->
+      <!-- Top 10 items — toggle: Most Expensive | Most Purchased -->
       <div class="full-card" style="margin-bottom:1.5rem;">
-        <div class="tbl-head" style="margin:-1.25rem -1.25rem 1rem -1.25rem;border-radius:11px 11px 0 0;padding:8px 14px;">
-          <div class="tbl-head-title">Top 10 Most Expensive Items</div>
+        <div class="tbl-head" style="margin:-1.25rem -1.25rem 1rem -1.25rem;border-radius:11px 11px 0 0;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div class="tbl-head-title" id="top-items-title">Top 10 Most Expensive Items</div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button id="toggle-topexp" class="tbl-toggle active" onclick="setTopItemsView('expensive')">Most expensive</button>
+            <button id="toggle-topfreq" class="tbl-toggle" onclick="setTopItemsView('frequent')">Most purchased</button>
+          </div>
         </div>
-        <div class="table-scroll"><table class="dt" style="width:100%"><thead><tr><th>Item</th><th>Price</th><th>Category</th><th>Subcategory</th><th>Year</th><th style="text-align:left">Spend Type</th></tr></thead><tbody id="top-items-table"></tbody></table></div>
+        <div class="table-scroll"><table class="dt" style="width:100%"><thead><tr id="top-items-head"><th>Item</th><th>Price</th><th>Category</th><th>Subcategory</th><th>Year</th><th style="text-align:left">Spend Type</th></tr></thead><tbody id="top-items-table"></tbody></table></div>
       </div>
       <!-- Category + Audience breakdown — side by side -->
       <div class="table-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1.5rem;">
@@ -1235,7 +1242,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <!-- How it works help -->
       <details style="margin-top:14px;background:#fff;border:1px solid var(--cream2);border-radius:8px;padding:10px 14px;">
         <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--teal);">How does return matching work?</summary>
-        <div style="margin-top:10px;font-size:12px;color:var(--text);line-height:1.6;">
+        <div style="margin-top:10px;font-size:14px;color:var(--text);line-height:1.6;">
           <div style="margin-bottom:8px;"><strong style="color:var(--teal);">✓ Auto-matched</strong> means we're confident the refund matches a specific item — either the order had only one item, or the refund amount uniquely matches exactly one item in a multi-item order. <em>No action needed — these are already excluded from your dashboard.</em></div>
           <div style="margin-bottom:8px;"><strong style="color:var(--rust);">⚠ Needs Review</strong> means the order had multiple items and the refund amount doesn't uniquely identify which one was returned (e.g., two items at the same price, or a partial refund that doesn't match any single item). <em>You'll pick which item was returned and whether it was a full or partial return.</em></div>
           <div style="margin-bottom:8px;"><strong>Partial returns</strong> happen when you bought multiple of an item (qty &gt; 1) and only returned some. Use the "Partial return" button — only the refund amount is subtracted from the item's price, and the rest still counts as spending.</div>
@@ -1256,7 +1263,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
   </div><!-- /tab-returns -->
 
   <!-- CATEGORY MAP TAB -->
-  <div id="tab-catmap">
+  <div id="tab-catmap" style="display:none">
 
     <div class="cm-header">
       <div>
@@ -1640,15 +1647,15 @@ const CAT_COLORS = {
   'Uncategorized':         '#bbb',
   'Other':                 '#888'
 };
-const AUD_COLORS = {'Kids':'#C4614A','Household':'#2D6A6A','Adult':'#8A7A4A'};
+const AUD_COLORS = {'Kids':'#C4614A','Household':'#2D6A6A','Adult':'#8A7A4A','Uncategorized':'#bbb'};
 const SESSION_COLORS = ['#0D5C5C','#C4614A','#4DD4A0','#E0977A','#1A8C8C'];
 const VALID_AUDS = ['Kids','Adult','Household'];
 const KIDS_WORDS = ['baby','toddler','kids','kid','girls','boys','youth','infant','child','children','teen','junior'];
 const HOUSEHOLD_CATS = new Set(['Home & Decor','Cleaning & Laundry','Food & Grocery','Party & Seasonal','Pets','Kitchen','Office & School','Pool & Water','Outdoor Living','Games & Puzzles','Gifts','Home Improvement']);
 const ADULT_CATS = new Set(['Clothing & Outerwear','Shoes & Accessories','Beauty','Fitness','Health','Electronics','Travel','Books & Media','Arts & Crafts']);
 const VALID_STYPES = ['Essential','Flexible','Discretionary'];
-const STYPE_COLORS  = {'Essential':'#0D5C5C','Flexible':'#E0977A','Discretionary':'#C4614A'};
-const STYPE_LABELS  = {'Essential':'Essential','Flexible':'Flexible','Discretionary':'Discretionary'};
+const STYPE_COLORS  = {'Essential':'#0D5C5C','Flexible':'#E0977A','Discretionary':'#C4614A','Uncategorized':'#bbb'};
+const STYPE_LABELS  = {'Essential':'Essential','Flexible':'Flexible','Discretionary':'Discretionary','Uncategorized':'Uncategorized'};
 const STYPE_DOT     = {'Essential':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0D5C5C;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Flexible':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#E0977A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>','Discretionary':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#C4614A;vertical-align:middle;margin-right:3px;flex-shrink:0;"></span>'};
 const SPEND_TYPE_MAP = {
   "Arts & Crafts": {
@@ -1847,6 +1854,7 @@ let managerItems  = [];
 let charts        = {};
 let filterView    = 'all';
 let spendView     = 'monthly'; // 'monthly' | 'yearly'
+let topItemsView  = 'expensive'; // 'expensive' | 'frequent'
 let cardViewMode  = 'uncat';   // 'uncat' | 'all'
 let imCatFilter = '', imSubFilter = '', imKwFilter = '';  // Review All Items drill-down filters
 let openCardIdx   = null;
@@ -1974,6 +1982,7 @@ function showMsg(type, msg, dur=6000){
 }
 
 function getAudience(cat,title){
+  if(cat==='Uncategorized')return'Uncategorized';   // don't guess audience for un-triaged items
   const t=(title||'').toLowerCase();
   if(cat==='Kids')return'Kids';
   if(KIDS_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(t)))return'Kids';
@@ -1984,6 +1993,7 @@ function getAudience(cat,title){
 }
 
 function getSpendType(cat, sub){
+  if(cat==='Uncategorized')return'Uncategorized';   // don't guess spend type for un-triaged items
   const key = overrideKey; // not used here — just lookup by cat/sub
   if(SPEND_TYPE_MAP[cat] && SPEND_TYPE_MAP[cat][sub]) return SPEND_TYPE_MAP[cat][sub];
   if(SPEND_TYPE_MAP[cat]) {
@@ -4814,13 +4824,14 @@ function renderDash(){
     // category
     catTotals[i.cat]=(catTotals[i.cat]||0)+i.amount;
     // spend type
-    const st=i.stype||getSpendType(i.cat,i.subcat||'');
+    const st=(i.cat==='Uncategorized')?'Uncategorized':(i.stype||getSpendType(i.cat,i.subcat||''));
     stypeTotals[st]=(stypeTotals[st]||0)+i.amount;
     // audience
-    if(VALID_AUDS.includes(i.aud)){
-      audTotals[i.aud]=(audTotals[i.aud]||0)+i.amount;
-      if(!audCatTotals[i.aud])audCatTotals[i.aud]={};
-      audCatTotals[i.aud][i.cat]=(audCatTotals[i.aud][i.cat]||0)+i.amount;
+    const ad=(i.cat==='Uncategorized')?'Uncategorized':i.aud;
+    if(VALID_AUDS.includes(ad)||ad==='Uncategorized'){
+      audTotals[ad]=(audTotals[ad]||0)+i.amount;
+      if(!audCatTotals[ad])audCatTotals[ad]={};
+      audCatTotals[ad][i.cat]=(audCatTotals[ad][i.cat]||0)+i.amount;
     }
     // subcategory totals (for Top 5 Subcategories chart)
     const subKey=i.subcat?`${i.cat} › ${i.subcat}`:null;
@@ -4836,7 +4847,7 @@ function renderDash(){
 
   const sc=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
   const sa=Object.entries(audTotals).sort((a,b)=>b[1]-a[1]);
-  const ss=VALID_STYPES.map(t=>[t,stypeTotals[t]||0]).filter(([,v])=>v>0);
+  const ss=[...VALID_STYPES,'Uncategorized'].map(t=>[t,stypeTotals[t]||0]).filter(([,v])=>v>0);
   const months=Object.keys(monthTotals).sort();
   const ts5=Object.entries(subTotals).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
@@ -5176,22 +5187,9 @@ function renderDash(){
   });
   document.getElementById('cat-table').innerHTML=catRows;
 
-  // ── Top 10 Most Expensive ──
-  const ti=[...items].sort((a,b)=>b.amount-a.amount).slice(0,10);
-  document.getElementById('top-items-table').innerHTML=ti.map(i=>{
-    const catColor=CAT_COLORS[i.cat]||'#888';
-    const subLabel=i.subcat||'—';
-    const st=i.stype||getSpendType(i.cat,i.subcat||'');
-    const stColor=STYPE_COLORS[st]||'#888';
-    return`<tr>
-      <td style="font-size:11px">${escHtml(i.title.slice(0,38))}${i.title.length>38?'…':''}</td>
-      <td style="font-weight:600;white-space:nowrap">${fmt(i.amount)}</td>
-      <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(i.cat)}</span></td>
-      <td style="font-size:11px;color:var(--muted)">${escHtml(subLabel)}</td>
-      <td style="font-size:11px;color:var(--muted);text-align:center">${escHtml(i.year||'—')}</td>
-      <td style="text-align:left"><span style="display:inline-flex;align-items:center;background:${stColor};color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;gap:4px;">${STYPE_DOT[st]||''}${escHtml(st)}</span></td>
-    </tr>`;
-  }).join('');
+  // ── Top 10 items (toggle: Most Expensive | Most Purchased) ──
+  window._dashItems=items;
+  renderTopItems(items);
 
   // ── Audience Breakdown table — expandable ──
   const expandedAuds=window._expandedAuds||new Set();
@@ -5222,7 +5220,7 @@ function renderDash(){
   const stypeCatTotals={};
   const stypeCatSubTotals={};
   items.forEach(i=>{
-    const st=i.stype||getSpendType(i.cat,i.subcat||'');
+    const st=(i.cat==='Uncategorized')?'Uncategorized':(i.stype||getSpendType(i.cat,i.subcat||''));
     if(!stypeCatTotals[st])stypeCatTotals[st]={};
     stypeCatTotals[st][i.cat]=(stypeCatTotals[st][i.cat]||0)+i.amount;
     if(i.subcat){
@@ -5335,6 +5333,61 @@ function setSpendView(view){
   document.getElementById('toggle-yearly').className='btn sm'+(view==='yearly'?'':' outline');
   document.getElementById('spend-chart-title').textContent=view==='monthly'?'Monthly Spend':'Yearly Spend';
   renderDash();
+}
+
+// Renders the Top-10 items table in whichever mode topItemsView is set to.
+function renderTopItems(items){
+  const head=document.getElementById('top-items-head');
+  const title=document.getElementById('top-items-title');
+  const body=document.getElementById('top-items-table');
+  if(!body) return;
+  if(topItemsView==='frequent'){
+    if(title) title.textContent='Top 10 Most Purchased Items';
+    if(head) head.innerHTML='<th>Item</th><th>Category</th><th style="text-align:center">Times ordered</th><th>Total spent</th>';
+    // Group by normalized product title; count separate purchase rows (≈ times ordered).
+    const freq={};
+    items.forEach(i=>{
+      const k=overrideKey(i.title);
+      if(!freq[k]) freq[k]={title:i.title,cat:i.cat,count:0,total:0};
+      freq[k].count++; freq[k].total+=i.amount;
+    });
+    const tf=Object.values(freq).sort((a,b)=>b.count-a.count||b.total-a.total).slice(0,10);
+    body.innerHTML=tf.map(r=>{
+      const catColor=CAT_COLORS[r.cat]||'#888';
+      return`<tr>
+        <td style="font-size:11px">${escHtml(r.title.slice(0,38))}${r.title.length>38?'…':''}</td>
+        <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(r.cat)}</span></td>
+        <td style="text-align:center;font-weight:600;white-space:nowrap">${r.count}&times;</td>
+        <td style="white-space:nowrap">${fmt(r.total)}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    if(title) title.textContent='Top 10 Most Expensive Items';
+    if(head) head.innerHTML='<th>Item</th><th>Price</th><th>Category</th><th>Subcategory</th><th>Year</th><th style="text-align:left">Spend Type</th>';
+    const ti=[...items].sort((a,b)=>b.amount-a.amount).slice(0,10);
+    body.innerHTML=ti.map(i=>{
+      const catColor=CAT_COLORS[i.cat]||'#888';
+      const subLabel=i.subcat||'—';
+      const st=(i.cat==='Uncategorized')?'Uncategorized':(i.stype||getSpendType(i.cat,i.subcat||''));
+      const stColor=STYPE_COLORS[st]||'#888';
+      return`<tr>
+        <td style="font-size:11px">${escHtml(i.title.slice(0,38))}${i.title.length>38?'…':''}</td>
+        <td style="font-weight:600;white-space:nowrap">${fmt(i.amount)}</td>
+        <td><span style="display:inline-block;background:${catColor}18;color:${catColor};border:1px solid ${catColor}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${escHtml(i.cat)}</span></td>
+        <td style="font-size:11px;color:var(--muted)">${escHtml(subLabel)}</td>
+        <td style="font-size:11px;color:var(--muted);text-align:center">${escHtml(i.year||'—')}</td>
+        <td style="text-align:left"><span style="display:inline-flex;align-items:center;background:${stColor};color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;gap:4px;">${STYPE_DOT[st]||''}${escHtml(st)}</span></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function setTopItemsView(view){
+  topItemsView=view;
+  const be=document.getElementById('toggle-topexp'), bf=document.getElementById('toggle-topfreq');
+  if(be) be.className='tbl-toggle'+(view==='expensive'?' active':'');
+  if(bf) bf.className='tbl-toggle'+(view==='frequent'?' active':'');
+  renderTopItems(window._dashItems||[]);
 }
 
 function toggleCatExpand(cat){
