@@ -240,6 +240,10 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:v
 .chart-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
 @media(max-width:900px){.chart-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:580px){.chart-grid{grid-template-columns:1fr;}}
+@media(max-width:580px){
+  .donut-row{flex-direction:column !important;align-items:stretch !important;}
+  .donut-row .legend{max-width:none !important;flex-direction:row !important;flex-wrap:wrap;justify-content:center;gap:8px 18px !important;margin-top:12px;}
+}
 .chart-card{background:#fff;border-radius:12px;padding:1.25rem;border:1px solid var(--cream2);box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .chart-card.clickable{cursor:pointer;transition:all .18s ease;position:relative;}
 .chart-card.clickable:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(45,106,106,.12);transform:translateY(-1px);}
@@ -997,9 +1001,9 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div class="hero" id="hero-metrics"></div>
       <div class="badges" id="top-badges"></div>
       <div class="chart-grid" style="grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Spend by Category</div><div style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="catChart"></canvas></div><div class="legend" id="cat-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Spend by Category</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="catChart"></canvas></div><div class="legend" id="cat-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Categories</div><div class="chart-wrap" id="top5-wrap" style="height:220px"><canvas id="top5Chart"></canvas></div></div>
-        <div class="chart-card clickable" onclick="scrollToBreakdown('aud')"><div class="cc-title">Spend by Audience</div><div style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="audChart"></canvas></div><div class="legend" id="aud-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('aud')"><div class="cc-title">Spend by Audience</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="audChart"></canvas></div><div class="legend" id="aud-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Subcategories</div><div class="chart-wrap" id="top5sub-wrap" style="height:220px"><canvas id="top5SubChart"></canvas></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('stype')" style="grid-column:1/-1"><div class="cc-title">Spend by Type</div><div class="chart-wrap" style="height:180px"><canvas id="stypeChart"></canvas></div><div style="display:flex;gap:16px;justify-content:center;margin-top:12px;" id="stype-legend"></div></div>
       </div>
@@ -1839,6 +1843,7 @@ let excludedItems = new Set(); // overrideKey'd titles excluded from all analysi
 let allItems      = [];
 let sessionItems  = [];
 let sessions      = [];
+let managerItems  = [];
 let charts        = {};
 let filterView    = 'all';
 let spendView     = 'monthly'; // 'monthly' | 'yearly'
