@@ -45,12 +45,14 @@ async function syncToSupabase() {
       ruleOverrides: localStorage.getItem('api_rule_overrides')
     };
 
+    const _ts = new Date().toISOString();
     await _supabase.from('user_data').upsert({
       user_id: user.id,
       sessions_data: sessionsData ? JSON.parse(sessionsData) : null,
       customizations: customizations,
-      updated_at: new Date().toISOString()
+      updated_at: _ts
     }, { onConflict: 'user_id' });
+    window._lastDataTs = _ts;   // remember our own write so pull-on-focus doesn't reload on our own change
   } catch(e) {
     console.error('Supabase sync error:', e);
   }
@@ -70,6 +72,7 @@ async function loadFromSupabase() {
       .single();
 
     if (!data) return false;
+    window._lastDataTs = data.updated_at || window._lastDataTs;   // track server version for pull-on-focus
 
     if (data.sessions_data) {
       localStorage.setItem('api_sessions_v2', JSON.stringify(data.sessions_data));
@@ -91,6 +94,29 @@ async function loadFromSupabase() {
     return false;
   }
 }
+
+// ── Cross-device pull-on-focus ─────────────────────────────────────────────
+// When the tab/app regains focus, check whether another device wrote newer data
+// and, if so, reload to pull it in. When leaving, flush any pending push so the
+// other device sees our latest. Keeps devices in sync without a manual refresh.
+async function checkForRemoteUpdates(){
+  try {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await _supabase.from('user_data').select('updated_at').eq('user_id', user.id).single();
+    if (data && data.updated_at && window._lastDataTs && data.updated_at > window._lastDataTs) {
+      window._lastDataTs = data.updated_at;
+      location.reload();   // reload re-hydrates cleanly via the (fixed) load path
+    }
+  } catch(e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    if (_syncTimer) { clearTimeout(_syncTimer); _syncTimer = null; syncToSupabase(); }  // push our latest before leaving
+  } else if (document.visibilityState === 'visible') {
+    checkForRemoteUpdates();
+  }
+});
 </script>
 <title>myshoplight</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
@@ -591,6 +617,12 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     <button class="menu-close" onclick="toggleMenu()" aria-label="Close menu">×</button>
   </div>
   <div class="menu-body">
+    <div class="menu-section-label">Account</div>
+    <button class="menu-item" onclick="openAccount()">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My account
+    </button>
+
     <div class="menu-section-label">Help &amp; info</div>
     <button class="menu-item" onclick="openMenuPage('how-to-use')">
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 2-2.5 4M12 17h.01"/></svg>
@@ -2351,6 +2383,53 @@ function closeMenuPage(){
   document.getElementById('hi-modal').classList.remove('open');
 }
 
+// ── MY ACCOUNT ─────────────────────────────────────────────────────────────
+async function openAccount(){
+  const drawer = document.getElementById('menu-drawer');
+  if(drawer && drawer.classList.contains('open')){ toggleMenu(); }
+  document.getElementById('hi-title').textContent = 'My account';
+  const body = document.getElementById('hi-body');
+  body.innerHTML = '<p style="color:var(--muted)">Loading…</p>';
+  document.getElementById('hi-modal').classList.add('open');
+
+  const fmtDate = s => { try { return new Date(s).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); } catch(e){ return '—'; } };
+  let email='—', created='—', access='—';
+  try {
+    const { data:{ user } } = await _supabase.auth.getUser();
+    if(user){
+      email = user.email || '—';
+      if(user.created_at) created = fmtDate(user.created_at);
+      const { data:ents } = await _supabase.from('user_entitlements').select('*').eq('user_id', user.id);
+      if(ents && ents.length) access = 'Lifetime access';
+    }
+  } catch(e){}
+  const ups = (typeof sessions!=='undefined' ? sessions : []).map(s=>s.uploadedAt).filter(Boolean).sort();
+  const lastUpload = ups.length ? fmtDate(ups[ups.length-1]) : '—';
+  const orders = (typeof allItems!=='undefined' ? allItems.length : 0);
+  const uploads = (typeof sessions!=='undefined' ? sessions.length : 0);
+
+  const row = (label,val) => `<div style="display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--cream2);">
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">${label}</span>
+      <span style="font-size:14px;color:var(--text);text-align:right;word-break:break-word;">${val}</span></div>`;
+
+  body.innerHTML = `
+    <div style="margin-bottom:.5rem;">
+      ${row('Email', email)}
+      ${row('Account created', created)}
+      ${row('Last upload', lastUpload)}
+      ${row('Access', access)}
+      ${row('Data', orders>0 ? `${orders.toLocaleString()} orders · ${uploads} upload${uploads===1?'':'s'}` : '—')}
+    </div>
+    <button onclick="signOut()" style="width:100%;margin-top:1rem;background:transparent;color:var(--rust);border:1.5px solid var(--rust);border-radius:8px;padding:10px;font-size:14px;font-weight:600;font-family:'Source Sans 3',sans-serif;cursor:pointer;">Sign out</button>`;
+}
+
+async function signOut(){
+  try { await _supabase.auth.signOut(); } catch(e){}
+  // Clear this user's cached data so the next person on this browser starts clean.
+  Object.keys(localStorage).filter(k=>k.startsWith('api_')).forEach(k=>localStorage.removeItem(k));
+  window.location.href = 'login.html';
+}
+
 // ── SEND FEEDBACK ──────────────────────────────────────────────────────────
 function openFeedback(){
   // Close the hamburger drawer if it's open
@@ -3331,7 +3410,7 @@ async function runProcessing(){
   const sessionLabel = uploadLabel ? `${yrLabel} · ${uploadLabel}` : yrLabel;
 
   const idx=sessions.length;
-  sessions.push({label:sessionLabel,count:dedupedItems.length,color:SESSION_COLORS[idx%SESSION_COLORS.length]});
+  sessions.push({label:sessionLabel,count:dedupedItems.length,color:SESSION_COLORS[idx%SESSION_COLORS.length],uploadedAt:new Date().toISOString()});
   sessionItems.push(dedupedItems);
   allItems=[...allItems,...dedupedItems];
 
@@ -5941,10 +6020,11 @@ document.addEventListener('DOMContentLoaded', async function(){
         document.getElementById('dash-head').style.display='';
         document.getElementById('dash-body').style.display='';
         renderSessionBadges();
-        renderDash();
         updateUncatBadge();
         document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
         showDashboardView();
+        switchTab('dashboard');   // make the dashboard the visible tab before rendering (fixes blank-until-tab-switch on login)
+        renderDash();             // render charts/tables into the now-visible, correctly-sized container
         // Backfill: if this device has data but the server had none, seed the server now
         // so the data (and future edits) are available on other devices.
         if(!hadServerData) syncToSupabase();
