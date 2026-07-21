@@ -14,7 +14,7 @@
 (async () => {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) {
-      window.location.href = 'login.html';
+      window.location.href = 'sales.html';
       return;
     }
     const { data: entitlements } = await _supabase
