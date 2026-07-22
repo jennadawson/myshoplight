@@ -5989,6 +5989,21 @@ document.addEventListener('DOMContentLoaded', async function(){
   const _cc=document.getElementById('landing-cat-count'); if(_cc)_cc.textContent=Object.keys(CAT_SUBS).length;
   // Pull the latest server copy into local storage before we render
   if(allItems.length === 0){
+    // Per-user cache guard: localStorage is shared across every account on this
+    // browser, not scoped to a user. If the logged-in user isn't the one this
+    // cache belongs to — a different account on a shared/family computer, or an
+    // account that was deleted and re-created with a new id — wipe it so we never
+    // render or back up someone else's data. A missing stamp counts as "not ours"
+    // too (we only trust cache we've explicitly claimed). Then claim it.
+    try {
+      const { data: { user: _cacheUser } } = await _supabase.auth.getUser();
+      if (_cacheUser) {
+        if (localStorage.getItem('api_owner_id') !== _cacheUser.id) {
+          Object.keys(localStorage).filter(k=>k.startsWith('api_')).forEach(k=>localStorage.removeItem(k));
+        }
+        localStorage.setItem('api_owner_id', _cacheUser.id);
+      }
+    } catch(e){ console.error('cache owner guard error:', e); }
     const hadServerData = await loadFromSupabase();
     // Restore added rules, overrides, moved keywords, and custom categories into memory.
     hydrateCustomizations();
