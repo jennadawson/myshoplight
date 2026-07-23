@@ -6036,10 +6036,30 @@ document.addEventListener('DOMContentLoaded', async function(){
       managerItems = sd.managerItems || [];
       const savedExcluded = localStorage.getItem('api_excluded_items');
       if(savedExcluded) excludedItems = new Set(JSON.parse(savedExcluded));
+      // Re-apply saved customizations onto the restored snapshot. The snapshot
+      // (api_sessions_v2) holds items as they were first categorized; category
+      // overrides / audience / spend-type edits are stored separately and MUST be
+      // layered back on here, or item-manager edits silently revert on reload.
       managerItems.forEach(m=>{
-        m.excluded = excludedItems.has(overrideKey(m.title));
-        m.stypeLocked = !!stypeOverrides[overrideKey(m.title)];
-        if(m.stypeLocked) m.stype = stypeOverrides[overrideKey(m.title)];
+        const key=overrideKey(m.title);
+        const ov=overrides[key];
+        if(ov){
+          m.cat=ov.cat; m.matchedSub=ov.sub; m.userCat=ov.cat; m.userSub=ov.sub;
+          m.pinned=true; m.suggested=false;
+        }
+        if(audOverrides[key]) m.aud=audOverrides[key];
+        m.excluded = excludedItems.has(key);
+        m.stypeLocked = !!stypeOverrides[key];
+        if(m.stypeLocked) m.stype = stypeOverrides[key];
+        else if(ov) m.stype = getSpendType(ov.cat, ov.sub);
+      });
+      allItems.forEach(ai=>{
+        const key=overrideKey(ai.title);
+        const ov=overrides[key];
+        if(ov){ ai.cat=ov.cat; ai.subcat=ov.sub; }
+        if(audOverrides[key]) ai.aud=audOverrides[key];
+        if(stypeOverrides[key]) ai.stype=stypeOverrides[key];
+        else if(ov) ai.stype=getSpendType(ov.cat, ov.sub);
       });
       // Restore the returns review queue / refund totals saved with this session.
       restoreReturns(sd.returns);
