@@ -46,13 +46,15 @@ async function syncToSupabase() {
     };
 
     const _ts = new Date().toISOString();
-    await _supabase.from('user_data').upsert({
+    const { error: _upErr } = await _supabase.from('user_data').upsert({
       user_id: user.id,
       sessions_data: sessionsData ? JSON.parse(sessionsData) : null,
       customizations: customizations,
       updated_at: _ts
     }, { onConflict: 'user_id' });
+    if (_upErr) throw _upErr;   // leave api_pending_sync set so we retry and don't lose local edits
     window._lastDataTs = _ts;   // remember our own write so pull-on-focus doesn't reload on our own change
+    try { localStorage.removeItem('api_pending_sync'); } catch(e) {}  // local now matches server
   } catch(e) {
     console.error('Supabase sync error:', e);
   }
@@ -64,6 +66,17 @@ async function loadFromSupabase() {
   try {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) return false;
+
+    // Don't clobber unsynced local edits. If a debounced sync was still pending
+    // when the page was refreshed, localStorage holds newer data than the server
+    // (api_pending_sync survives the reload and is only cleared after a push
+    // succeeds). Push local up and keep it, instead of overwriting local with the
+    // server's stale copy. This is the fix for "categorized on mobile, refreshed,
+    // edits reverted."
+    if (localStorage.getItem('api_pending_sync')) {
+      syncToSupabase();
+      return true;   // treat as "have data" — caller must not overwrite/backfill local
+    }
 
     const { data } = await _supabase
       .from('user_data')
@@ -1886,6 +1899,7 @@ let _syncTimer = null;
 function syncCustomizationsToSupabase(){
   // Debounce — 2s after the last change — then push a full snapshot (items + customizations)
   // to user_data, the SAME table/format loadFromSupabase reads, so edits reach other devices.
+  try { localStorage.setItem('api_pending_sync','1'); } catch(e) {}  // mark local as ahead of server until the push lands
   if(_syncTimer) clearTimeout(_syncTimer);
   _syncTimer = setTimeout(() => { syncToSupabase(); }, 2000);
 }
@@ -2140,6 +2154,7 @@ function togglePin(idx){
   delete overrides[key];
   item.pinned=false;
   try{localStorage.setItem(STORAGE_KEY_OVERRIDES,JSON.stringify(overrides));}catch(e){}
+  syncCustomizationsToSupabase();   // persist the unlock to the server too
   updateStorageBar();
   renderManager();
   showMsg('info','Item unlocked — keyword rules will apply on next upload.');
