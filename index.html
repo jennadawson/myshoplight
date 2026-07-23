@@ -130,7 +130,8 @@ document.addEventListener('visibilitychange', () => {
   --terra:#E0977A;--terra-light:#EDB89F;--terra-tint:#FBF0EB;
   --cream:#F5F0E8;--cream2:#EDE8DC;--text:#2A2A2A;--muted:#666;
 }
-body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:var(--text);min-height:100vh;}
+html{overscroll-behavior-y:contain;}
+body{font-family:'Source Sans 3',system-ui,sans-serif;background:#F5F0E8;color:var(--text);min-height:100vh;overscroll-behavior-y:contain;}
 
 /* ── HEADER ── */
 .app-header{background:var(--teal);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:relative;}
@@ -1312,14 +1313,13 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <div style="display:flex;gap:8px;">
           <button class="btn sm" onclick="toggleSection('cat-section')">+ New Category</button>
           <button class="btn sm outline" onclick="toggleSection('sub-section')">+ New Subcategory</button>
-          <button class="btn sm rust" onclick="toggleSection('del-section')">Remove Category / Subcategory</button>
         </div>
       </div>
 
       <div class="msl-help" style="margin-top:12px;margin-bottom:4px;">
         <span class="msl-help-icon" aria-hidden="true">🗂️</span>
         <div class="msl-help-body">
-          <strong>Before you add:</strong> match the built-in style — use “&amp;” instead of “and” (e.g. <em>Arts &amp; Crafts</em>) and keep names short. New categories and subcategories don’t come with automatic keyword rules, so items won’t flow into them on their own — assign items in the Item Manager, or add your own keyword rules in the table below. Removing a category only affects rules you added; the built-in rules are protected, and you can move your affected rules to another category instead of deleting them.
+          <strong>Before you add:</strong> match the built-in style — use “&amp;” instead of “and” (e.g. <em>Arts &amp; Crafts</em>) and keep names short. New categories and subcategories don’t come with automatic keyword rules, so items won’t flow into them on their own — assign items in the Item Manager, or add your own keyword rules in the table below.
         </div>
       </div>
 
@@ -1374,32 +1374,8 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         </div>
       </div>
 
-      <!-- Remove Category / Subcategory form -->
-      <div id="del-section" style="display:none;border-top:1px solid var(--cream2);padding-top:12px;margin-top:4px;">
-        <div style="font-size:12px;font-weight:600;color:var(--rust);margin-bottom:8px;">Remove Category or Subcategory</div>
-        <div class="catmap-inline-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;">
-          <div class="catmap-form-group">
-            <label>Category <span style="color:var(--rust)">*</span></label>
-            <select id="del-cat-select" class="cm-filter-sel" style="width:100%" onchange="updateDelSubOptions()">
-              <option value="">Select category</option>
-            </select>
-          </div>
-          <div class="catmap-form-group">
-            <label>Subcategory (leave blank to remove entire category)</label>
-            <select id="del-sub-select" class="cm-filter-sel" style="width:100%" disabled>
-              <option value="">— Entire category —</option>
-            </select>
-          </div>
-          <div class="catmap-form-group">
-            <label>Move affected rules to</label>
-            <select id="del-move-cat" class="cm-filter-sel" style="width:100%">
-              <option value="">Delete rules</option>
-            </select>
-          </div>
-          <button class="btn sm rust" onclick="removeCategory()">Remove</button>
-        </div>
-        <div style="font-size:11px;color:var(--rust);margin-top:6px;">⚠ This affects your locally added rules only. Original map rules are protected.</div>
-      </div>
+      <!-- Remove Category / Subcategory form — feature paused July 23 (pending Merge/Remove redesign).
+           UI removed; removeCategory()/updateDelSubOptions() left in place as dead code for easy restore. -->
 
       <!-- Live category browser -->
       <div style="border-top:1px solid var(--cream2);padding-top:12px;margin-top:12px;">
@@ -2133,6 +2109,10 @@ function saveSessionData(){
   }catch(e){
     // localStorage full — silently skip
   }
+  // Push to Supabase too (debounced). Without this, session-data edits — notably
+  // return-manager resolutions — lived only in localStorage, so a reload's
+  // loadFromSupabase would overwrite them with the stale server copy and lose them.
+  syncCustomizationsToSupabase();
 }
 
 function updateStorageBar(){
@@ -3995,6 +3975,7 @@ function imSetCat(gi, val){
   if(!item) return;
   item.userCat=val;
   item.userSub='';
+  item.matchedSub='';   // clear stale sub from the previous category so it can't carry over
   // update subcategory dropdown in place — no full re-render needed
   const subSel=document.getElementById('im-sub-'+gi);
   if(subSel){
@@ -4004,12 +3985,37 @@ function imSetCat(gi, val){
   // update badge on card face in place
   const badge=document.getElementById('im-badge-'+gi);
   if(badge&&val){badge.style.background='var(--teal-tint)';badge.style.color='var(--teal)';badge.textContent=val;}
+  if(val) imPersistSelection(gi);   // auto-save on pick (like Audience/Spend type) — survives refresh
 }
 
 function imSetSub(gi, val){
   const item=managerItems[gi];
   if(!item) return;
   item.userSub=val;
+  imPersistSelection(gi);   // auto-save on pick — survives refresh
+}
+
+// Persist the current Category/Subcategory choice immediately, mirroring how
+// setAudience/setSpendType already write-through. This makes a category pick
+// durable the moment it's made, so a refresh (or cross-device reload) can't
+// discard it. The Save button still exists for adding keyword rules + confirm.
+function imPersistSelection(gi){
+  const item=managerItems[gi];
+  if(!item) return;
+  const cat=item.userCat||item.cat;
+  if(!cat||cat==='Uncategorized') return;   // nothing categorizable yet
+  const key=overrideKey(item.title);
+  const sub=item.userSub||item.matchedSub||'';
+  overrides[key]={cat,sub};
+  item.cat=cat;
+  item.matchedSub=sub;
+  item.suggested=false;
+  allItems.forEach(ai=>{if(overrideKey(ai.title)===key){ai.cat=cat;ai.subcat=sub;ai.aud=getAudience(cat,ai.title);}});
+  try{localStorage.setItem(STORAGE_KEY_OVERRIDES,JSON.stringify(overrides));}catch(e){}
+  syncCustomizationsToSupabase();
+  updateStorageBar();
+  updateUncatBadge();
+  renderDash();
 }
 
 function imQuickConfirm(gi){
