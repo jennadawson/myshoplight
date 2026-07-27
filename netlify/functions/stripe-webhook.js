@@ -9,6 +9,24 @@ const supabase = createClient(
 
 const resend = new Resend(process.env.RESEND_S_KEY);
 
+// Find an auth user by email, paging through all users. The admin listUsers()
+// call returns only one page (default 50), so a single unpaginated call silently
+// misses any existing buyer past the first page once the user base grows —
+// which would drop a repeat/returning buyer into a duplicate createUser() and a 500.
+async function findUserByEmail(email) {
+  const target = (email || '').toLowerCase();
+  const perPage = 100;
+  for (let page = 1; page <= 200; page++) {   // backstop cap (~20k users)
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+    const users = data?.users || [];
+    if (!users.length) return null;           // walked past the last page
+    const match = users.find(u => (u.email || '').toLowerCase() === target);
+    if (match) return match;
+  }
+  return null;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' };
@@ -43,9 +61,8 @@ exports.handler = async (event) => {
   console.log(`Processing purchase for: ${email}`);
 
   try {
-    // 1. Find or create Supabase user
-    const { data: { users } } = await supabase.auth.admin.listUsers();
-    const existingUser = users?.find(u => u.email === email);
+    // 1. Find or create Supabase user (paginated + case-insensitive lookup)
+    const existingUser = await findUserByEmail(email);
 
     let userId;
 
