@@ -131,6 +131,19 @@
     }
     .nav-cta:hover { background: #3bc490; }
 
+    .nav-right { display: flex; align-items: center; gap: 18px; }
+    .nav-login {
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .nav-login:hover { opacity: 1; text-decoration: underline; }
+
     /* ── HERO ── */
     .hero {
       background: var(--teal);
@@ -478,7 +491,10 @@
       </svg>
       <span class="wordmark"><span class="my">my</span><span class="shop">shop</span><span class="light">light</span></span>
     </a>
-    <button class="nav-cta" onclick="handleCheckout('nav')">Buy now — $27</button>
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">Log in</a>
+      <button class="nav-cta" onclick="handleCheckout('nav')">Buy now — $27</button>
+    </div>
   </nav>
 
   <!-- HERO -->
