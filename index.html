@@ -1170,6 +1170,18 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           <div style="font-size:18px;color:var(--muted);flex-shrink:0;">›</div>
         </div>
 
+        <!-- Re-run rules -->
+        <div style="background:#fff;border:1px solid var(--cream2);border-radius:14px;padding:1.25rem 1.5rem;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="width:36px;height:36px;background:var(--teal-tint);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">↺</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);">Re-run rules</div>
+          </div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.5;padding-left:46px;margin-bottom:12px;">Added or changed a category, subcategory, or keyword rule? Click <strong>Re-run rules</strong> and every item you <strong>haven't manually adjusted</strong> will be re-sorted using your current rules. Anything you've saved or edited by hand stays exactly as you set it.</div>
+          <div style="padding-left:46px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button class="btn sm teal" onclick="reRunCategorization(this)" title="Re-apply all keyword rules to every item you haven't manually adjusted">↺ Re-run rules</button>
+          </div>
+        </div>
+
         <!-- Export Item Data -->
         <div style="background:#fff;border:1px solid var(--cream2);border-radius:14px;padding:1.25rem 1.5rem;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
@@ -1203,7 +1215,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
           <div id="card-view-sub" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
         </div>
         <div style="margin-left:auto;">
-          <button class="btn sm teal" onclick="reRunCategorization()" title="Re-apply all keyword rules to every unlocked item">↺ Re-run rules</button>
+          <button class="btn sm teal" onclick="reRunCategorization(this)" title="Re-apply all keyword rules to every unlocked item">↺ Re-run rules</button>
         </div>
       </div>
 
@@ -2538,20 +2550,34 @@ function hamburgerExport(){
 
 
 
-function hamburgerStartOver(){
+async function hamburgerStartOver(){
   toggleMenu();
-  if(!confirm('This will clear all your uploaded data and customizations. Are you sure?')) return;
-  // Clear all storage
+  if(!confirm('This will permanently clear all your uploaded data and customizations from your account — on every device. This cannot be undone. Are you sure?')) return;
+  // 1) Clear the SERVER copy FIRST. The app syncs everything to Supabase, so if we only
+  //    wiped localStorage the page reload would immediately re-download the server copy and
+  //    restore everything (the "Start Over did nothing" bug). Upsert an empty record — this
+  //    reuses the exact write path the app already uses to sync, so RLS permits it.
   try{
-    localStorage.removeItem(STORAGE_KEY_NEW);
-    localStorage.removeItem(STORAGE_KEY_OVERRIDES);
-    localStorage.removeItem(STORAGE_KEY_AUD_OV);
-    localStorage.removeItem(STORAGE_KEY_STYPE_OV);
-    localStorage.removeItem(STORAGE_KEY_EXCLUDED);
-    localStorage.removeItem(STORAGE_KEY_STRUCTURE);
-    localStorage.removeItem(STORAGE_KEY_UPLOADED);
-    localStorage.removeItem(STORAGE_KEY_SESSIONS);
+    const { data: { user } } = await _supabase.auth.getUser();
+    if(user){
+      const { error } = await _supabase.from('user_data').upsert({
+        user_id: user.id,
+        sessions_data: null,
+        customizations: {},
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      if(error) throw error;
+    }
+  }catch(e){
+    console.error('Start Over: server clear failed', e);
+    alert('Couldn’t clear your saved data on the server just now — please check your connection and try again. Nothing was changed.');
+    return;   // abort before touching local, so we don't reload into a state the server would just restore
+  }
+  // 2) Clear ALL local app storage (every api_* key, incl. api_pending_sync so nothing is re-pushed).
+  try{
+    Object.keys(localStorage).filter(k=>k.startsWith('api_')).forEach(k=>localStorage.removeItem(k));
   }catch(e){}
+  // 3) Reload into a genuine clean slate.
   location.reload();
 }
 
@@ -5531,9 +5557,11 @@ function toggleStypeExpand(key){
   renderDash();
 }
 
-function reRunCategorization(){
-  if(!managerItems.length){showMsg('info','No items loaded yet.');return;}
-  const btn=document.querySelector('.btn.teal[onclick="reRunCategorization()"]');
+function reRunCategorization(btn){
+  if(!managerItems.length){showMsg('info','No items loaded yet — upload your data first.');return;}
+  // btn is passed from whichever button was clicked (hub card or Review-All header);
+  // fall back to a lookup for any legacy call site.
+  if(!btn || !btn.tagName) btn=document.querySelector('.btn.teal[onclick^="reRunCategorization"]');
   if(btn){btn.disabled=true;btn.textContent='↻ Running…';btn.style.opacity='0.6';}
   setTimeout(()=>_reRunCategorization(btn),30);
 }
