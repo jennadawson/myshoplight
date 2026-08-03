@@ -1003,7 +1003,12 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       </label>
     </div>
     <div id="dash-body" style="display:none">
-      <div id="insight-strip" class="insight-strip" style="display:none"></div>
+      <div id="uncat-banner" style="display:none;background:var(--terra-tint);border:1px solid var(--cream2);border-left:3px solid var(--terra);border-radius:8px;padding:10px 14px;margin-bottom:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:12px;color:var(--text);line-height:1.5;">
+          <span id="uncat-banner-text"></span>
+          <a onclick="switchTab('manager')" style="color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;margin-left:6px;">Review in Item Manager →</a>
+        </div>
+      </div>
       <div class="filters">
         <!-- Year multi-select -->
         <div class="ms-filter" id="ms-year-filter">
@@ -5000,73 +5005,22 @@ function renderDash(){
     <div class="badge"><div class="badge-left">Top Category</div><div class="badge-right"><div><div style="font-size:20px;font-weight:600;">${sc[0]?escHtml(sc[0][0]):'—'}</div><div style="font-size:14px;color:var(--muted);font-weight:400;margin-top:3px;">${sc[0]?fmt(sc[0][1])+' · '+Math.round(sc[0][1]/total*100)+'% of total spend':''}</div></div></div></div>
     <div class="badge"><div class="badge-left">Top Audience</div><div class="badge-right"><div><div style="font-size:20px;font-weight:600;">${sa[0]?escHtml(sa[0][0]):'—'}</div><div style="font-size:14px;color:var(--muted);font-weight:400;margin-top:3px;">${sa[0]?fmt(sa[0][1])+' · '+Math.round(sa[0][1]/total*100)+'% of total spend':''}</div></div></div></div>`;
 
-  // ── Insight strip ──
-  (function renderInsights(){
-    const strip = document.getElementById('insight-strip');
-    const insights = [];
-    const yrSel = getMsYearSelections();   // null = all years
-    const moSel = getMsMonthSelections();  // null = all months
-
-    // Insight 1: month-over-month comparison within the CURRENT filtered view.
-    // Uses the same filtered monthTotals/months the monthly chart uses, so it
-    // responds to the year/month filter instead of being pinned to the latest
-    // two months across all data (was previously built from allItems).
-    (function(){
-      const MONTH_NAMES = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const sortedMonths = months; // outer scope: sorted keys of the filtered monthTotals
-      if(sortedMonths.length >= 2){
-        const latestKey = sortedMonths[sortedMonths.length-1];
-        const prevKey = sortedMonths[sortedMonths.length-2];
-        const latestAmt = monthTotals[latestKey];
-        const prevAmt = monthTotals[prevKey];
-        if(prevAmt > 0){
-          const pctChange = Math.round(((latestAmt - prevAmt) / prevAmt) * 100);
-          const dir = pctChange >= 0 ? 'up' : 'down';
-          const arrow = pctChange >= 0 ? '↑' : '↓';
-          const [latestYr, latestMo] = latestKey.split('-');
-          const [prevYr, prevMo] = prevKey.split('-');
-          const latestLabel = `${MONTH_NAMES[parseInt(latestMo)]} ${latestYr}`;
-          const prevLabel = `${MONTH_NAMES[parseInt(prevMo)]} ${prevYr}`;
-          insights.push(`<div class="insight-item"><span class="insight-${dir}" style="font-size:17px;">${arrow} ${Math.abs(pctChange)}% vs ${prevLabel}</span><br>You spent <span class="insight-val">${fmt(latestAmt)}</span> in ${latestLabel} vs <span class="insight-val">${fmt(prevAmt)}</span> in ${prevLabel}</div>`);
-        }
-      }
-    })();
-
-    // Insight 2: avg order vs overall (only when filtered to specific years)
-    if(yrSel && yrSel.size === 1){
-      const overallAvg = allItems.reduce((s,i)=>s+i.amount,0) / allItems.length;
-      const diff = avg - overallAvg;
-      if(Math.abs(diff) > 1){
-        const dir = diff >= 0 ? 'up' : 'down';
-        const arrow = diff >= 0 ? '↑' : '↓';
-        insights.push(`<div class="insight-item">Avg item in <strong>${[...yrSel][0]}</strong>: <span class="insight-val">${fmt(avg)}</span><br><span class="insight-${dir}" style="font-size:17px;">${arrow} ${fmt(Math.abs(diff))}</span> vs your overall avg of <span class="insight-val">${fmt(overallAvg)}</span></div>`);
-      }
-    }
-
-    // Insight 3: spend type split
-    const essAmt = stypeTotals['Essential']||0;
-    const flexAmt = stypeTotals['Flexible']||0;
-    const discAmt = stypeTotals['Discretionary']||0;
-    if(essAmt>0||discAmt>0){
-      const essPct=Math.round(essAmt/total*100);
-      const flexPct=Math.round(flexAmt/total*100);
-      const discPct=Math.round(discAmt/total*100);
-      const dot=(color)=>`<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:${color};vertical-align:middle;margin-right:3px;"></span>`;
-      insights.push(`<div class="insight-item">${dot('#0D5C5C')}<strong>${essPct}%</strong> Essential &nbsp; ${dot('#E0977A')}<strong>${flexPct}%</strong> Flexible &nbsp; ${dot('#C4614A')}<strong>${discPct}%</strong> Discretionary<br><span style="font-size:13px;color:var(--muted);">${fmt(essAmt)} · ${fmt(flexAmt)} · ${fmt(discAmt)}</span></div>`);
-    }
-
-    // Insight 4: uncategorized callout
-    const uncatAmt = (catTotals['Uncategorized']||0);
+  // ── Uncategorized banner (styled like the returns banner above) ──
+  // Replaces the old insight strip: the month-over-month card was effectively
+  // pinned to Nov→Dec (most years run through December) and the spend-type split
+  // now duplicates the "Spend by Type" donut, so only the uncategorized callout
+  // remains — promoted to a small banner matching the returns indicator.
+  (function renderUncatBanner(){
+    const banner = document.getElementById('uncat-banner');
+    if(!banner) return;
+    const uncatAmt = catTotals['Uncategorized']||0;
     if(uncatAmt > 0){
       const uncatPct = Math.round(uncatAmt/total*100);
-      insights.push(`<div class="insight-item" style="border-color:var(--terra);background:var(--terra-tint);border-width:1.5px;">⚠️ <span style="color:var(--terra);font-weight:700;">${fmt(uncatAmt)} (${uncatPct}%)</span> uncategorized<br><a onclick="switchTab('manager')" style="color:var(--teal);cursor:pointer;text-decoration:underline;font-size:13px;">Review in Item Manager →</a></div>`);
-    }
-
-    if(insights.length){
-      strip.innerHTML = insights.join('');
-      strip.style.display = '';
+      const txt = document.getElementById('uncat-banner-text');
+      if(txt) txt.innerHTML = `⚠️ <strong style="color:var(--terra);">${fmt(uncatAmt)} (${uncatPct}%)</strong> of your spending is uncategorized.`;
+      banner.style.display = 'flex';
     } else {
-      strip.style.display = 'none';
+      banner.style.display = 'none';
     }
   })();
 
