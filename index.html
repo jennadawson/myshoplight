@@ -1050,11 +1050,10 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div class="hero" id="hero-metrics"></div>
       <div class="badges" id="top-badges"></div>
       <div class="chart-grid" style="grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-        <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Spend by Category</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="catChart"></canvas></div><div class="legend" id="cat-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Categories</div><div class="chart-wrap" id="top5-wrap" style="height:220px"><canvas id="top5Chart"></canvas></div></div>
-        <div class="chart-card clickable" onclick="scrollToBreakdown('aud')"><div class="cc-title">Spend by Audience</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="audChart"></canvas></div><div class="legend" id="aud-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
         <div class="chart-card clickable" onclick="scrollToBreakdown('cat')"><div class="cc-title">Top 5 Subcategories</div><div class="chart-wrap" id="top5sub-wrap" style="height:220px"><canvas id="top5SubChart"></canvas></div></div>
-        <div class="chart-card clickable" onclick="scrollToBreakdown('stype')" style="grid-column:1/-1"><div class="cc-title">Spend by Type</div><div class="chart-wrap" style="height:180px"><canvas id="stypeChart"></canvas></div><div style="display:flex;gap:16px;justify-content:center;margin-top:12px;" id="stype-legend"></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('aud')"><div class="cc-title">Spend by Audience</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="audChart"></canvas></div><div class="legend" id="aud-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:120px;"></div></div></div>
+        <div class="chart-card clickable" onclick="scrollToBreakdown('stype')"><div class="cc-title">Spend by Type</div><div class="donut-row" style="display:flex;gap:12px;align-items:center;"><div class="chart-wrap" style="height:220px;flex:1;min-width:0;"><canvas id="stypeChart"></canvas></div><div class="legend" id="stype-legend" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;max-width:130px;"></div></div></div>
       </div>
       <!-- Top 10 items — toggle: Most Expensive | Most Purchased -->
       <div class="full-card" style="margin-bottom:1.5rem;">
@@ -2294,7 +2293,7 @@ const HELP_CONTENT = {
       <h4>Your dashboard (Spend Spotlights)</h4>
       <p>This is home base. It surfaces the highlights: your biggest categories, who your spending was for, and how much fell into essential vs. flexible vs. discretionary. Start here to get the story at a glance.</p>
       <h4>Item Manager</h4>
-      <p>Where you make it yours. Every order gets auto-sorted into a category, but you know your household better than any rule does. Open Item Manager to review items, fix anything that landed in the wrong place, and clear out anything marked uncategorized (that little number badge on the tab is your to-do count). Use <strong>Review All Items</strong> to page through everything and reassign in bulk.</p>
+      <p>Where you make it yours. Every item gets auto-sorted into a category, but you know your household better than any rule does. Open Item Manager to review items, fix anything that landed in the wrong place, and clear out anything marked uncategorized (that little number badge on the tab is your to-do count). Use <strong>Review All Items</strong> to page through everything and reassign in bulk.</p>
       <h4>Category Map</h4>
       <p>The rulebook behind the scenes. This shows how myshoplight decides where things go &mdash; the keywords and categories doing the sorting. Peek in here when you want to understand <em>why</em> something was categorized a certain way, or tune the rules for how your family actually shops.</p>
       <h4>Returns</h4>
@@ -2323,7 +2322,7 @@ const HELP_CONTENT = {
       <h4>Is this a subscription?</h4>
       <p>No. It's a one-time purchase. No monthly fees, no renewal reminders.</p>
       <h4>Why are some of my items uncategorized?</h4>
-      <p>A handful of orders won't match any rule &mdash; odd product names, one-offs, that kind of thing. They show up in Item Manager with a badge so you can assign them in a few clicks. Once you do, they fold into your dashboard.</p>
+      <p>A handful of items won't match any rule &mdash; odd product names, one-offs, that kind of thing. They show up in Item Manager with a badge so you can assign them in a few clicks. Once you do, they fold into your dashboard.</p>
       <h4>Can I change how something's categorized?</h4>
       <p>Absolutely. That's what Item Manager and Category Map are for. Recategorize any item, and adjust the keyword rules so future uploads follow your lead.</p>`
   },
@@ -2343,7 +2342,7 @@ const HELP_CONTENT = {
     title: 'How categorization works',
     html: `
       <h4>The overall concept</h4>
-      <p>myshoplight sorts every order by matching words in the product title against a library of keyword rules, grouped into set categories and subcategories. Each rule says "if you see this word, file it here." You start with 2,000+ built-in rules, and you can add both your own keywords and your own categories/subcategories. This lets you tune your dashboard to match exactly how your household shops.</p>
+      <p>myshoplight sorts every item by matching words in the product title against a library of keyword rules, grouped into set categories and subcategories. Each rule says "if you see this word, file it here." You start with 2,000+ built-in rules, and you can add both your own keywords and your own categories/subcategories. This lets you tune your dashboard to match exactly how your household shops.</p>
       <h4>The three priority tiers</h4>
       <p>When you add a keyword, you pick a priority tier that describes how specific it is:</p>
       <ul>
@@ -2416,7 +2415,7 @@ async function openAccount(){
       ${row('Account created', created)}
       ${row('Last upload', lastUpload)}
       ${row('Access', access)}
-      ${row('Data', orders>0 ? `${orders.toLocaleString()} orders · ${uploads} upload${uploads===1?'':'s'}` : '—')}
+      ${row('Data', orders>0 ? `${orders.toLocaleString()} items · ${uploads} upload${uploads===1?'':'s'}` : '—')}
     </div>
     <button onclick="signOut()" style="width:100%;margin-top:1rem;background:transparent;color:var(--rust);border:1.5px solid var(--rust);border-radius:8px;padding:10px;font-size:14px;font-weight:600;font-family:'Source Sans 3',sans-serif;cursor:pointer;">Sign out</button>`;
 }
@@ -2756,7 +2755,7 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
         addrSpan.textContent = addr;
         const countSpan = document.createElement('span');
         countSpan.style.cssText='font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0;';
-        countSpan.textContent = `${addrCounts[addr]} order${addrCounts[addr]!==1?'s':''}`;
+        countSpan.textContent = `${addrCounts[addr]} item${addrCounts[addr]!==1?'s':''}`;
         textWrap.appendChild(addrSpan);
         textWrap.appendChild(countSpan);
         label.appendChild(cb);
@@ -2799,7 +2798,7 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
       const toggleWrap = document.getElementById('addr-toggle-wrap');
       if(toggleWrap){
         if(hiddenCount > 0 && !addrSection._showingAll){
-          toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ orders — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
+          toggleWrap.innerHTML=`Showing addresses with ${ADDR_THRESHOLD}+ items — gifts &amp; one-time deliveries excluded. <a id="addr-show-all-link" style="color:var(--teal);cursor:pointer;text-decoration:underline;">Show all ${allAddrs.length} addresses</a>`;
           document.getElementById('addr-show-all-link').addEventListener('click', ()=>{
             addrSection._showingAll = true;
             renderAddressesForSelectedYears();
@@ -2832,7 +2831,7 @@ document.getElementById('orders-input').addEventListener('change', async e=>{
   // Update the Order History status indicator
   const ordersStatusEl = document.getElementById('orders-file-status');
   if(ordersStatusEl){
-    ordersStatusEl.innerHTML = `✓ ${lines.length - 1} orders loaded`;
+    ordersStatusEl.innerHTML = `✓ ${lines.length - 1} items loaded`;
     ordersStatusEl.style.color = 'var(--teal)';
     ordersStatusEl.style.fontWeight = '600';
   }
@@ -3292,7 +3291,7 @@ async function runProcessing(){
 
   if(!items.length){
     const yrList=[...selectedYears].join(', ');
-    showMsg('err',`No orders found for the selected year${selectedYears.size>1?'s':''} (${yrList}). Try selecting different years.`);
+    showMsg('err',`No items found for the selected year${selectedYears.size>1?'s':''} (${yrList}). Try selecting different years.`);
     runBtn.disabled=false;runBtn.textContent='▶ Build Dashboard';
     return;
   }
@@ -3318,11 +3317,11 @@ async function runProcessing(){
     if(allItems.length){
       // Nothing new, but a dashboard already exists — return to it instead of
       // stranding the user on the upload screen (this was the "stall").
-      showMsg('info',`Those ${items.length} orders are already in your dashboard — nothing new to add.`);
+      showMsg('info',`Those ${items.length} items are already in your dashboard — nothing new to add.`);
       showDashboardView();
       switchTab('dashboard');
     } else {
-      showMsg('err',`All ${items.length} orders already exist — nothing to add.`);
+      showMsg('err',`All ${items.length} items already exist — nothing to add.`);
     }
     return;
   }
@@ -3444,7 +3443,7 @@ async function runProcessing(){
     if(refundMatchResult.ambiguous.length > 0) parts.push(`${refundMatchResult.ambiguous.length} need${refundMatchResult.ambiguous.length===1?'s':''} review`);
     if(parts.length) refundMsg = ` ${parts.join(', ')} — see Returns tab.`;
   }
-  showMsg('success',`${sessionLabel} loaded — ${dedupedItems.length} orders, ${pct}% categorized.${dupeMsg}${skipped>0?' '+skipped+' items need review in Item Manager.':''}${refundMsg}`);
+  showMsg('success',`${sessionLabel} loaded — ${dedupedItems.length} items, ${pct}% categorized.${dupeMsg}${skipped>0?' '+skipped+' items need review in Item Manager.':''}${refundMsg}`);
 
   // Show Returns tab if any refund data was processed
   if(returnsData.refundMap){
@@ -3486,7 +3485,7 @@ async function runProcessing(){
   const refundsStatus = document.getElementById('refunds-file-status');
   if(refundsStatus){ refundsStatus.textContent='Optional — for return tracking'; refundsStatus.style.color='var(--muted)'; refundsStatus.style.fontWeight=''; }
   runBtn.disabled=true;runBtn.textContent='▶ Build Dashboard';
-  document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
+  document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total items. Upload another file to add more data.`;
 }
 
 // ── TABS ───────────────────────────────────────────────────────────────────
@@ -4685,7 +4684,7 @@ function updateReturnsBanner(){
 // ── SESSIONS ───────────────────────────────────────────────────────────────
 function renderSessionBadges(){
   document.getElementById('sessions').innerHTML=sessions.map((s,i)=>
-    `<span class="session-badge" style="background:${s.color}">${s.label} · ${s.count} orders
+    `<span class="session-badge" style="background:${s.color}">${s.label} · ${s.count} items
      <span class="session-remove" onclick="removeSession(${i})">×</span></span>`
   ).join('');
 }
@@ -4993,10 +4992,9 @@ function renderDash(){
 
   // ── Hero metrics ──
   document.getElementById('hero-metrics').innerHTML=`
-    <div class="hero-card"><div class="hc-label">Total Spent</div><div class="hc-val">${fmtShort(total)}</div><div class="hc-sub">${count} orders</div></div>
-    <div class="hero-card"><div class="hc-label">Order Count</div><div class="hc-val">${count}</div></div>
-    <div class="hero-card"><div class="hc-label">Avg Order</div><div class="hc-val">${fmt(avg)}</div></div>
-    <div class="hero-card"><div class="hc-label">Categories</div><div class="hc-val">${sc.length}</div></div>`;
+    <div class="hero-card"><div class="hc-label">Total Spent</div><div class="hc-val">${fmtShort(total)}</div><div class="hc-sub">${count.toLocaleString()} items</div></div>
+    <div class="hero-card"><div class="hc-label">Total Items</div><div class="hc-val">${count.toLocaleString()}</div></div>
+    <div class="hero-card"><div class="hc-label">Avg Item Price</div><div class="hc-val">${fmt(avg)}</div></div>`;
 
   document.getElementById('top-badges').innerHTML=`
     <div class="badge"><div class="badge-left">Top Category</div><div class="badge-right"><div><div style="font-size:20px;font-weight:600;">${sc[0]?escHtml(sc[0][0]):'—'}</div><div style="font-size:14px;color:var(--muted);font-weight:400;margin-top:3px;">${sc[0]?fmt(sc[0][1])+' · '+Math.round(sc[0][1]/total*100)+'% of total spend':''}</div></div></div></div>
@@ -5009,28 +5007,28 @@ function renderDash(){
     const yrSel = getMsYearSelections();   // null = all years
     const moSel = getMsMonthSelections();  // null = all months
 
-    // Insight 1: month-over-month comparison using all data (always shown regardless of filter)
+    // Insight 1: month-over-month comparison within the CURRENT filtered view.
+    // Uses the same filtered monthTotals/months the monthly chart uses, so it
+    // responds to the year/month filter instead of being pinned to the latest
+    // two months across all data (was previously built from allItems).
     (function(){
       const MONTH_NAMES = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const monthTotals = {};
-      allItems.forEach(i=>{
-        const key = `${i.year}-${String(i.month).padStart(2,'0')}`;
-        monthTotals[key] = (monthTotals[key]||0) + i.amount;
-      });
-      const sortedMonths = Object.keys(monthTotals).sort();
+      const sortedMonths = months; // outer scope: sorted keys of the filtered monthTotals
       if(sortedMonths.length >= 2){
         const latestKey = sortedMonths[sortedMonths.length-1];
         const prevKey = sortedMonths[sortedMonths.length-2];
         const latestAmt = monthTotals[latestKey];
         const prevAmt = monthTotals[prevKey];
-        const pctChange = Math.round(((latestAmt - prevAmt) / prevAmt) * 100);
-        const dir = pctChange >= 0 ? 'up' : 'down';
-        const arrow = pctChange >= 0 ? '↑' : '↓';
-        const [latestYr, latestMo] = latestKey.split('-');
-        const [prevYr, prevMo] = prevKey.split('-');
-        const latestLabel = `${MONTH_NAMES[parseInt(latestMo)]} ${latestYr}`;
-        const prevLabel = `${MONTH_NAMES[parseInt(prevMo)]} ${prevYr}`;
-        insights.push(`<div class="insight-item"><span class="insight-${dir}" style="font-size:17px;">${arrow} ${Math.abs(pctChange)}% vs ${prevLabel}</span><br>You spent <span class="insight-val">${fmt(latestAmt)}</span> in ${latestLabel} vs <span class="insight-val">${fmt(prevAmt)}</span> in ${prevLabel}</div>`);
+        if(prevAmt > 0){
+          const pctChange = Math.round(((latestAmt - prevAmt) / prevAmt) * 100);
+          const dir = pctChange >= 0 ? 'up' : 'down';
+          const arrow = pctChange >= 0 ? '↑' : '↓';
+          const [latestYr, latestMo] = latestKey.split('-');
+          const [prevYr, prevMo] = prevKey.split('-');
+          const latestLabel = `${MONTH_NAMES[parseInt(latestMo)]} ${latestYr}`;
+          const prevLabel = `${MONTH_NAMES[parseInt(prevMo)]} ${prevYr}`;
+          insights.push(`<div class="insight-item"><span class="insight-${dir}" style="font-size:17px;">${arrow} ${Math.abs(pctChange)}% vs ${prevLabel}</span><br>You spent <span class="insight-val">${fmt(latestAmt)}</span> in ${latestLabel} vs <span class="insight-val">${fmt(prevAmt)}</span> in ${prevLabel}</div>`);
+        }
       }
     })();
 
@@ -5041,7 +5039,7 @@ function renderDash(){
       if(Math.abs(diff) > 1){
         const dir = diff >= 0 ? 'up' : 'down';
         const arrow = diff >= 0 ? '↑' : '↓';
-        insights.push(`<div class="insight-item">Avg order in <strong>${[...yrSel][0]}</strong>: <span class="insight-val">${fmt(avg)}</span><br><span class="insight-${dir}" style="font-size:17px;">${arrow} ${fmt(Math.abs(diff))}</span> vs your overall avg of <span class="insight-val">${fmt(overallAvg)}</span></div>`);
+        insights.push(`<div class="insight-item">Avg item in <strong>${[...yrSel][0]}</strong>: <span class="insight-val">${fmt(avg)}</span><br><span class="insight-${dir}" style="font-size:17px;">${arrow} ${fmt(Math.abs(diff))}</span> vs your overall avg of <span class="insight-val">${fmt(overallAvg)}</span></div>`);
       }
     }
 
@@ -5072,45 +5070,7 @@ function renderDash(){
     }
   })();
 
-  // ── Chart 1: Spend by Category (donut) — inline labels ──
-  document.getElementById('cat-legend').innerHTML=sc.slice(0,6).map(([c,v])=>`<span class="leg-item"><span class="leg-dot" style="background:${CAT_COLORS[c]||'#888'}"></span><span><span style="font-size:12px;font-weight:600;color:var(--text);display:block;">${c}</span><span style="font-size:11px;color:var(--muted);">${fmt(v)}</span></span></span>`).join('');
-  if(charts.cat)charts.cat.destroy();
-  charts.cat=new Chart(document.getElementById('catChart'),{
-    type:'doughnut',
-    data:{labels:sc.map(([c])=>c),datasets:[{data:sc.map(([,v])=>Math.round(v*100)/100),backgroundColor:sc.map(([c])=>CAT_COLORS[c]||'#888'),borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      layout:{padding:4},
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>{const pct=Math.round(ctx.parsed/total*100);return' '+fmt(ctx.parsed)+' ('+pct+'%)';}}}
-      }
-    },
-    plugins:[{
-      id:'donut-labels-cat',
-      afterDraw(chart){
-        const{ctx,data}=chart;
-        const meta=chart.getDatasetMeta(0);
-        meta.data.forEach((arc,i)=>{
-          const val=data.datasets[0].data[i];
-          const pct=Math.round(val/total*100);
-          if(pct<6)return;
-          const cx=(arc.startAngle+arc.endAngle)/2;
-          const r=(arc.innerRadius+arc.outerRadius)/2;
-          const x=arc.x+Math.cos(cx)*r;
-          const y=arc.y+Math.sin(cx)*r;
-          ctx.save();
-          ctx.fillStyle='rgba(255,255,255,0.95)';
-          ctx.font='bold 10px sans-serif';
-          ctx.textAlign='center';
-          ctx.textBaseline='middle';
-          ctx.fillText(pct+'%',x,y-6);
-          ctx.font='9px sans-serif';
-          ctx.fillText(fmtShort(val),x,y+6);
-          ctx.restore();
-        });
-      }
-    }]
-  });
+  // (Spend by Category donut removed — categories are covered by the Top 5 Categories bar + the Category Breakdown table)
 
   // ── Chart 2: Top 5 Categories (horizontal bar) — inline labels ──
   const t5=sc.slice(0,5);
@@ -5189,39 +5149,45 @@ function renderDash(){
     }]
   });
 
-  // ── Chart 3b: Spend by Type (horizontal bar) ──
-  document.getElementById('stype-legend').innerHTML=ss.map(([t])=>`<span class="leg-item"><span class="leg-dot" style="background:${STYPE_COLORS[t]||'#888'};border-radius:50%;width:12px;height:12px;"></span><span style="font-size:13px;">${t}</span></span>`).join('');
+  // ── Chart 3b: Spend by Type (donut) ──
+  document.getElementById('stype-legend').innerHTML=ss.map(([t,v])=>`<span class="leg-item"><span class="leg-dot" style="background:${STYPE_COLORS[t]||'#888'}"></span><span><span style="font-size:12px;font-weight:600;color:var(--text);display:block;">${STYPE_LABELS[t]||t}</span><span style="font-size:11px;color:var(--muted);">${fmt(v)}</span></span></span>`).join('');
   if(charts.stype)charts.stype.destroy();
-  const _stypePlugin={id:'bar-labels-stype',afterDraw(chart){
-    const{ctx,data}=chart;
-    const meta=chart.getDatasetMeta(0);
-    meta.data.forEach((bar,i)=>{
-      const val=data.datasets[0].data[i];
-      const barW=bar.width||0;
-      if(barW<50)return;
-      const x=bar.x-barW+8;
-      const y=bar.y;
-      const pct=Math.round(val/total*100);
-      ctx.save();
-      ctx.fillStyle='rgba(255,255,255,0.95)';
-      ctx.font='bold 10px sans-serif';
-      ctx.textAlign='left';
-      ctx.textBaseline='middle';
-      ctx.fillText(fmtShort(val)+' ('+pct+'%)',x,y);
-      ctx.restore();
-    });
-  }};
   charts.stype=new Chart(document.getElementById('stypeChart'),{
-    type:'bar',
-    data:{labels:ss.map(([t])=>STYPE_LABELS[t]||t),datasets:[{data:ss.map(([,v])=>Math.round(v*100)/100),backgroundColor:ss.map(([t])=>STYPE_COLORS[t]||'#888'),borderRadius:5,barThickness:32}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const pct=Math.round(ctx.parsed.x/total*100);return' '+fmt(ctx.parsed.x)+' ('+pct+'%)';}}}}  ,
-      scales:{
-        x:{ticks:{callback:v=>fmtShort(v),font:{size:10},color:'#999'},grid:{color:'rgba(0,0,0,0.05)'}},
-        y:{ticks:{font:{size:13,weight:'bold'},color:'#444'},grid:{display:false}}
+    type:'doughnut',
+    data:{labels:ss.map(([t])=>STYPE_LABELS[t]||t),datasets:[{data:ss.map(([,v])=>Math.round(v*100)/100),backgroundColor:ss.map(([t])=>STYPE_COLORS[t]||'#888'),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:4},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{const pct=Math.round(ctx.parsed/total*100);return' '+fmt(ctx.parsed)+' ('+pct+'%)';}}}
       }
-    }
-  },[_stypePlugin]);
+    },
+    plugins:[{
+      id:'donut-labels-stype',
+      afterDraw(chart){
+        const{ctx,data}=chart;
+        const meta=chart.getDatasetMeta(0);
+        meta.data.forEach((arc,i)=>{
+          const val=data.datasets[0].data[i];
+          const pct=Math.round(val/total*100);
+          if(pct<6)return;
+          const cx=(arc.startAngle+arc.endAngle)/2;
+          const r=(arc.innerRadius+arc.outerRadius)/2;
+          const x=arc.x+Math.cos(cx)*r;
+          const y=arc.y+Math.sin(cx)*r;
+          ctx.save();
+          ctx.fillStyle='rgba(255,255,255,0.95)';
+          ctx.font='bold 10px sans-serif';
+          ctx.textAlign='center';
+          ctx.textBaseline='middle';
+          ctx.fillText(pct+'%',x,y-6);
+          ctx.font='9px sans-serif';
+          ctx.fillText(fmtShort(val),x,y+6);
+          ctx.restore();
+        });
+      }
+    }]
+  });
 
   // ── Chart 4: Top 5 Subcategories (horizontal bar) — inline labels ──
   document.getElementById('top5sub-wrap').style.height=Math.max(180,(ts5.length*44)+60)+'px';
@@ -5463,7 +5429,7 @@ function renderDash(){
     document.getElementById('dash-sub').textContent=
       f.toLocaleString('default',{month:'long',year:'numeric'})+' — '+
       l.toLocaleString('default',{month:'long',year:'numeric'})+
-      ' · '+allItems.length+' total orders';
+      ' · '+allItems.length+' total items';
   }
 }
 
@@ -6120,7 +6086,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         document.getElementById('dash-body').style.display='';
         renderSessionBadges();
         updateUncatBadge();
-        document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total orders. Upload another file to add more data.`;
+        document.getElementById('panel-sub').textContent=`${sessions.length} session${sessions.length>1?'s':''} loaded · ${allItems.length} total items. Upload another file to add more data.`;
         showDashboardView();
         switchTab('dashboard');   // make the dashboard the visible tab before rendering (fixes blank-until-tab-switch on login)
         renderDash();             // render charts/tables into the now-visible, correctly-sized container
