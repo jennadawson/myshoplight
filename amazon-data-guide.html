@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to download your Amazon order history — myshoplight</title>
+  <meta name="description" content="A free, step-by-step guide to requesting your Amazon order history from Amazon's privacy portal — what to ask for, how long it takes, and what's inside the file when it arrives." />
+
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-3xuEqRnSVB3y7Mk-Amflc.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0D5C5C;
+      --teal-hover: #1A8C8C;
+      --teal-tint: #E8F7F2;
+      --mint: #4DD4A0;
+      --rust: #C4614A;
+      --rust-tint: #FAECE7;
+      --terra: #E0977A;
+      --terra-tint: #FBF0EB;
+      --cream: #F5F0E8;
+      --cream2: #EDE8DC;
+      --text: #2A2A2A;
+      --muted: #666666;
+      --font-sans: 'Source Sans 3', sans-serif;
+      --font-serif: 'Playfair Display', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    section { padding: 56px 24px; }
+    .container { max-width: 720px; margin: 0 auto; }
+    .bg-white { background: #ffffff; }
+    .bg-cream { background: var(--cream); }
+    .bg-teal  { background: var(--teal); }
+
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--teal);
+    }
+
+    /* ── NAV ── */
+    .nav {
+      background: var(--teal);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .wordmark { font-family: var(--font-sans); font-size: 20px; letter-spacing: -0.02em; line-height: 1; }
+    .wordmark .my    { color: rgba(255,255,255,0.45); font-weight: 400; }
+    .wordmark .shop  { color: var(--mint); font-weight: 700; }
+    .wordmark .light { color: #fff; font-weight: 700; }
+    .nav-right { display: flex; align-items: center; gap: 18px; }
+    .nav-login {
+      color: #fff; font-size: 13px; font-weight: 600; text-decoration: none;
+      opacity: 0.85; white-space: nowrap;
+    }
+    .nav-login:hover { opacity: 1; text-decoration: underline; }
+    .nav-cta {
+      background: var(--mint); color: var(--teal); border: none;
+      padding: 9px 20px; border-radius: 20px;
+      font-family: var(--font-sans); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s; white-space: nowrap;
+    }
+    .nav-cta:hover { background: #3bc490; }
+
+    /* ── HEADER ── */
+    .guide-hero { background: var(--teal); padding: 56px 24px 48px; text-align: center; color: #fff; }
+    .guide-hero .eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--mint); margin-bottom: 12px;
+    }
+    .guide-hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700; line-height: 1.15; margin-bottom: 14px;
+    }
+    .guide-hero p {
+      font-size: 15px; color: rgba(255,255,255,0.75);
+      line-height: 1.65; max-width: 520px; margin: 0 auto;
+    }
+    .free-badge {
+      display: inline-block; background: rgba(77,212,160,0.15);
+      border: 1px solid rgba(77,212,160,0.4); color: var(--mint);
+      font-size: 12px; font-weight: 600; border-radius: 20px;
+      padding: 5px 14px; margin-top: 20px;
+    }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 30px; }
+    .step { display: flex; align-items: flex-start; gap: 18px; }
+    .step-num {
+      width: 34px; height: 34px; min-width: 34px; border-radius: 50%;
+      background: var(--teal); color: #fff; font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .step p  { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    .step p + p { margin-top: 8px; }
+    .step code {
+      background: var(--cream2); padding: 1px 6px; border-radius: 4px;
+      font-size: 13px; color: var(--text);
+    }
+
+    /* ── WARNING ── */
+    .warn {
+      background: var(--rust-tint);
+      border-left: 3px solid var(--rust);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-top: 14px;
+    }
+    .warn-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--rust); margin-bottom: 8px;
+    }
+    .warn p { font-size: 13.5px; color: var(--text); line-height: 1.65; }
+
+    /* ── FILE LIST ── */
+    .files { display: flex; flex-direction: column; gap: 12px; }
+    .file-row {
+      background: var(--cream); border: 1px solid var(--cream2);
+      border-radius: 10px; padding: 16px 18px;
+    }
+    .file-name {
+      font-size: 14px; font-weight: 600; color: var(--teal); margin-bottom: 3px;
+    }
+    .file-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .file-row.needed { background: var(--teal-tint); border-color: rgba(13,92,92,0.2); }
+    .file-tag {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--teal); color: #fff;
+      border-radius: 10px; padding: 2px 8px; margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; }
+    .faq-item { border-bottom: 1px solid var(--cream2); padding: 20px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--cream2); }
+    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .faq-a { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .faq-a strong { color: var(--text); }
+
+    /* ── BUY BOX ── */
+    .buy2 { text-align: center; }
+    .buy2 h2 { margin-bottom: 8px; }
+    .buy2-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+    .buy2-box {
+      background: #fff; border-radius: 18px; border: 1px solid var(--cream2);
+      padding: 28px; max-width: 360px; margin: 0 auto; text-align: left;
+    }
+    .buy-box-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+    }
+    .buy-price {
+      font-size: 38px; font-weight: 600; color: var(--teal);
+      line-height: 1; letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .buy-price sup { font-size: 20px; vertical-align: super; }
+    .tax-note { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .buy-note { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+    .btn-primary {
+      display: block; width: 100%; background: var(--teal); color: #fff;
+      border: none; padding: 15px; border-radius: 8px;
+      font-family: var(--font-sans); font-size: 15px; font-weight: 600;
+      cursor: pointer; text-align: center; margin-bottom: 12px;
+      transition: background 0.15s; text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--teal-hover); }
+    .secure-note {
+      font-size: 11px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .guarantee {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 12px; line-height: 1.5; color: var(--muted);
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid rgba(0,0,0,0.07); text-align: left;
+    }
+    .guarantee svg { min-width: 14px; margin-top: 2px; stroke: var(--teal); }
+    .guarantee strong { color: var(--teal); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--teal); padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+    .btn-loading { opacity: 0.7; cursor: wait; }
+
+    @media (max-width: 540px) {
+      h2 { font-size: 24px; }
+      .buy2-box { padding: 22px 18px; }
+      .step { gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="sales.html" class="logo">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="6" y="18" width="28" height="18" rx="2" stroke="white" stroke-width="1.8"/>
+        <path d="M6 22l14-4 14 4" stroke="white" stroke-width="1.8"/>
+        <path d="M6 18l4-6h20l4 6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="10" r="6" stroke="#4DD4A0" stroke-width="1.8" fill="rgba(77,212,160,0.12)"/>
+        <line x1="18.2" y1="14.2" x2="22" y2="18" stroke="#4DD4A0" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="14" cy="10" r="2.5" fill="#4DD4A0" opacity="0.5"/>
+      </svg>
+      <span class="wordmark"><span class="my">my</span><span class="shop">shop</span><span class="light">light</span></span>
+    </a>
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">Log in</a>
+      <button class="nav-cta" onclick="handleCheckout('guide-nav')">Buy now — $27</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="guide-hero">
+    <p class="eyebrow">Free guide</p>
+    <h1>How to download your Amazon order history</h1>
+    <p>Amazon will hand you every order you have ever placed, going back to the day you opened the account. It is free, it takes about four clicks, and most people have no idea it exists.</p>
+    <span class="free-badge">No purchase needed — this guide is free</span>
+  </header>
+
+  <!-- STEPS -->
+  <section class="bg-white">
+    <div class="container">
+      <p class="section-label">The four steps</p>
+      <h2>Requesting the file</h2>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <div>
+            <h3>Go to Amazon's data request page</h3>
+            <p>Sign in to Amazon, then open <strong>Account &amp; Lists → Your Account → Data and Privacy</strong>, and look for <strong>Request Your Information</strong>. If you would rather go straight there, it lives at <code>amazon.com/hz/privacy-central/data-requests/preview.html</code>.</p>
+            <p>Do this on a computer if you can. The page exists on mobile, but the menus are buried several taps deeper.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <div>
+            <h3>Choose "Your Orders" — not "Request All Your Data"</h3>
+            <p>The dropdown offers a long list of categories. Pick the orders category and submit.</p>
+            <p>You <em>can</em> request everything, but "all your data" pulls in your Kindle highlights, Alexa recordings, browsing history and a great deal else. It takes far longer to prepare, arrives as a much larger download, and none of the extra is used here.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <div>
+            <h3>Confirm the request from your email</h3>
+            <p>Amazon sends a confirmation email within a few minutes. <strong>Your request does not start until you click the link inside it.</strong></p>
+            <div class="warn">
+              <p class="warn-label">Don't skip this</p>
+              <p>This is where nearly everyone gets stuck. The confirmation email looks like a receipt — as though the request is already running — so it gets skimmed and left. It isn't a receipt. It's a switch. If your data never turns up, this is almost always why: check your inbox, and check spam and promotions too.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num" aria-hidden="true">4</div>
+          <div>
+            <h3>Wait for the download link, then save the file</h3>
+            <p>Amazon usually takes <strong>a few hours to a day or so</strong>, though it can stretch longer if you have a decade of orders. When it is ready you get a second email with a download link.</p>
+            <p>The link expires, so download it when you see it rather than leaving it for the weekend. What lands is a <code>.zip</code> file. Save it somewhere you will find again — you do not need to unzip it to know what is inside, but you will want the CSVs out of it.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S IN THE ZIP -->
+  <section class="bg-cream">
+    <div class="container">
+      <p class="section-label">What arrives</p>
+      <h2>What's inside the zip</h2>
+      <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:22px;">Amazon's export is generous to the point of being confusing — you get a folder of CSVs, most of which you will never open. These are the ones that matter:</p>
+      <div class="files">
+        <div class="file-row needed">
+          <p class="file-name">Your order history <span class="file-tag">Needed</span></p>
+          <p class="file-desc">One row per item, not per order — with the date, the product title, the price, the quantity and the shipping address. This is the file that becomes your dashboard.</p>
+        </div>
+        <div class="file-row needed">
+          <p class="file-name">Your refunds and returns <span class="file-tag">Optional</span></p>
+          <p class="file-desc">Everything you sent back. Add it and your totals become <strong>net</strong> spend rather than gross — what you actually kept, not just what you ordered. Worth including if it's there.</p>
+        </div>
+        <div class="file-row">
+          <p class="file-name">Everything else</p>
+          <p class="file-desc">Digital orders, subscriptions, gift card activity, address book exports and more. Interesting to poke at, but nothing here needs them.</p>
+        </div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); line-height:1.65; margin-top:20px;">Amazon has renamed these files more than once and the exact wording varies by account and region — so match on what the file <em>contains</em> rather than on an exact filename. If you open one and it has a row per item with a date and a price, that's the one.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="bg-white">
+    <div class="container">
+      <p class="section-label">Questions</p>
+      <h2>Things people ask at this point</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <p class="faq-q">Is it safe to request this?</p>
+          <p class="faq-a">Yes — you are asking Amazon for a copy of your own records, which they are required to provide. It is the same right that lets you ask any company what they hold on you. Nothing changes on your account, and nobody is notified.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">How far back does it go?</p>
+          <p class="faq-a">Usually to the day you opened the account. People who have been on Amazon since the 2000s routinely get <strong>fifteen-plus years</strong> of orders back. That length of history is the whole reason this is interesting — one year tells you what you bought, fifteen tells you how you changed.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">I requested it and nothing arrived.</p>
+          <p class="faq-a">Ninety percent of the time it's step 3 — the confirmation email was never clicked. Check spam and promotions. If you did confirm and it has been more than a few days, just submit the request again; there is no penalty for asking twice.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">Do I have to buy myshoplight to use this guide?</p>
+          <p class="faq-a">No. Downloading your Amazon data is free, it's your data, and the four steps above are the whole process. Plenty of people stop here and open the CSV in a spreadsheet — that works. myshoplight exists because a spreadsheet of 2,600 rows with titles like "Amazon Brand - Mama Bear Gentle Fragrance-Free Wipes, 6 Packs" is not the same thing as knowing where your money went.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">What does myshoplight actually do with it?</p>
+          <p class="faq-a">It reads the file in your browser, sorts every item into categories using <strong>3,000+ built-in rules</strong>, and gives you the dashboard: spend by category, by household member, by year, Essential vs Flexible vs Discretionary, most expensive, most purchased. You can correct any category and it remembers. No bank login and no Amazon password, ever.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <section class="bg-cream buy2">
+    <div class="container">
+      <h2>Got your file?</h2>
+      <p class="buy2-sub">This is the part that turns it into something you can read.</p>
+      <div class="buy2-box">
+        <p class="buy-box-label">One-time purchase</p>
+        <p class="buy-price"><sup>$</sup>27</p>
+        <p class="tax-note">+ tax where applicable</p>
+        <p class="buy-note">No subscription. No monthly fees. No bank login.</p>
+        <button class="btn-primary" id="guide-btn" onclick="handleCheckout('guide-footer')">Reveal my spending habits</button>
+        <p class="secure-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure checkout via Stripe
+        </p>
+        <p class="guarantee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span><strong>30-day money-back guarantee.</strong> If it isn't worth it, email me and I'll refund you. No form to fill in.</span>
+        </p>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:24px;">
+        Still deciding? <a href="sales.html" style="color:var(--teal); font-weight:600;">See what the dashboard looks like →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-copy">© 2026 Caliet Ventures LLC</p>
+    <nav class="footer-links" aria-label="Footer links">
+      <a href="sales.html">Home</a>
+      <a href="/privacy">Privacy policy</a>
+      <a href="/terms">Terms of use</a>
+      <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a>
+    </nav>
+  </footer>
+
+  <script>
+    function handleCheckout(location) {
+      const CHECKOUT_URL = 'https://buy.stripe.com/14AeVe1KT1Yp2zH2Ka3AY00';
+      const btns = document.querySelectorAll('.btn-primary');
+      btns.forEach(b => { b.textContent = 'Redirecting to checkout…'; b.classList.add('btn-loading'); b.disabled = true; });
+
+      let redirected = false;
+      const go = () => {
+        if (redirected) return;
+        redirected = true;
+        window.location.href = CHECKOUT_URL;
+      };
+
+      try {
+        window.plausible('Checkout Click', { props: { location: location || 'unknown' }, callback: go });
+        setTimeout(go, 800);
+      } catch (err) {
+        console.error(err);
+        go();
+      }
+    }
+  </script>
+
+</body>
+</html>
