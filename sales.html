@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>myshoplight — See what you really spend on Amazon</title>
-  <meta name="description" content="myshoplight breaks down your Amazon order history by category — Essential, Flexible, and Discretionary — so you finally know what's behind that monthly charge." />
+  <meta name="description" content="myshoplight breaks down your Amazon order history by category: Essential, Flexible, and Discretionary. Finally know what's behind that monthly charge." />
 
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-3xuEqRnSVB3y7Mk-Amflc.js"></script>
@@ -245,22 +245,23 @@
     /* ── PROOF STRIP ── */
     .proof-strip {
       background: var(--cream2);
-      padding: 14px 24px;
+      padding: 18px 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 28px;
+      gap: 14px 26px;
       flex-wrap: wrap;
     }
     .proof-item {
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--teal);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
+      white-space: nowrap;
     }
-    .proof-item strong { color: var(--teal); }
-    .proof-dot { color: var(--mint); font-size: 14px; }
+    .proof-dot { color: var(--mint); font-size: 15px; }
 
     /* ── PAIN LIST ── */
     .pain-list {
@@ -573,8 +574,30 @@
     @media (max-width: 540px) {
       .spend-types      { grid-template-columns: 1fr; }
       .features-grid    { grid-template-columns: 1fr; }
-      .proof-strip      { gap: 12px; }
+      /* Two-up was tried first and rejected: at 390px two of the five labels
+         wrapped to a second line, which read as ragged. A single left-aligned
+         column centred as a block keeps every bullet on one line. The strip
+         already sits below the buy box on mobile, so its height is cheap. */
+      .proof-strip {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: fit-content;
+        gap: 10px;
+        margin: 0 auto;
+        padding: 20px 24px;
+      }
+      .proof-item { font-size: 14.5px; }
       .buy-box, .buy2-box { padding: 22px 18px; }
+      /* Pre-existing: at 390px the wordmark, "Log in" and the CTA overflowed
+         the nav and collided with no gap between them. */
+      .nav          { padding: 12px 14px; }
+      .nav-right    { gap: 12px; }
+      .logo         { gap: 7px; }
+      .logo svg     { width: 26px; height: 26px; }
+      .wordmark     { font-size: 17px; }
+      .nav-login    { font-size: 12px; }
+      .nav-cta      { font-size: 12px; padding: 8px 13px; }
       h2                { font-size: 24px; }
       .proof-hint       { display: block; }   /* mobile is the primary view for a
                                                  launch that runs on Instagram */
@@ -610,7 +633,7 @@
       <p class="eyebrow">Amazon spending analysis</p>
       <h1>$750 on Amazon.<br>But <span>what did you actually buy?</span></h1>
       <p class="hero-sub">You know what you spent. You have no idea what you bought.</p>
-      <p class="hero-body">Your bank statement shows one number. myshoplight shows you everything behind it — every category, every pattern, broken down by what your family actually needed vs. what just showed up in a box.</p>
+      <p class="hero-body">Your bank statement shows one number. myshoplight shows you everything behind it: every category, every pattern, broken down by what your family actually needed and what just showed up in a box.</p>
 
       <div class="buy-box">
         <p class="buy-box-label">One-time purchase</p>
@@ -632,9 +655,11 @@
 
   <!-- PROOF STRIP -->
   <div class="proof-strip">
-    <div class="proof-item"><span class="proof-dot">●</span> <strong>Your real order data</strong> — not estimates</div>
-    <div class="proof-item"><span class="proof-dot">●</span> <strong>No bank login</strong> — ever</div>
-    <div class="proof-item"><span class="proof-dot">●</span> <strong>One-time $27</strong> — no subscription</div>
+    <div class="proof-item"><span class="proof-dot">●</span> Your real order data</div>
+    <div class="proof-item"><span class="proof-dot">●</span> No bank login</div>
+    <div class="proof-item"><span class="proof-dot">●</span> No Amazon password</div>
+    <div class="proof-item"><span class="proof-dot">●</span> One-time $27</div>
+    <div class="proof-item"><span class="proof-dot">●</span> No subscription</div>
   </div>
 
   <!-- VISUAL PROOF — self-hiding. See the #proof script at the bottom. -->
@@ -642,7 +667,7 @@
     <div class="proof-wide">
       <div class="container" style="text-align:center; margin-bottom:34px;">
         <p class="section-label">This is what you get</p>
-        <h2 style="margin-bottom:0;">My actual dashboard. Not a mockup.</h2>
+        <h2 style="margin-bottom:0;">Yep, this is my actual dashboard. See why I needed this?</h2>
       </div>
 
       <div class="proof-tile" id="tile-reel">
@@ -652,21 +677,21 @@
             <source src="assets/reel.mp4" type="video/mp4">
           </video>
         </div>
-        <p class="proof-cap">Two files in, and every item you have ever ordered comes back sorted. <strong>No bank login.</strong></p>
+        <p class="proof-cap">Two files in, and your order history comes back sorted.</p>
       </div>
 
       <div class="proof-tile" id="tile-categories">
         <a class="proof-frame narrow" href="assets/shot-categories.png" target="_blank" rel="noopener">
           <img src="assets/shot-categories.png" alt="Top 5 spending categories, led by Kids &amp; Baby at $13.5k" loading="lazy">
         </a>
-        <p class="proof-cap">Every order sorted automatically. <strong>$13.5k on the kids. $7.9k on the house.</strong></p>
+        <p class="proof-cap"><strong>$13.5k on the kids. $7.9k on the house.</strong> Sorted automatically, and the few it misses you fix once and it remembers.</p>
       </div>
 
       <div class="proof-tile" id="tile-purchased">
         <a class="proof-frame" href="assets/shot-purchased.png" target="_blank" rel="noopener">
           <img src="assets/shot-purchased.png" alt="Most purchased items, led by a sports drink ordered 87 times" loading="lazy">
         </a>
-        <p class="proof-cap">The stuff you forgot you bought. <strong>One sports drink. 87 separate orders.</strong></p>
+        <p class="proof-cap"><strong>87 separate orders of the same sports drink.</strong> I should probably look into Subscribe &amp; Save...</p>
       </div>
 
       <div class="proof-tile" id="tile-yearly">
@@ -693,25 +718,25 @@
   <section class="bg-white">
     <div class="container">
       <p class="section-label">How myshoplight sorts it</p>
-      <h2>Essential, Flexible, or Discretionary — now you'll actually know</h2>
+      <h2>Essential, Flexible, or Discretionary. Now you'll actually know.</h2>
       <div class="spend-types">
         <div class="spend-card essential">
           <p class="spend-card-label">Essential</p>
-          <p>Diapers, pet food, household basics — the stuff your family genuinely needs</p>
+          <p>Diapers, pet food, household basics. The stuff your family genuinely needs.</p>
         </div>
         <div class="spend-card flexible">
           <p class="spend-card-label">Flexible</p>
-          <p>Clothing, home goods — needed, but timing and amount are choices</p>
+          <p>Clothing, home goods. Needed, but the timing and the amount are choices.</p>
         </div>
         <div class="spend-card discretionary">
           <p class="spend-card-label">Discretionary</p>
-          <p>Gadgets, décor, trend purchases — the category worth watching</p>
+          <p>Gadgets, décor, trend purchases. The category worth watching.</p>
         </div>
       </div>
-      <p class="spend-note">myshoplight categorizes your orders automatically using a library of <strong>3,000+ rules</strong> — then lets you customize it to match your family's real purchase patterns. Because your household isn't the same as everyone else's.</p>
+      <p class="spend-note">myshoplight categorizes your orders automatically using a library of <strong>3,000+ rules</strong>, then lets you customize it to match your family's real purchase patterns. Because your household isn't the same as everyone else's.</p>
       <div class="callout">
         <p class="callout-q">Amazon accounts don't always map neatly to one household.</p>
-        <p class="callout-a">Still sharing a legacy account with a parent? Split households where partners each have their own account? No problem. myshoplight sorts by shipping address so you see only your household's spending — and you can upload data from multiple accounts to get the full picture in one place.</p>
+        <p class="callout-a">Still sharing a legacy account with a parent? Split households where partners each have their own account? No problem. myshoplight sorts by shipping address so you see only your household's spending, and you can upload data from multiple accounts to get the full picture in one place.</p>
       </div>
     </div>
   </section>
@@ -726,7 +751,7 @@
           <div class="step-num" aria-hidden="true">1</div>
           <div>
             <h3>Download your Amazon order history</h3>
-            <p>Request your data directly from Amazon through their privacy portal — it takes about 24 hours to arrive. You do not have to buy anything to do this part, and you do not need us: the full walkthrough is free and on this site.</p>
+            <p>Request your data directly from Amazon through their privacy portal. It takes about 24 hours to arrive. You do not have to buy anything to do this part, and you do not need us: the full walkthrough is free and on this site.</p>
             <a class="guide-link" href="amazon-data-guide.html" onclick="plausibleGuide('sales-step1')">Read the free guide →</a>
           </div>
         </div>
@@ -734,14 +759,14 @@
           <div class="step-num" aria-hidden="true">2</div>
           <div>
             <h3>Upload it to myshoplight</h3>
-            <p>Drop in your file from any device — no bank login required, no Amazon password. Your data stays yours.</p>
+            <p>Drop in your file from any device. No bank login required, no Amazon password. Your data stays yours.</p>
           </div>
         </div>
         <div class="step">
           <div class="step-num" aria-hidden="true">3</div>
           <div>
             <h3>See everything behind the number</h3>
-            <p>Every category, every trend, every pattern — broken down the way your bank statement never will be. Then check in from any device, any time.</p>
+            <p>Every category, every trend, every pattern, broken down the way your bank statement never will be. Then check in from any device, any time.</p>
           </div>
         </div>
       </div>
@@ -762,7 +787,7 @@
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
           <h3>Monthly and yearly trends</h3>
-          <p>See exactly when your Amazon spending crept up — and which categories drove it.</p>
+          <p>See exactly when your Amazon spending crept up, and which categories drove it.</p>
         </div>
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
@@ -772,17 +797,17 @@
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
           <h3>Most expensive and most purchased</h3>
-          <p>Your top items by spend and by frequency — the patterns hiding in plain sight.</p>
+          <p>Your top items by spend and by frequency. The patterns hiding in plain sight.</p>
         </div>
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
           <h3>Return tracker</h3>
-          <p>Fold return data into your dashboard to see net spend — not just what you ordered, but what you actually kept.</p>
+          <p>Fold return data into your dashboard to see net spend: not just what you ordered, but what you actually kept.</p>
         </div>
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
           <h3>Your real data</h3>
-          <p>Direct from Amazon. Not estimates, not averages — your actual orders, down to the item.</p>
+          <p>Direct from Amazon. Not estimates, not averages. Your actual orders, down to the item.</p>
         </div>
       </div>
     </div>
@@ -792,12 +817,12 @@
   <section class="bg-teal">
     <div class="container">
       <p class="section-label mint">Who made this</p>
-      <h2>I built this for my own kitchen table first.</h2>
+      <h2>I built this to finally settle the household debates.</h2>
       <div class="founder">
-        <p>I kept looking at Amazon charges and having no idea what past-me had bought. Not in a dramatic way — just a number, every month, that explained nothing. So I built the thing I wanted: upload the order history, get back every item, sorted.</p>
-        <p id="founder-proof">The screenshots above are my actual dashboard, with my actual numbers. I have not tidied them up for the sales page — the sports drink really was 87 separate orders.</p>
-        <p>It is a one-time $27 because I did not want to build another app that sits on your bank account forever. If it does not tell you something useful, email me and I will refund you.</p>
-        <p class="sig">— Jenna, Caliet Ventures LLC</p>
+        <p>I kept looking at Amazon charges and having no idea what past-me had bought. Not in a dramatic way. Just a number, every month, that explained nothing, and it was super frustrating. So I built the thing I wanted: upload the order history, sort the items, categorize purchases and show me where my money is actually going.</p>
+        <p id="founder-proof">The screenshots above are my actual dashboard, with my actual numbers. Am I proud of 87 separate orders for a sports drink? Not necessarily, but it's certainly eye-opening!</p>
+        <p>Now I request my data once a quarter, upload, and watch my spending habits improve.</p>
+        <p class="sig">— Jenna, Toddler Mom and Household Manager Extraordinaire</p>
       </div>
     </div>
   </section>
@@ -837,35 +862,35 @@
         </div>
         <div class="faq-item">
           <p class="faq-q">How do I get my Amazon order history?</p>
-          <p class="faq-a">You request it directly from Amazon through their data privacy portal. It takes about <strong>24 hours</strong> to arrive in your inbox as a downloadable file. The full walkthrough is <a href="amazon-data-guide.html" style="color:var(--teal);" onclick="plausibleGuide('sales-faq')">free and right here</a> — you do not have to buy anything to follow it.</p>
+          <p class="faq-a">You request it directly from Amazon through their data privacy portal. It takes about <strong>24 hours</strong> to arrive in your inbox as a downloadable file. The full walkthrough is <a href="amazon-data-guide.html" style="color:var(--teal);" onclick="plausibleGuide('sales-faq')">free and right here</a>. You do not have to buy anything to follow it.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Is my data safe? Does myshoplight store my order history?</p>
-          <p class="faq-a">Your Amazon data is stored securely in your myshoplight account — it's never sold or shared with anyone. We don't connect to Amazon directly and we never ask for your Amazon password.</p>
+          <p class="faq-a">Your Amazon data is stored securely in your myshoplight account. It's never sold or shared with anyone. We don't connect to Amazon directly and we never ask for your Amazon password.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">How far back does it go?</p>
-          <p class="faq-a">As far back as Amazon's data export covers — typically <strong>several years</strong> of order history. The more history you have, the more patterns myshoplight can surface.</p>
+          <p class="faq-a">As far back as Amazon's data export covers, typically <strong>several years</strong> of order history. The more history you have, the more patterns myshoplight can surface.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Our household doesn't map neatly to one Amazon account. Does that break it?</p>
-          <p class="faq-a">No — that is the normal case, not the edge case. One account covering several households (still on your parents' Prime, say) sorts by <strong>shipping address</strong>, so you see only what came to your door. One household spread across several accounts works the other way: upload them all and they land in one dashboard together. Either shape, you end up with your household's real picture rather than whatever the login happens to contain.</p>
+          <p class="faq-a">No. That is the normal case, not the edge case. One account covering several households (still on your parents' Prime, say) sorts by <strong>shipping address</strong>, so you see only what came to your door. One household spread across several accounts works the other way: upload them all and they land in one dashboard together. Either shape, you end up with your household's real picture rather than whatever the login happens to contain.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">What if I buy it and it isn't useful?</p>
-          <p class="faq-a">Email me within <strong>30 days</strong> and I'll refund you — there's no form and I won't ask you to justify it. You bought a $27 tool from a person, not a subscription from a company.</p>
+          <p class="faq-a">Email me within <strong>30 days</strong> and I'll refund you. There's no form, and I won't ask you to justify it. You bought a $27 tool from a person, not a subscription from a company.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Can I use it on my phone?</p>
-          <p class="faq-a">Yes — the full myshoplight experience works on any device. Upload your file, explore your dashboard, and check back on your spending from your phone, tablet, or desktop. Nothing requires a computer.</p>
+          <p class="faq-a">Yes. The full myshoplight experience works on any device. Upload your file, explore your dashboard, and check back on your spending from your phone, tablet, or desktop. Nothing requires a computer.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Is this a subscription?</p>
-          <p class="faq-a">No. It's a <strong>one-time purchase of $27</strong>. You get access to myshoplight on any device, forever — no monthly fees, no renewal reminders.</p>
+          <p class="faq-a">No. It's a <strong>one-time purchase of $27</strong>. You get access to myshoplight on any device, forever. No monthly fees, no renewal reminders.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">What if the categories don't match how my family shops?</p>
-          <p class="faq-a">myshoplight starts with 3,000+ built-in categorization rules, but every family is different. You can customize any category to match your household's actual habits — so your dashboard reflects your life, not a generic template.</p>
+          <p class="faq-a">myshoplight starts with 3,000+ built-in categorization rules, but every family is different. You can customize any category to match your household's actual habits, so your dashboard reflects your life, not a generic template.</p>
         </div>
       </div>
     </div>
