@@ -463,6 +463,109 @@
     .footer-links a { font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: none; }
     .footer-links a:hover { color: rgba(255,255,255,0.7); }
 
+    /* ── VISUAL PROOF ── */
+    /* Every tile below is hidden by default and only revealed by JS once its
+       file actually resolves. A missing asset degrades to nothing, never to a
+       broken icon. If no tile resolves, the whole section removes itself. */
+    #proof { display: none; }
+    .proof-wide {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .proof-tile {
+      display: none;
+      margin-bottom: 34px;
+    }
+    .proof-tile:last-child { margin-bottom: 0; }
+    .proof-frame {
+      display: block;
+      background: #fff;
+      border: 1px solid var(--cream2);
+      border-radius: 14px;
+      padding: 10px;
+      overflow: hidden;
+    }
+    .proof-frame img,
+    .proof-frame video {
+      display: block;
+      width: 100%;
+      height: auto;          /* reel v2 is 16:9-ish — never hard-code a height */
+      border-radius: 8px;
+    }
+    /* shot-categories.png is natively narrower than the others — cap it rather
+       than upscaling a 777px-wide chart to 1100px and making it mushy. */
+    .proof-frame.narrow { max-width: 800px; margin: 0 auto; }
+    .proof-cap {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: 12px;
+      text-align: center;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .proof-cap strong { color: var(--text); }
+    .proof-hint {
+      display: none;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 22px;
+      font-style: italic;
+    }
+
+    /* ── GUARANTEE ── */
+    .guarantee {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(0,0,0,0.07);
+      text-align: left;
+    }
+    .guarantee svg { min-width: 14px; margin-top: 2px; stroke: var(--teal); }
+    .guarantee strong { color: var(--teal); }
+
+    .tax-note { font-size: 11px; color: var(--muted); margin-top: -2px; margin-bottom: 6px; }
+
+    /* ── FOUNDER NOTE ── */
+    .founder {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-left: 3px solid var(--mint);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .founder p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .founder p:last-child { margin-bottom: 0; }
+    .founder .sig { font-size: 13px; color: var(--mint); font-weight: 600; }
+    #founder-proof { display: none; }
+
+    /* ── FREE GUIDE LINK ── */
+    .guide-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+      text-decoration: none;
+      margin-top: 8px;
+      border-bottom: 1px solid rgba(13,92,92,0.3);
+      padding-bottom: 1px;
+    }
+    .guide-link:hover { border-bottom-color: var(--teal); }
+
     /* ── LOADING STATE ── */
     .btn-loading { opacity: 0.7; cursor: wait; }
 
@@ -473,6 +576,10 @@
       .proof-strip      { gap: 12px; }
       .buy-box, .buy2-box { padding: 22px 18px; }
       h2                { font-size: 24px; }
+      .proof-hint       { display: block; }   /* mobile is the primary view for a
+                                                 launch that runs on Instagram */
+      .proof-tile       { margin-bottom: 26px; }
+      .proof-cap        { font-size: 12.5px; }
     }
   </style>
 </head>
@@ -508,11 +615,16 @@
       <div class="buy-box">
         <p class="buy-box-label">One-time purchase</p>
         <p class="buy-price"><sup>$</sup>27</p>
+        <p class="tax-note">+ tax where applicable</p>
         <p class="buy-note">Yours forever. No subscription. No monthly fees.</p>
         <button class="btn-primary" id="hero-btn" onclick="handleCheckout('hero')">Reveal my spending habits</button>
         <p class="secure-note">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           Secure checkout via Stripe
+        </p>
+        <p class="guarantee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span><strong>30-day money-back guarantee.</strong> Upload your data, look around, and if it isn't worth it, email me and I'll refund you. No form to fill in.</span>
         </p>
       </div>
     </div>
@@ -525,38 +637,60 @@
     <div class="proof-item"><span class="proof-dot">●</span> <strong>One-time $27</strong> — no subscription</div>
   </div>
 
+  <!-- VISUAL PROOF — self-hiding. See the #proof script at the bottom. -->
+  <section class="bg-white" id="proof">
+    <div class="proof-wide">
+      <div class="container" style="text-align:center; margin-bottom:34px;">
+        <p class="section-label">This is what you get</p>
+        <h2 style="margin-bottom:0;">My actual dashboard. Not a mockup.</h2>
+      </div>
+
+      <div class="proof-tile" id="tile-reel">
+        <div class="proof-frame">
+          <video id="proof-video" width="1660" height="934" autoplay muted loop playsinline preload="metadata" poster="assets/reel-poster.jpg">
+            <source src="assets/reel.webm" type="video/webm">
+            <source src="assets/reel.mp4" type="video/mp4">
+          </video>
+        </div>
+        <p class="proof-cap">Two files in, and every item you have ever ordered comes back sorted. <strong>No bank login.</strong></p>
+      </div>
+
+      <div class="proof-tile" id="tile-categories">
+        <a class="proof-frame narrow" href="assets/shot-categories.png" target="_blank" rel="noopener">
+          <img src="assets/shot-categories.png" alt="Top 5 spending categories, led by Kids &amp; Baby at $13.5k" loading="lazy">
+        </a>
+        <p class="proof-cap">Every order sorted automatically. <strong>$13.5k on the kids. $7.9k on the house.</strong></p>
+      </div>
+
+      <div class="proof-tile" id="tile-purchased">
+        <a class="proof-frame" href="assets/shot-purchased.png" target="_blank" rel="noopener">
+          <img src="assets/shot-purchased.png" alt="Most purchased items, led by a sports drink ordered 87 times" loading="lazy">
+        </a>
+        <p class="proof-cap">The stuff you forgot you bought. <strong>One sports drink. 87 separate orders.</strong></p>
+      </div>
+
+      <div class="proof-tile" id="tile-yearly">
+        <a class="proof-frame" href="assets/shot-yearly.png" target="_blank" rel="noopener">
+          <img src="assets/shot-yearly.png" alt="Yearly Amazon spend from 2012 to 2026, with 2021 highlighted" loading="lazy">
+        </a>
+        <p class="proof-cap">Every year you have had an account, side by side. <strong>See 2021? That's the year we had our first kid.</strong></p>
+      </div>
+
+      <p class="proof-hint" id="proof-hint">Tap any screenshot to see it full size.</p>
+    </div>
+  </section>
+
   <!-- THE PROBLEM -->
-  <section class="bg-white">
-    <div class="container">
+  <section class="bg-cream">
+    <div class="container" style="text-align:center;">
       <p class="section-label">The problem</p>
-      <h2>Amazon is a black hole for family spending</h2>
-      <ul class="pain-list">
-        <li>
-          <div class="pain-icon" aria-hidden="true">✕</div>
-          <span>Your bank statement lumps diapers, dog food, and impulse buys into one line: <strong>Amazon — $750</strong>. That number tells you nothing.</span>
-        </li>
-        <li>
-          <div class="pain-icon" aria-hidden="true">✕</div>
-          <span>You can categorize grocery stores and some retailers easily. Amazon is different — it sells everything, so it explains nothing.</span>
-        </li>
-        <li>
-          <div class="pain-icon" aria-hidden="true">✕</div>
-          <span>The convenience of the platform makes it easy for unnecessary spending to inflate quietly, month after month.</span>
-        </li>
-        <li>
-          <div class="pain-icon" aria-hidden="true">✕</div>
-          <span>You suspect some of it is essential. You have no idea how much of it isn't.</span>
-        </li>
-        <li>
-          <div class="pain-icon" aria-hidden="true">✕</div>
-          <span>Every package that lands on the porch starts a conversation. Was it necessary? Did we need that? You shouldn't have to defend your household spending without the receipts to back it up.</span>
-        </li>
-      </ul>
+      <h2 style="margin-bottom:14px;">Your bank statement gives you one number.<br>Here's everything behind it.</h2>
+      <p style="font-size:15px; color:var(--muted); line-height:1.7; max-width:560px; margin:0 auto;">Diapers, dog food, a birthday present and something you do not remember ordering all land on the same line: <strong style="color:var(--text);">Amazon — $750</strong>. Amazon sells everything, which is exactly why the charge explains nothing.</p>
     </div>
   </section>
 
   <!-- HOW IT SORTS -->
-  <section class="bg-cream">
+  <section class="bg-white">
     <div class="container">
       <p class="section-label">How myshoplight sorts it</p>
       <h2>Essential, Flexible, or Discretionary — now you'll actually know</h2>
@@ -574,10 +708,42 @@
           <p>Gadgets, décor, trend purchases — the category worth watching</p>
         </div>
       </div>
-      <p class="spend-note">myshoplight categorizes your orders automatically using a library of <strong>2,000+ rules</strong> — then lets you customize it to match your family's real purchase patterns. Because your household isn't the same as everyone else's.</p>
+      <p class="spend-note">myshoplight categorizes your orders automatically using a library of <strong>3,000+ rules</strong> — then lets you customize it to match your family's real purchase patterns. Because your household isn't the same as everyone else's.</p>
       <div class="callout">
         <p class="callout-q">Amazon accounts don't always map neatly to one household.</p>
         <p class="callout-a">Still sharing a legacy account with a parent? Split households where partners each have their own account? No problem. myshoplight sorts by shipping address so you see only your household's spending — and you can upload data from multiple accounts to get the full picture in one place.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="bg-cream">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <h2>Three steps. Your entire Amazon history.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <div>
+            <h3>Download your Amazon order history</h3>
+            <p>Request your data directly from Amazon through their privacy portal — it takes about 24 hours to arrive. You do not have to buy anything to do this part, and you do not need us: the full walkthrough is free and on this site.</p>
+            <a class="guide-link" href="amazon-data-guide.html" onclick="plausibleGuide('sales-step1')">Read the free guide →</a>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <div>
+            <h3>Upload it to myshoplight</h3>
+            <p>Drop in your file from any device — no bank login required, no Amazon password. Your data stays yours.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <div>
+            <h3>See everything behind the number</h3>
+            <p>Every category, every trend, every pattern — broken down the way your bank statement never will be. Then check in from any device, any time.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -591,7 +757,7 @@
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h12"/></svg></div>
           <h3>Auto-categorization</h3>
-          <p>2,000+ rules sort every order instantly. Customize any category to match your family's habits.</p>
+          <p>3,000+ rules sort every order instantly. Customize any category to match your family's habits.</p>
         </div>
         <div class="feat-card">
           <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
@@ -622,55 +788,16 @@
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section class="bg-cream">
-    <div class="container">
-      <p class="section-label">How it works</p>
-      <h2>Three steps. Your entire Amazon history.</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num" aria-hidden="true">1</div>
-          <div>
-            <h3>Download your Amazon order history</h3>
-            <p>Request your data directly from Amazon through their privacy portal — it takes about 24 hours to arrive. After you purchase, we send you a step-by-step guide so you know exactly what to request.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num" aria-hidden="true">2</div>
-          <div>
-            <h3>Upload it to myshoplight</h3>
-            <p>Drop in your file from any device — no bank login required, no Amazon password. Your data stays yours.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num" aria-hidden="true">3</div>
-          <div>
-            <h3>See everything behind the number</h3>
-            <p>Every category, every trend, every pattern — broken down the way your bank statement never will be. Then check in from any device, any time.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- TESTIMONIALS -->
   <section class="bg-teal">
     <div class="container">
-      <p class="section-label mint">What people are saying</p>
-      <h2>They knew what they spent. They had no idea what they bought.</h2>
-      <div class="testi-grid">
-        <div class="testi">
-          <p class="testi-q">"I assumed most of our Amazon spending was household essentials. Turns out over half actually was — but seeing it spelled out made me feel so much better about where the money was going. No more guilt every time a box shows up."</p>
-          <p class="testi-who">— Rose, frequent Amazon buyer</p>
-        </div>
-        <div class="testi">
-          <p class="testi-q">"With three kids, diapers and wipes add up fast. I always knew we spent a lot on Amazon but I had no idea how much of it was just keeping the house running. myshoplight finally gave me a number I could show my husband."</p>
-          <p class="testi-who">— Sam, mom of three</p>
-        </div>
-        <div class="testi">
-          <p class="testi-q">"Kitchen gadgets are my weakness. I knew it, but seeing every impulse buy sitting in its own category — with the total — was the reality check I apparently needed. Worth every dollar."</p>
-          <p class="testi-who">— Amy, self-described impulse buyer</p>
-        </div>
+      <p class="section-label mint">Who made this</p>
+      <h2>I built this for my own kitchen table first.</h2>
+      <div class="founder">
+        <p>I kept looking at Amazon charges and having no idea what past-me had bought. Not in a dramatic way — just a number, every month, that explained nothing. So I built the thing I wanted: upload the order history, get back every item, sorted.</p>
+        <p id="founder-proof">The screenshots above are my actual dashboard, with my actual numbers. I have not tidied them up for the sales page — the sports drink really was 87 separate orders.</p>
+        <p>It is a one-time $27 because I did not want to build another app that sits on your bank account forever. If it does not tell you something useful, email me and I will refund you.</p>
+        <p class="sig">— Jenna, Caliet Ventures LLC</p>
       </div>
     </div>
   </section>
@@ -683,11 +810,16 @@
       <div class="buy2-box">
         <p class="buy-box-label">One-time purchase</p>
         <p class="buy-price"><sup>$</sup>27</p>
+        <p class="tax-note">+ tax where applicable</p>
         <p class="buy-note">No subscription. No monthly fees. No bank login.</p>
         <button class="btn-primary" id="buy2-btn" onclick="handleCheckout('buy2')">Reveal my spending habits</button>
         <p class="secure-note" style="margin-top: 4px;">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           Secure checkout via Stripe
+        </p>
+        <p class="guarantee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span><strong>30-day money-back guarantee.</strong> If it isn't worth it, email me and I'll refund you. No form to fill in.</span>
         </p>
       </div>
     </div>
@@ -700,8 +832,12 @@
       <h2>A few things people ask before buying</h2>
       <div class="faq-list">
         <div class="faq-item">
+          <p class="faq-q">Couldn't I just put my order history into ChatGPT?</p>
+          <p class="faq-a">You can, and for a quick one-off question it will do a decent job. The difference is that this is a <strong>dashboard, not an answer</strong>. Your file comes back sorted the same way every time, the categories stay put so this year is comparable to last year, you can correct a category once and have it stick, and it is all still there next month without re-uploading or re-explaining. A chat gives you one reading of your data. This gives you somewhere to keep it.</p>
+        </div>
+        <div class="faq-item">
           <p class="faq-q">How do I get my Amazon order history?</p>
-          <p class="faq-a">You request it directly from Amazon through their data privacy portal. It takes about <strong>24 hours</strong> to arrive in your inbox as a downloadable file. After you purchase myshoplight, we send you a step-by-step guide so you know exactly what to request and where to find it.</p>
+          <p class="faq-a">You request it directly from Amazon through their data privacy portal. It takes about <strong>24 hours</strong> to arrive in your inbox as a downloadable file. The full walkthrough is <a href="amazon-data-guide.html" style="color:var(--teal);" onclick="plausibleGuide('sales-faq')">free and right here</a> — you do not have to buy anything to follow it.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Is my data safe? Does myshoplight store my order history?</p>
@@ -712,8 +848,12 @@
           <p class="faq-a">As far back as Amazon's data export covers — typically <strong>several years</strong> of order history. The more history you have, the more patterns myshoplight can surface.</p>
         </div>
         <div class="faq-item">
-          <p class="faq-q">We share an Amazon account. Will it still work?</p>
-          <p class="faq-a">Yes. myshoplight filters by shipping address, so even a shared account breaks down cleanly by household. And if you and your partner have separate accounts, you can upload both and see everything together in one dashboard.</p>
+          <p class="faq-q">Our household doesn't map neatly to one Amazon account. Does that break it?</p>
+          <p class="faq-a">No — that is the normal case, not the edge case. One account covering several households (still on your parents' Prime, say) sorts by <strong>shipping address</strong>, so you see only what came to your door. One household spread across several accounts works the other way: upload them all and they land in one dashboard together. Either shape, you end up with your household's real picture rather than whatever the login happens to contain.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">What if I buy it and it isn't useful?</p>
+          <p class="faq-a">Email me within <strong>30 days</strong> and I'll refund you — there's no form and I won't ask you to justify it. You bought a $27 tool from a person, not a subscription from a company.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Can I use it on my phone?</p>
@@ -725,7 +865,7 @@
         </div>
         <div class="faq-item">
           <p class="faq-q">What if the categories don't match how my family shops?</p>
-          <p class="faq-a">myshoplight starts with 2,000+ built-in categorization rules, but every family is different. You can customize any category to match your household's actual habits — so your dashboard reflects your life, not a generic template.</p>
+          <p class="faq-a">myshoplight starts with 3,000+ built-in categorization rules, but every family is different. You can customize any category to match your household's actual habits — so your dashboard reflects your life, not a generic template.</p>
         </div>
       </div>
     </div>
@@ -737,7 +877,7 @@
     <nav class="footer-links" aria-label="Footer links">
       <a href="/privacy">Privacy policy</a>
       <a href="/terms">Terms of use</a>
-      <a href="mailto:help@myshoplight.com">help@myshoplight.com</a>
+      <a href="mailto:jenna@myshoplight.com">jenna@myshoplight.com</a>
     </nav>
   </footer>
 
@@ -765,6 +905,71 @@
         go();
       }
     }
+
+    // Tag clicks through to the free Amazon-data guide so its contribution to
+    // conversion is measurable separately from the buy buttons.
+    function plausibleGuide(location) {
+      try { window.plausible('Guide Click', { props: { location: location || 'unknown' } }); }
+      catch (err) { /* analytics blocked — never block the navigation */ }
+    }
+
+    /* ── SELF-HIDING VISUAL PROOF ────────────────────────────────────────────
+       Each tile stays hidden until its file actually resolves, so a missing or
+       half-uploaded assets/ folder degrades to nothing rather than to a row of
+       broken-image icons. If nothing resolves, the section removes itself and
+       the page reads exactly as it did before the screenshots existed.        */
+    (function () {
+      var STILLS = [
+        ['tile-categories', 'assets/shot-categories.png'],
+        ['tile-purchased',  'assets/shot-purchased.png'],
+        ['tile-yearly',     'assets/shot-yearly.png']
+      ];
+      var shown = 0, stillsShown = 0, pending = STILLS.length + 1;
+
+      function reveal(id) {
+        var el = document.getElementById(id);
+        if (el) { el.style.display = 'block'; shown++; }
+      }
+
+      function settle() {
+        if (--pending > 0) return;
+        if (shown === 0) {
+          var s = document.getElementById('proof');
+          if (s && s.parentNode) s.parentNode.removeChild(s);
+          return;
+        }
+        document.getElementById('proof').style.display = 'block';
+        // The founder note claims the screenshots above are real. Only let it
+        // say so if at least one of them is actually on the page.
+        if (stillsShown > 0) {
+          var fp = document.getElementById('founder-proof');
+          if (fp) fp.style.display = 'block';
+        }
+        var hint = document.getElementById('proof-hint');
+        if (hint && stillsShown === 0) hint.style.display = 'none';
+      }
+
+      STILLS.forEach(function (pair) {
+        var probe = new Image();
+        probe.onload  = function () { reveal(pair[0]); stillsShown++; settle(); };
+        probe.onerror = function () { settle(); };
+        probe.src = pair[1];
+      });
+
+      var v = document.getElementById('proof-video');
+      if (!v) { settle(); }
+      else {
+        var done = false;
+        var ok   = function () { if (done) return; done = true; reveal('tile-reel'); settle(); };
+        var fail = function () { if (done) return; done = true; settle(); };
+        v.addEventListener('loadeddata', ok);
+        v.addEventListener('error', fail, true);   // capture: <source> errors bubble oddly
+        // readyState can already be past HAVE_CURRENT_DATA from cache.
+        if (v.readyState >= 2) ok();
+        // If neither event lands (no playable source at all), fail closed.
+        setTimeout(fail, 6000);
+      }
+    })();
   </script>
 
 </body>
