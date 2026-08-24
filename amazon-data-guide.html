@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How to download your Amazon order history — myshoplight</title>
-  <meta name="description" content="A free, step-by-step guide to requesting your Amazon order history from Amazon's privacy portal — what to ask for, how long it takes, and what's inside the file when it arrives." />
+  <meta name="description" content="A free, step-by-step guide to requesting your Amazon order history from Amazon's privacy portal: what to ask for, how long it takes, and what's inside the file when it arrives." />
 
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-3xuEqRnSVB3y7Mk-Amflc.js"></script>
@@ -237,6 +237,14 @@
       h2 { font-size: 24px; }
       .buy2-box { padding: 22px 18px; }
       .step { gap: 14px; }
+      /* Same nav collision fix as sales.html. */
+      .nav       { padding: 12px 14px; }
+      .nav-right { gap: 12px; }
+      .logo      { gap: 7px; }
+      .logo svg  { width: 26px; height: 26px; }
+      .wordmark  { font-size: 17px; }
+      .nav-login { font-size: 12px; }
+      .nav-cta   { font-size: 12px; padding: 8px 13px; }
     }
   </style>
 </head>
@@ -266,7 +274,7 @@
     <p class="eyebrow">Free guide</p>
     <h1>How to download your Amazon order history</h1>
     <p>Amazon will hand you every order you have ever placed, going back to the day you opened the account. It is free, it takes about four clicks, and most people have no idea it exists.</p>
-    <span class="free-badge">No purchase needed — this guide is free</span>
+    <span class="free-badge">No purchase needed. This guide is free.</span>
   </header>
 
   <!-- STEPS -->
@@ -288,7 +296,7 @@
         <div class="step">
           <div class="step-num" aria-hidden="true">2</div>
           <div>
-            <h3>Choose "Your Orders" — not "Request All Your Data"</h3>
+            <h3>Choose "Your Orders", not "Request All Your Data"</h3>
             <p>The dropdown offers a long list of categories. Pick the orders category and submit.</p>
             <p>You <em>can</em> request everything, but "all your data" pulls in your Kindle highlights, Alexa recordings, browsing history and a great deal else. It takes far longer to prepare, arrives as a much larger download, and none of the extra is used here.</p>
           </div>
@@ -301,7 +309,7 @@
             <p>Amazon sends a confirmation email within a few minutes. <strong>Your request does not start until you click the link inside it.</strong></p>
             <div class="warn">
               <p class="warn-label">Don't skip this</p>
-              <p>This is where nearly everyone gets stuck. The confirmation email looks like a receipt — as though the request is already running — so it gets skimmed and left. It isn't a receipt. It's a switch. If your data never turns up, this is almost always why: check your inbox, and check spam and promotions too.</p>
+              <p>This is where nearly everyone gets stuck. The confirmation email looks like a receipt, as though the request is already running, so it gets skimmed and left. It isn't a receipt. It's a switch. If your data never turns up, this is almost always why: check your inbox, and check spam and promotions too.</p>
             </div>
           </div>
         </div>
@@ -311,7 +319,7 @@
           <div>
             <h3>Wait for the download link, then save the file</h3>
             <p>Amazon usually takes <strong>a few hours to a day or so</strong>, though it can stretch longer if you have a decade of orders. When it is ready you get a second email with a download link.</p>
-            <p>The link expires, so download it when you see it rather than leaving it for the weekend. What lands is a <code>.zip</code> file. Save it somewhere you will find again — you do not need to unzip it to know what is inside, but you will want the CSVs out of it.</p>
+            <p>The link expires, so download it when you see it rather than leaving it for the weekend. What lands is a <code>.zip</code> file. Save it somewhere you will find again. You do not need to unzip it to know what is inside, but you will want the CSVs out of it.</p>
           </div>
         </div>
 
@@ -324,22 +332,22 @@
     <div class="container">
       <p class="section-label">What arrives</p>
       <h2>What's inside the zip</h2>
-      <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:22px;">Amazon's export is generous to the point of being confusing — you get a folder of CSVs, most of which you will never open. These are the ones that matter:</p>
+      <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:22px;">Amazon's export is generous to the point of being confusing. You get a folder of CSVs, most of which you will never open. These are the ones that matter:</p>
       <div class="files">
         <div class="file-row needed">
           <p class="file-name">Your order history <span class="file-tag">Needed</span></p>
-          <p class="file-desc">One row per item, not per order — with the date, the product title, the price, the quantity and the shipping address. This is the file that becomes your dashboard.</p>
+          <p class="file-desc">One row per item, not per order, with the date, the product title, the price, the quantity and the shipping address. This is the file that becomes your dashboard.</p>
         </div>
         <div class="file-row needed">
           <p class="file-name">Your refunds and returns <span class="file-tag">Optional</span></p>
-          <p class="file-desc">Everything you sent back. Add it and your totals become <strong>net</strong> spend rather than gross — what you actually kept, not just what you ordered. Worth including if it's there.</p>
+          <p class="file-desc">Everything you sent back. Add it and your totals become <strong>net</strong> spend rather than gross: what you actually kept, not just what you ordered. Worth including if it's there.</p>
         </div>
         <div class="file-row">
           <p class="file-name">Everything else</p>
           <p class="file-desc">Digital orders, subscriptions, gift card activity, address book exports and more. Interesting to poke at, but nothing here needs them.</p>
         </div>
       </div>
-      <p style="font-size:13px; color:var(--muted); line-height:1.65; margin-top:20px;">Amazon has renamed these files more than once and the exact wording varies by account and region — so match on what the file <em>contains</em> rather than on an exact filename. If you open one and it has a row per item with a date and a price, that's the one.</p>
+      <p style="font-size:13px; color:var(--muted); line-height:1.65; margin-top:20px;">Amazon has renamed these files more than once and the exact wording varies by account and region, so match on what the file <em>contains</em> rather than on an exact filename. If you open one and it has a row per item with a date and a price, that's the one.</p>
     </div>
   </section>
 
@@ -351,19 +359,19 @@
       <div class="faq-list">
         <div class="faq-item">
           <p class="faq-q">Is it safe to request this?</p>
-          <p class="faq-a">Yes — you are asking Amazon for a copy of your own records, which they are required to provide. It is the same right that lets you ask any company what they hold on you. Nothing changes on your account, and nobody is notified.</p>
+          <p class="faq-a">Yes. You are asking Amazon for a copy of your own records, which they are required to provide. It is the same right that lets you ask any company what they hold on you. Nothing changes on your account, and nobody is notified.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">How far back does it go?</p>
-          <p class="faq-a">Usually to the day you opened the account. People who have been on Amazon since the 2000s routinely get <strong>fifteen-plus years</strong> of orders back. That length of history is the whole reason this is interesting — one year tells you what you bought, fifteen tells you how you changed.</p>
+          <p class="faq-a">Usually to the day you opened the account. People who have been on Amazon since the 2000s routinely get <strong>fifteen-plus years</strong> of orders back. That length of history is the whole reason this is interesting: one year tells you what you bought, fifteen tells you how you changed.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">I requested it and nothing arrived.</p>
-          <p class="faq-a">Ninety percent of the time it's step 3 — the confirmation email was never clicked. Check spam and promotions. If you did confirm and it has been more than a few days, just submit the request again; there is no penalty for asking twice.</p>
+          <p class="faq-a">Ninety percent of the time it's step 3: the confirmation email was never clicked. Check spam and promotions. If you did confirm and it has been more than a few days, just submit the request again; there is no penalty for asking twice.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">Do I have to buy myshoplight to use this guide?</p>
-          <p class="faq-a">No. Downloading your Amazon data is free, it's your data, and the four steps above are the whole process. Plenty of people stop here and open the CSV in a spreadsheet — that works. myshoplight exists because a spreadsheet of 2,600 rows with titles like "Amazon Brand - Mama Bear Gentle Fragrance-Free Wipes, 6 Packs" is not the same thing as knowing where your money went.</p>
+          <p class="faq-a">No. Downloading your Amazon data is free, it's your data, and the four steps above are the whole process. Plenty of people stop here and open the CSV in a spreadsheet, and that works. myshoplight exists because a spreadsheet of 2,600 rows with titles like "Amazon Brand - Mama Bear Gentle Fragrance-Free Wipes, 6 Packs" is not the same thing as knowing where your money went.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">What does myshoplight actually do with it?</p>
