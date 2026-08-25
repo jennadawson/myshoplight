@@ -638,6 +638,11 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
     </button>
 
     <div class="menu-section-label">Help &amp; info</div>
+    <!-- Revealed by probeHelpClips() only when at least one tutorial file is actually present. -->
+    <button class="menu-item" id="menu-help-videos" onclick="openHelpVideos()" style="display:none">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>
+      Help &amp; tutorials
+    </button>
     <button class="menu-item" onclick="openMenuPage('how-to-use')">
       <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 2-2.5 4M12 17h.01"/></svg>
       How to use this
@@ -776,6 +781,56 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div class="fb-success-title">Got it — thank you</div>
       <div class="fb-success-sub">Every note gets read. If you left your email, we'll reach out when it makes sense.</div>
       <button class="fb-btn" type="button" onclick="closeFeedback()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── HELP & TUTORIALS (VIDEO LIBRARY) ────────────────────────────────────── -->
+<style>
+  .hv-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1.5rem;background:rgba(13,92,92,.28);}
+  .hv-modal.open{display:flex;}
+  .hv-card{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(13,92,92,.18);padding:2rem 2rem 1.75rem;position:relative;}
+  .hv-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:4px;z-index:1;}
+  .hv-close:hover{color:var(--text);}
+  .hv-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--teal);margin-bottom:4px;padding-right:1.75rem;}
+  .hv-sub{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:1.25rem;}
+  .hv-list{display:flex;flex-direction:column;gap:10px;}
+  .hv-item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--cream2);border-radius:12px;padding:10px;cursor:pointer;text-align:left;width:100%;font-family:'Source Sans 3',sans-serif;transition:border-color .15s;}
+  .hv-item:hover{border-color:var(--teal);}
+  .hv-thumb{width:132px;height:74px;flex-shrink:0;border-radius:8px;background:var(--cream);object-fit:cover;display:block;}
+  .hv-item-body{flex:1;min-width:0;}
+  .hv-item-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--teal);margin-bottom:3px;}
+  .hv-item-desc{font-size:13px;color:var(--muted);line-height:1.5;}
+  .hv-dur{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.03em;margin-top:5px;}
+  .hv-back{background:transparent;border:none;color:var(--teal);font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:12px;display:inline-flex;align-items:center;gap:5px;}
+  .hv-back:hover{text-decoration:underline;}
+  .hv-player{width:100%;border-radius:10px;background:#000;display:block;aspect-ratio:16/9;}
+  .hv-empty{font-size:14px;color:var(--muted);line-height:1.6;}
+  /* Contextual "How this works" pointer */
+  .hv-link{display:none;align-items:center;gap:5px;background:transparent;border:none;color:var(--teal);font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:600;cursor:pointer;padding:0;margin:0;}
+  .hv-link.on{display:inline-flex;}
+  .hv-link:hover{text-decoration:underline;}
+  @media(max-width:560px){
+    .hv-card{padding:1.5rem 1.25rem 1.25rem;}
+    .hv-item{flex-direction:column;align-items:stretch;gap:10px;}
+    .hv-thumb{width:100%;height:auto;aspect-ratio:16/9;}
+  }
+</style>
+<div class="hv-modal" id="hv-modal" onclick="if(event.target===this)closeHelpVideos()">
+  <div class="hv-card" role="dialog" aria-modal="true" aria-labelledby="hv-title">
+    <button class="hv-close" onclick="closeHelpVideos()" aria-label="Close">&times;</button>
+    <!-- LIST VIEW -->
+    <div id="hv-list-view">
+      <div class="hv-title" id="hv-title">Help &amp; tutorials</div>
+      <div class="hv-sub">Short walkthroughs of the parts people ask about most. Nothing loads until you press play.</div>
+      <div class="hv-list" id="hv-list"></div>
+    </div>
+    <!-- PLAYER VIEW -->
+    <div id="hv-player-view" style="display:none">
+      <button class="hv-back" onclick="hvShowList()">&larr; All tutorials</button>
+      <div class="hv-title" id="hv-player-title" style="font-size:20px;margin-bottom:10px;"></div>
+      <video class="hv-player" id="hv-player" controls preload="none" playsinline></video>
+      <div class="hv-sub" id="hv-player-desc" style="margin:10px 0 0;"></div>
     </div>
   </div>
 </div>
@@ -1114,6 +1169,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div style="margin-bottom:1.5rem;">
         <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--teal);margin-bottom:6px;">Item Manager</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.6;">Review and improve your spending data. Pick a task below to get started.</div>
+        <button class="hv-link" id="hv-link-manager" onclick="openHelpVideo('assign')" style="margin-top:7px;">&#9654; How this works</button>
       </div>
 
       <!-- Gifts note -->
@@ -1301,6 +1357,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
         <div>
           <div style="font-family:'Playfair Display',serif;font-size:19px;color:var(--teal);margin-bottom:4px;">Returns Manager</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.5;max-width:560px;">Returned items are excluded from your dashboard so your numbers reflect what you actually spent. Review and resolve any items below where we couldn't auto-match a refund.</div>
+          <button class="hv-link" id="hv-link-returns" onclick="openHelpVideo('returns')" style="margin-top:7px;">&#9654; How this works</button>
         </div>
         <div id="returns-summary" style="text-align:right;font-size:12px;color:var(--text);line-height:1.7;"></div>
       </div>
@@ -1334,6 +1391,7 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
       <div>
         <div class="cm-title">Category Map</div>
         <div class="cm-sub"><span id="cm-builtin-count">2,210</span> built-in keyword rules are always active. Add your own rules below to improve categorization for items specific to your household. Your additions are saved to your browser automatically.</div>
+        <button class="hv-link" id="hv-link-catmap" onclick="openHelpVideo('categorymap')" style="margin-top:7px;">&#9654; How this works</button>
       </div>
       <div class="cm-actions"></div>
     </div>
@@ -2394,6 +2452,173 @@ function openMenuPage(page){
 function closeMenuPage(){
   document.getElementById('hi-modal').classList.remove('open');
 }
+
+// ── HELP & TUTORIALS (VIDEO LIBRARY) ───────────────────────────────────────
+// Registry-driven and self-hiding, same discipline as the sales page proof section:
+// a clip whose file is not present in assets/ simply does not appear, so clips can
+// ship one at a time and a half-uploaded assets/ folder degrades to a shorter list
+// rather than a broken player.
+//
+// Nothing here touches first paint. The only network on load is a handful of HEAD
+// requests (no body) fired on idle; video bytes are fetched only when a clip is opened.
+const HELP_CLIPS = [
+  { id:'assign',      file:'assets/help-assign.mp4',      poster:'assets/help-assign-poster.jpg',
+    title:'Assign and categorize items', duration:'4:24',
+    desc:'Working through uncategorized items and getting everything into the right place.' },
+  { id:'review',      file:'assets/help-review.mp4',      poster:'assets/help-review-poster.jpg',
+    title:'Review and reassign with confidence', duration:'2:23',
+    desc:'Paging through everything you bought and fixing what landed in the wrong category.' },
+  { id:'returns',     file:'assets/help-returns.mp4',     poster:'assets/help-returns-poster.jpg',
+    title:'Returns Manager', duration:'2:49',
+    desc:'Matching refunds to items so your dashboard reflects what you actually spent.' },
+  { id:'categorymap', file:'assets/help-categorymap.mp4', poster:'assets/help-categorymap-poster.jpg',
+    title:'Category Map and keywords', duration:'3:36',
+    desc:'The rulebook behind the sorting, and how to tune it for your household.' }
+];
+
+// Contextual "▶ How this works" pointers: element id → clip id.
+const HELP_CLIP_ANCHORS = {
+  'hv-link-manager': 'assign',
+  'hv-link-returns': 'returns',
+  'hv-link-catmap':  'categorymap'
+};
+
+let hvAvailable = null;   // Set of clip ids confirmed present; null until probed.
+let hvProbing   = false;
+
+// HEAD-probe each clip once. A missing file 404s and that clip stays hidden.
+// Any failure at all leaves the library hidden, which is exactly today's behaviour.
+async function probeHelpClips(){
+  if(hvAvailable !== null || hvProbing) return;
+  hvProbing = true;
+  const found = new Set();
+  try{
+    await Promise.all(HELP_CLIPS.map(async c => {
+      try{
+        const r = await fetch(c.file, { method:'HEAD', cache:'no-store' });
+        if(r && r.ok) found.add(c.id);
+      }catch(e){ /* clip absent or unreachable — stays hidden */ }
+    }));
+  }catch(e){ /* never let this break the app */ }
+  hvAvailable = found;
+  hvProbing = false;
+  try{ revealHelpEntryPoints(); }catch(e){}
+}
+
+function revealHelpEntryPoints(){
+  const any = hvAvailable && hvAvailable.size > 0;
+  const menuBtn = document.getElementById('menu-help-videos');
+  if(menuBtn) menuBtn.style.display = any ? '' : 'none';
+  Object.keys(HELP_CLIP_ANCHORS).forEach(elId => {
+    const el = document.getElementById(elId);
+    if(!el) return;
+    el.classList.toggle('on', !!(hvAvailable && hvAvailable.has(HELP_CLIP_ANCHORS[elId])));
+  });
+}
+
+function hvClips(){
+  return HELP_CLIPS.filter(c => hvAvailable && hvAvailable.has(c.id));
+}
+
+function hvRenderList(){
+  const wrap = document.getElementById('hv-list');
+  if(!wrap) return;
+  const clips = hvClips();
+  if(!clips.length){
+    wrap.innerHTML = '<div class="hv-empty">No tutorials are available yet. They\'ll show up here as they\'re added.</div>';
+    return;
+  }
+  wrap.innerHTML = clips.map(c => `
+    <button class="hv-item" onclick="openHelpVideo('${c.id}')">
+      <img class="hv-thumb" src="${c.poster}" alt="" loading="lazy" onerror="this.remove()">
+      <div class="hv-item-body">
+        <div class="hv-item-title">${c.title}</div>
+        <div class="hv-item-desc">${c.desc}</div>
+        <div class="hv-dur">${c.duration}</div>
+      </div>
+    </button>`).join('');
+}
+
+function hvShowList(){
+  hvStopPlayer();
+  const l = document.getElementById('hv-list-view');
+  const p = document.getElementById('hv-player-view');
+  if(l) l.style.display = '';
+  if(p) p.style.display = 'none';
+  hvRenderList();
+}
+
+// Release the video element so a closed panel is never still downloading.
+function hvStopPlayer(){
+  const v = document.getElementById('hv-player');
+  if(!v) return;
+  try{ v.pause(); }catch(e){}
+  v.removeAttribute('src');
+  v.removeAttribute('poster');
+  try{ v.load(); }catch(e){}
+}
+
+function hvOpenModal(){
+  const m = document.getElementById('hv-modal');
+  if(!m) return;
+  m.classList.add('open');
+  const card = m.querySelector('.hv-card');
+  if(card) card.scrollTop = 0;
+}
+
+// Library front door — from the hamburger.
+async function openHelpVideos(){
+  const drawer = document.getElementById('menu-drawer');
+  if(drawer && drawer.classList.contains('open')) toggleMenu();
+  if(hvAvailable === null) await probeHelpClips();
+  hvShowList();
+  hvOpenModal();
+}
+
+// Straight to one clip — from a contextual "How this works" link.
+// Someone stuck on Returns lands on the Returns clip, not a menu of four.
+async function openHelpVideo(id){
+  const drawer = document.getElementById('menu-drawer');
+  if(drawer && drawer.classList.contains('open')) toggleMenu();
+  if(hvAvailable === null) await probeHelpClips();
+  const c = HELP_CLIPS.find(x => x.id === id);
+  if(!c || !hvAvailable || !hvAvailable.has(id)){ hvShowList(); hvOpenModal(); return; }
+  const v = document.getElementById('hv-player');
+  const t = document.getElementById('hv-player-title');
+  const d = document.getElementById('hv-player-desc');
+  if(t) t.textContent = c.title;
+  if(d) d.textContent = c.desc;
+  if(v){
+    v.setAttribute('poster', c.poster);
+    v.setAttribute('preload', 'none');
+    v.setAttribute('src', c.file);
+  }
+  const l = document.getElementById('hv-list-view');
+  const p = document.getElementById('hv-player-view');
+  if(l) l.style.display = 'none';
+  if(p) p.style.display = '';
+  hvOpenModal();
+}
+
+function closeHelpVideos(){
+  hvStopPlayer();
+  const m = document.getElementById('hv-modal');
+  if(m) m.classList.remove('open');
+}
+
+// Probe on idle — never during load, never blocking anything.
+(function scheduleHelpClipProbe(){
+  const go = () => { probeHelpClips().catch(()=>{}); };
+  if(typeof requestIdleCallback === 'function') requestIdleCallback(go, { timeout: 4000 });
+  else setTimeout(go, 2500);
+})();
+
+// Esc closes whichever help surface is open.
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  const m = document.getElementById('hv-modal');
+  if(m && m.classList.contains('open')) closeHelpVideos();
+});
 
 // ── MY ACCOUNT ─────────────────────────────────────────────────────────────
 async function openAccount(){
