@@ -2461,20 +2461,28 @@ function closeMenuPage(){
 //
 // Nothing here touches first paint. The only network on load is a handful of HEAD
 // requests (no body) fired on idle; video bytes are fetched only when a clip is opened.
+// Where the clip files actually live in the repo. Uploading a folder to GitHub keeps the
+// folder name, so the files sit one level below assets/. This constant is the single place
+// to change if they are ever moved.
+const HELP_CLIP_BASE = 'assets/myshoplight-help-clips/';
+
 const HELP_CLIPS = [
-  { id:'assign',      file:'assets/help-assign.mp4',      poster:'assets/help-assign-poster.jpg',
+  { id:'assign',      slug:'help-assign',
     title:'Assign and categorize items', duration:'4:24',
     desc:'Working through uncategorized items and getting everything into the right place.' },
-  { id:'review',      file:'assets/help-review.mp4',      poster:'assets/help-review-poster.jpg',
+  { id:'review',      slug:'help-review',
     title:'Review and reassign with confidence', duration:'2:23',
     desc:'Paging through everything you bought and fixing what landed in the wrong category.' },
-  { id:'returns',     file:'assets/help-returns.mp4',     poster:'assets/help-returns-poster.jpg',
+  { id:'returns',     slug:'help-returns',
     title:'Returns Manager', duration:'2:49',
     desc:'Matching refunds to items so your dashboard reflects what you actually spent.' },
-  { id:'categorymap', file:'assets/help-categorymap.mp4', poster:'assets/help-categorymap-poster.jpg',
+  { id:'categorymap', slug:'help-categorymap',
     title:'Category Map and keywords', duration:'3:36',
     desc:'The rulebook behind the sorting, and how to tune it for your household.' }
-];
+].map(c => Object.assign(c, {
+  file:   HELP_CLIP_BASE + c.slug + '.mp4',
+  poster: HELP_CLIP_BASE + c.slug + '-poster.jpg'
+}));
 
 // Contextual "▶ How this works" pointers: element id → clip id.
 const HELP_CLIP_ANCHORS = {
