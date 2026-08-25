@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" ry="12" fill="#0D5C5C"/>
+  <g transform="translate(8.96 5.120000000000001) scale(0.768)">
+    <polygon points="10,44 30,38 50,44 50,56 30,62 10,56" fill="#4DD4A0" fill-opacity=".18" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="10,44 30,38 50,44 30,50" fill="#4DD4A0" fill-opacity=".30" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="0" y1="40" x2="10" y2="44" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="0,36 10,40 10,44 0,40" fill="#fff" fill-opacity=".08" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="50" y1="44" x2="60" y2="40" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="50,44 60,40 60,36 50,40" fill="#fff" fill-opacity=".08" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="22,38 38,38 35,22 25,22" fill="#4DD4A0" fill-opacity=".38" stroke="none"/>
+    <circle cx="30" cy="18" r="13" fill="none" stroke="#4DD4A0" stroke-width="3.6"/>
+    <circle cx="30" cy="18" r="8.5" fill="#4DD4A0" fill-opacity=".20" stroke="#4DD4A0" stroke-width="1.8"/>
+    <line x1="40" y1="28" x2="50" y2="40" stroke="#4DD4A0" stroke-width="5.6" stroke-linecap="round"/></g>
+</svg>

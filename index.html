@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Icons + home-screen install. Absolute paths so every page resolves them the same. -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0D5C5C">
+  <meta name="apple-mobile-web-app-title" content="myshoplight">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const { createClient } = supabase;
@@ -42,7 +49,8 @@ async function syncToSupabase() {
       excludedItems: localStorage.getItem('api_excluded_items'),
       catStructure: localStorage.getItem('api_cat_structure'),
       catStypes: localStorage.getItem('api_cat_stypes'),
-      ruleOverrides: localStorage.getItem('api_rule_overrides')
+      ruleOverrides: localStorage.getItem('api_rule_overrides'),
+      rulesetVersion: localStorage.getItem('api_ruleset_version')
     };
 
     const _ts = new Date().toISOString();
@@ -100,6 +108,7 @@ async function loadFromSupabase() {
       if (c.catStructure) localStorage.setItem('api_cat_structure', c.catStructure);
       if (c.catStypes) localStorage.setItem('api_cat_stypes', c.catStypes);
       if (c.ruleOverrides) localStorage.setItem('api_rule_overrides', c.ruleOverrides);
+      if (c.rulesetVersion) localStorage.setItem('api_ruleset_version', c.rulesetVersion);
     }
     return !!data.sessions_data;
   } catch(e) {
@@ -543,6 +552,18 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 .next-steps-text strong{color:var(--text);}
 .next-steps-dismiss{font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;opacity:.7;}
 .next-steps-dismiss:hover{opacity:1;color:var(--rust);}
+
+/* ── RULESET-UPDATE BANNER ── */
+.rv-banner{background:#fff;border:1px solid var(--cream2);border-left:3px solid var(--terra);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.rv-banner-text{font-size:13px;color:var(--text);line-height:1.6;flex:1;min-width:240px;}
+.rv-banner-text strong{color:var(--teal);}
+.rv-banner-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.rv-banner-dismiss{font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;opacity:.7;}
+.rv-banner-dismiss:hover{opacity:1;color:var(--rust);}
+@media(max-width:540px){
+  .rv-banner{padding:1rem;}
+  .rv-banner-actions{width:100%;justify-content:space-between;}
+}
 
 /* ── INSIGHT STRIP ── */
 .insight-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:1.25rem;}
@@ -1033,6 +1054,21 @@ table.dt tr.sub-row:last-child td{border-bottom:none;}
 
   <!-- DASHBOARD TAB -->
   <div id="tab-dashboard" style="display:none">
+    <!-- Ruleset-update banner: shown when this account's stored data was categorized
+         under an older ruleset than the one now shipping. Dismiss lasts the session. -->
+    <div id="ruleset-banner" class="rv-banner" style="display:none">
+      <div class="rv-banner-text">
+        <strong>The sorting rules have been updated.</strong>
+        We add keywords, categories and subcategories regularly &mdash; sometimes from our own passes, often
+        because someone told us an item landed in the wrong place. Your items were sorted under an earlier
+        version. Re-run to pick up the latest. Anything you've adjusted by hand stays exactly as you set it.
+      </div>
+      <div class="rv-banner-actions">
+        <button class="btn sm teal" id="rv-rerun-btn" onclick="rulesetBannerRerun()">&#8634; Re-run rules</button>
+        <span class="rv-banner-dismiss" onclick="dismissRulesetBanner()">&#10005; Not now</span>
+      </div>
+    </div>
+
     <!-- Next-steps callout (shown after first upload, dismissed by user) -->
     <div id="next-steps-callout" class="next-steps" style="display:none">
       <div class="next-steps-text" id="next-steps-text"></div>
@@ -1541,6 +1577,19 @@ const STORAGE_KEY_SESSIONS  = 'api_sessions_v2';    // persisted session data
 const STORAGE_KEY_EXCLUDED  = 'api_excluded_items'; // Set of overrideKey'd titles
 const STORAGE_KEY_STYPE_OV  = 'api_stype_overrides'; // {titleKey -> spendType}
 const STORAGE_KEY_RULE_OV   = 'api_rule_overrides'; // {keyword -> {cat, sub}} — moved keyword rules
+
+// ── RULESET VERSIONING ──────────────────────────────────────────────────────
+// Items are categorized at UPLOAD time and the result is stored, so a user who
+// uploaded under an older ruleset keeps those labels until rules are re-run.
+// That is the stale-label bug: their dashboard is wrong and nothing tells them.
+//
+// BUMP THIS whenever a taxonomy or rule change should prompt existing users to
+// re-run. It is the only edit required — everything else reads from here.
+// Do NOT derive it from categoryRules.length: swapping one rule for another
+// leaves the count identical and the bump would be silently missed.
+const RULESET_VERSION = 1;
+const STORAGE_KEY_RULESET_VER = 'api_ruleset_version';
+const SESSION_KEY_RV_DISMISSED = 'api_rv_banner_dismissed'; // per-session only
 const STORAGE_KEY_RETURNS   = 'api_returns'; // returns session state (refund map, review queue, totals)
 const ANTHROPIC_API_KEY = ''; // Leave blank — users enter their own, or omit for keyword-only mode
 
@@ -2204,6 +2253,70 @@ function saveSessionData(){
   // return-manager resolutions — lived only in localStorage, so a reload's
   // loadFromSupabase would overwrite them with the stale server copy and lose them.
   syncCustomizationsToSupabase();
+}
+
+// ── RULESET VERSIONING ──────────────────────────────────────────────────────
+// Deliberately NOT stamped by saveSessionData(). The stamp means "these labels
+// were produced by this ruleset", so it is written only where that is true:
+// after a categorization run, and once for legacy data that predates versioning.
+// Stamping on every save would let a returning user silently clear the banner
+// just by editing one item, without ever re-running.
+
+function stampRulesetVersion(){
+  try{ localStorage.setItem(STORAGE_KEY_RULESET_VER, String(RULESET_VERSION)); }catch(e){}
+}
+
+// null = never stamped (data predates versioning); otherwise the stored number.
+function storedRulesetVersion(){
+  try{
+    const v = localStorage.getItem(STORAGE_KEY_RULESET_VER);
+    if(v==null || v==='') return null;
+    const n = parseInt(v,10);
+    return isNaN(n) ? 0 : n;
+  }catch(e){ return null; }
+}
+
+function rulesetIsStale(){
+  const v = storedRulesetVersion();
+  return v !== null && v < RULESET_VERSION;
+}
+
+let _rvInitDone = false;
+
+// Called from renderDash(). First call handles legacy data; every call re-evaluates
+// whether the banner should be visible.
+function initRulesetVersion(){
+  try{
+    if(!managerItems.length) return;      // nothing categorized yet — nothing to stamp
+    if(!_rvInitDone){
+      _rvInitDone = true;
+      if(storedRulesetVersion()===null){
+        // Pre-versioning data. Stamp silently as current — no banner for existing
+        // accounts. Bumping RULESET_VERSION later is what fires the prompt.
+        stampRulesetVersion();
+        syncCustomizationsToSupabase();
+      }
+    }
+    maybeShowRulesetBanner();
+  }catch(e){ /* never let versioning break the dashboard */ }
+}
+
+function maybeShowRulesetBanner(){
+  const el = document.getElementById('ruleset-banner');
+  if(!el) return;
+  let dismissed = false;
+  try{ dismissed = sessionStorage.getItem(SESSION_KEY_RV_DISMISSED)==='1'; }catch(e){}
+  el.style.display = (managerItems.length && rulesetIsStale() && !dismissed) ? '' : 'none';
+}
+
+// Dismiss lasts this browser session only — it returns on next login until they re-run.
+function dismissRulesetBanner(){
+  try{ sessionStorage.setItem(SESSION_KEY_RV_DISMISSED,'1'); }catch(e){}
+  maybeShowRulesetBanner();
+}
+
+function rulesetBannerRerun(){
+  reRunCategorization(document.getElementById('rv-rerun-btn'));
 }
 
 function updateStorageBar(){
@@ -5226,6 +5339,7 @@ function suggestKeyword(title){
 }
 
 function renderDash(){
+  initRulesetVersion();
   updateReturnsBanner();
   const items=getFiltered();
   if(!items.length){
@@ -5803,8 +5917,13 @@ function _reRunCategorization(btn){
     if(upd){ai.cat=upd.cat;ai.subcat=upd.sub;ai.aud=upd.aud;ai.stype=upd.stype;}
   });
 
+  // These labels were just produced by the current ruleset, so the stamp is now true.
+  // This is the one place a stale account becomes current, which is why the banner
+  // cannot be cleared by any other edit.
+  stampRulesetVersion();
   saveSessionData();
   syncCustomizationsToSupabase();
+  maybeShowRulesetBanner();
   updateUncatBadge();
   renderManager();
   renderDash();
