@@ -133,7 +133,7 @@
         showError('Enter your email address first, then click Forgot password.');
         return;
       }
-      await client.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/index.html' });
+      await client.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/reset.html' });
       showError('Check your email — we sent a password reset link.');
       document.getElementById('error-msg').style.color = 'var(--teal)';
       document.getElementById('error-msg').style.background = 'var(--teal-tint)';
