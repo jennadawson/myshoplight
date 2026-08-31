@@ -575,6 +575,40 @@
     }
     .guide-link:hover { border-bottom-color: var(--teal); }
 
+    /* ── SECONDARY (FREE STEP) BUTTON ── */
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      background: transparent;
+      color: var(--teal);
+      border: 1.5px solid var(--teal);
+      padding: 13px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: var(--teal-tint); }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .btn-free-note {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+      margin: 8px 0 14px;
+    }
+
     /* ── LOADING STATE ── */
     .btn-loading { opacity: 0.7; cursor: wait; }
 
@@ -643,16 +677,19 @@
   <section class="hero">
     <div class="container">
       <p class="eyebrow">Amazon spending analysis</p>
-      <h1>$750 on Amazon.<br>But <span>what did you actually buy?</span></h1>
-      <p class="hero-sub">You know what you spent. You have no idea what you bought.</p>
-      <p class="hero-body">Your bank statement shows one number. myshoplight shows you everything behind it: every category, every pattern, broken down by what your family actually needed and what just showed up in a box.</p>
+      <h1>I bought 308 things on Amazon in 2025.<br><span>Say what?</span></h1>
+      <p class="hero-sub">I could name maybe twenty of them. That's the problem.</p>
+      <p class="hero-body">Amazon can't tell you this. Its order page gives you order totals to scroll through &mdash; not how many items you bought, not what any single one cost. myshoplight sorts every item: every category, every pattern, what your family actually needed and what just showed up in a box.</p>
 
       <div class="buy-box">
         <p class="buy-box-label">One-time purchase</p>
         <p class="buy-price"><sup>$</sup>27</p>
         <p class="tax-note">+ tax where applicable</p>
         <p class="buy-note">Yours forever. No subscription. No monthly fees.</p>
-        <button class="btn-primary" id="hero-btn" onclick="handleCheckout('hero')">Reveal my spending habits</button>
+        <p class="step-label">Two steps. The first one's free.</p>
+        <a class="btn-secondary" href="amazon-data-guide.html" onclick="plausibleGuide('hero-buybox')">1. Get your Amazon file &mdash; free</a>
+        <p class="btn-free-note">Amazon takes about 24 hours to send it. Start now and it'll be waiting.</p>
+        <button class="btn-primary" id="hero-btn" onclick="handleCheckout('hero')">2. See what I actually bought &mdash; $27</button>
         <p class="secure-note">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           Secure checkout via Stripe
@@ -722,7 +759,7 @@
     <div class="container" style="text-align:center;">
       <p class="section-label">The problem</p>
       <h2 style="margin-bottom:14px;">Your bank statement gives you one number.<br>Here's everything behind it.</h2>
-      <p style="font-size:15px; color:var(--muted); line-height:1.7; max-width:560px; margin:0 auto;">Diapers, dog food, a birthday present and something you do not remember ordering all land on the same line: <strong style="color:var(--text);">Amazon — $750</strong>. Amazon sells everything, which is exactly why the charge explains nothing.</p>
+      <p style="font-size:15px; color:var(--muted); line-height:1.7; max-width:560px; margin:0 auto;">Diapers, dog food, a birthday present and something you don't remember ordering all land on the same line: <strong style="color:var(--text);">Amazon — $213.47</strong>. Amazon sells everything, which is exactly why the charge explains nothing.</p>
     </div>
   </section>
 
@@ -833,7 +870,7 @@
       <div class="founder">
         <p>I kept looking at Amazon charges and having no idea what past-me had bought. Not in a dramatic way. Just a number, every month, that explained nothing, and it was super frustrating. So I built the thing I wanted: upload the order history, sort the items, categorize purchases and show me where my money is actually going.</p>
         <p id="founder-proof">The screenshots above are my actual dashboard, with my actual numbers. Am I proud of 87 separate orders for a sports drink? Not necessarily, but it's certainly eye-opening!</p>
-        <p>Now I request my data once a quarter, upload, and watch my spending habits improve.</p>
+        <p>I didn't build it to make myself spend less &mdash; I built it so I'd stop being surprised. What you do with yours is your business. Now I request my data once a quarter, upload, and watch my spending habits improve.</p>
         <p class="sig">— Jenna, Toddler Mom and Household Manager Extraordinaire</p>
       </div>
     </div>
@@ -842,14 +879,17 @@
   <!-- SECOND BUY -->
   <section class="bg-cream buy2">
     <div class="container">
-      <h2>Ready to see what you really spend on?</h2>
+      <h2>So, what's your number?</h2>
       <p class="buy2-sub">One-time, $27. Your real data. No guesswork.</p>
       <div class="buy2-box">
         <p class="buy-box-label">One-time purchase</p>
         <p class="buy-price"><sup>$</sup>27</p>
         <p class="tax-note">+ tax where applicable</p>
         <p class="buy-note">No subscription. No monthly fees. No bank login.</p>
-        <button class="btn-primary" id="buy2-btn" onclick="handleCheckout('buy2')">Reveal my spending habits</button>
+        <p class="step-label">Two steps. The first one's free.</p>
+        <a class="btn-secondary" href="amazon-data-guide.html" onclick="plausibleGuide('buy2-buybox')">1. Get your Amazon file &mdash; free</a>
+        <p class="btn-free-note">Amazon takes about 24 hours to send it. Start now and it'll be waiting.</p>
+        <button class="btn-primary" id="buy2-btn" onclick="handleCheckout('buy2')">2. See what I actually bought &mdash; $27</button>
         <p class="secure-note" style="margin-top: 4px;">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           Secure checkout via Stripe
@@ -871,6 +911,10 @@
         <div class="faq-item">
           <p class="faq-q">Couldn't I just put my order history into ChatGPT?</p>
           <p class="faq-a">You can, and for a quick one-off question it will do a decent job. The difference is that this is a <strong>dashboard, not an answer</strong>. Your file comes back sorted the same way every time, the categories stay put so this year is comparable to last year, you can correct a category once and have it stick, and it is all still there next month without re-uploading or re-explaining. A chat gives you one reading of your data. This gives you somewhere to keep it.</p>
+        </div>
+        <div class="faq-item">
+          <p class="faq-q">Can't I just look at this in my Amazon account?</p>
+          <p class="faq-a">Not really. Amazon's order page shows you <strong>orders</strong> &mdash; one at a time, each with its own total. You can scroll back through three years of packages and still not know how many individual items you bought, what any single one of them cost, or how much of it went to the kids. There's no category view, no per-item breakdown, and no way to total any of it up. That gap is the whole reason this exists.</p>
         </div>
         <div class="faq-item">
           <p class="faq-q">How do I get my Amazon order history?</p>
