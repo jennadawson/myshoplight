@@ -160,6 +160,21 @@
     }
     .warn p { font-size: 13.5px; color: var(--text); line-height: 1.65; }
 
+    /* ── TIP (helpful heads-up, NOT a warning — teal, never rust) ── */
+    .tip {
+      background: var(--teal-tint);
+      border-left: 3px solid var(--mint);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-top: 14px;
+    }
+    .tip-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 8px;
+    }
+    .tip p { font-size: 13.5px; color: var(--text); line-height: 1.65; }
+    .tip p + p { margin-top: 10px; }
+
     /* ── FILE LIST ── */
     .files { display: flex; flex-direction: column; gap: 12px; }
     .file-row {
@@ -171,6 +186,39 @@
     }
     .file-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .file-row.needed { background: var(--teal-tint); border-color: rgba(13,92,92,0.2); }
+    /* ── FILE TREE ── */
+    .tree-wrap {
+      background: #fff; border: 1px solid var(--cream2);
+      border-radius: 12px; padding: 20px 18px; margin-top: 22px;
+      overflow-x: auto;
+    }
+    .tree-cap {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+    }
+    .tree { list-style: none; font-size: 13.5px; line-height: 1.5; white-space: nowrap; }
+    .tree ul { list-style: none; margin-left: 18px; }
+    .tree li { padding: 3px 0; }
+    .tree .row {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 3px 8px; border-radius: 6px;
+    }
+    .tree .ico { width: 15px; height: 15px; flex-shrink: 0; }
+    .tree .folder .ico { stroke: var(--teal); fill: none; stroke-width: 1.7; }
+    .tree .file   .ico { stroke: var(--muted); fill: none; stroke-width: 1.5; }
+    .tree .folder { font-weight: 600; color: var(--text); }
+    .tree .file   { color: var(--muted); }
+    .tree .row.hit        { background: var(--teal-tint); color: var(--teal); font-weight: 600; }
+    .tree .row.hit .ico   { stroke: var(--teal); stroke-width: 1.8; }
+    .tree .row.hit.opt    { background: var(--terra-tint); color: #8A3A10; }
+    .tree .row.hit.opt .ico { stroke: #8A3A10; }
+    .tree-tag {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #fff; background: var(--teal);
+      border-radius: 9px; padding: 1px 7px; margin-left: 4px;
+    }
+    .tree-tag.opt { background: var(--terra); color: #5c2a0c; }
+
     .file-tag {
       display: inline-block; font-size: 10px; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
@@ -299,7 +347,7 @@
           <div class="step-num" aria-hidden="true">1</div>
           <div>
             <h3>Go to Amazon's data request page</h3>
-            <p>Sign in to Amazon, then open <strong>Account &amp; Lists → Your Account → Data and Privacy</strong>, and look for <strong>Request Your Information</strong>. If you would rather go straight there, it lives at <code>amazon.com/hz/privacy-central/data-requests/preview.html</code>.</p>
+            <p>Sign in to Amazon, then open <strong>Account &amp; Lists → Your Account → Data and Privacy</strong>, and look for <strong>Request Your Information</strong>. If you would rather go straight there, it lives at <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" rel="noopener"><code>amazon.com/hz/privacy-central/data-requests/preview.html</code></a>.</p>
             <p>Do this on a computer if you can. The page exists on mobile, but the menus are buried several taps deeper.</p>
           </div>
         </div>
@@ -331,6 +379,10 @@
             <h3>Wait for the download link, then save the file</h3>
             <p>Amazon usually takes <strong>a few hours to a day or so</strong>, though it can stretch longer if you have a decade of orders. When it is ready you get a second email with a download link.</p>
             <p>The link expires, so download it when you see it rather than leaving it for the weekend. What lands is a <code>.zip</code> file. Save it somewhere you will find again. You do not need to unzip it to know what is inside, but you will want the CSVs out of it.</p>
+            <div class="tip">
+              <p class="tip-label">Bookmark this page before you go</p>
+              <p>The email you're waiting for comes from Amazon, and it won't mention myshoplight at all. When the file lands, this page is the easiest way back &mdash; or just remember <strong>myshoplight.com</strong>.</p>
+            </div>
           </div>
         </div>
 
@@ -346,11 +398,11 @@
       <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:22px;">Amazon's export is generous to the point of being confusing. You get a folder of CSVs, most of which you will never open. These are the ones that matter:</p>
       <div class="files">
         <div class="file-row needed">
-          <p class="file-name">Your order history <span class="file-tag">Needed</span></p>
+          <p class="file-name">Order History.csv <span class="file-tag">Needed</span></p>
           <p class="file-desc">One row per item, not per order, with the date, the product title, the price, the quantity and the shipping address. This is the file that becomes your dashboard.</p>
         </div>
         <div class="file-row needed">
-          <p class="file-name">Your refunds and returns <span class="file-tag">Optional</span></p>
+          <p class="file-name">Refund Details.csv <span class="file-tag">Optional</span></p>
           <p class="file-desc">Everything you sent back. Add it and your totals become <strong>net</strong> spend rather than gross: what you actually kept, not just what you ordered. Worth including if it's there.</p>
         </div>
         <div class="file-row">
@@ -358,7 +410,42 @@
           <p class="file-desc">Digital orders, subscriptions, gift card activity, address book exports and more. Interesting to poke at, but nothing here needs them.</p>
         </div>
       </div>
+
+      <div class="tree-wrap">
+        <p class="tree-cap">What the unzipped folder looks like</p>
+        <ul class="tree">
+          <li><span class="row folder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Your Orders</span>
+            <ul>
+              <li><span class="row folder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Additional Data</span></li>
+              <li><span class="row folder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Your Amazon Orders</span>
+                <ul>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Cart History.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Delivery Photos.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Digital Borrowed Items.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Digital Content Orders.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Digital Returns.csv</span></li>
+                  <li><span class="row folder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Media</span></li>
+                  <li><span class="row file hit"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Order History.csv<span class="tree-tag">Needed</span></span></li>
+                </ul>
+              </li>
+              <li><span class="row folder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Your Returns &amp; Refunds</span>
+                <ul>
+                  <li><span class="row file hit opt"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Refund Details.csv<span class="tree-tag opt">Optional</span></span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Replacement Orders.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Return Requests.csv</span></li>
+                  <li><span class="row file"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/></svg>Returns Status.csv</span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
       <p style="font-size:13px; color:var(--muted); line-height:1.65; margin-top:20px;">Amazon has renamed these files more than once and the exact wording varies by account and region, so match on what the file <em>contains</em> rather than on an exact filename. If you open one and it has a row per item with a date and a price, that's the one.</p>
+      <div class="tip" style="margin-top:22px;">
+        <p class="tip-label">Fair warning about that first file</p>
+        <p>It's a few thousand rows of spreadsheet, with columns named things like <code>ASIN</code> and product titles that run ninety characters long. Every order you have ever placed, in the least readable format imaginable.</p>
+        <p>Opening it is the moment most people understand why I built this. It's genuinely all in there &mdash; it just isn't anything you can read yet.</p>
+      </div>
     </div>
   </section>
 
@@ -402,7 +489,7 @@
         <p class="buy-price"><sup>$</sup>27</p>
         <p class="tax-note">+ tax where applicable</p>
         <p class="buy-note">No subscription. No monthly fees. No bank login.</p>
-        <button class="btn-primary" id="guide-btn" onclick="handleCheckout('guide-footer')">Reveal my spending habits</button>
+        <button class="btn-primary" id="guide-btn" onclick="handleCheckout('guide-footer')">See what I actually bought &mdash; $27</button>
         <p class="secure-note">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           Secure checkout via Stripe
